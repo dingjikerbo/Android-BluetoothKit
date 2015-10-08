@@ -2,6 +2,7 @@
 Android蓝牙通用框架，包括BLE及经典蓝牙扫描，广播解析，蓝牙连接等
 
 一、蓝牙扫描
+
 可设置一系列经典和BLE的扫描组合，配置扫描时长。
 ```Java
 BluetoothSearchRequest request = new BluetoothSearchRequest.Builder()
