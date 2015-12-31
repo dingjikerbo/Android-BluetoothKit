@@ -90,7 +90,7 @@ BLEConnectManager.write(mDeviceMac, serviceUUID, characterUUID, bytes, new BleWr
 });
 ```
 
-四、通知
+四、打开通知
 ----
 
 ```
@@ -136,37 +136,37 @@ LocalBroadcastManager.getInstance(context).registerReceiver(mReceiver, filter);
 
 private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null) {
-				return;
-			}
-
-			String mac = intent
-					.getStringExtra(XmBluetoothManager.KEY_DEVICE_ADDRESS);
-
-			String action = intent.getAction();
-
-			if (XmBluetoothManager.ACTION_CHARACTER_CHANGED
-					.equalsIgnoreCase(action)) {
-				UUID service = (UUID) intent
-						.getSerializableExtra(XmBluetoothManager.KEY_SERVICE_UUID);
-				UUID character = (UUID) intent
-						.getSerializableExtra(XmBluetoothManager.KEY_CHARACTER_UUID);
-				byte[] value = intent
-						.getByteArrayExtra(XmBluetoothManager.KEY_CHARACTER_VALUE);
-
-				if (service != null && character != null) {
-					processNotify(service, character, value);
-				}
-			} else if (XmBluetoothManager.ACTION_CONNECT_STATUS_CHANGED
-					.equalsIgnoreCase(action)) {
-				int status = intent.getIntExtra(
-						XmBluetoothManager.KEY_CONNECT_STATUS,
-						XmBluetoothManager.STATUS_UNKNOWN);
-				processConnectStatusChanged(status);
-			}
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		if (intent == null) {
+			return;
 		}
-	};
+
+		String mac = intent
+				.getStringExtra(XmBluetoothManager.KEY_DEVICE_ADDRESS);
+
+		String action = intent.getAction();
+
+		if (XmBluetoothManager.ACTION_CHARACTER_CHANGED
+				.equalsIgnoreCase(action)) {
+			UUID service = (UUID) intent
+					.getSerializableExtra(XmBluetoothManager.KEY_SERVICE_UUID);
+			UUID character = (UUID) intent
+					.getSerializableExtra(XmBluetoothManager.KEY_CHARACTER_UUID);
+			byte[] value = intent
+					.getByteArrayExtra(XmBluetoothManager.KEY_CHARACTER_VALUE);
+
+			if (service != null && character != null) {
+				processNotify(service, character, value);
+			}
+		} else if (XmBluetoothManager.ACTION_CONNECT_STATUS_CHANGED
+				.equalsIgnoreCase(action)) {
+			int status = intent.getIntExtra(
+					XmBluetoothManager.KEY_CONNECT_STATUS,
+					XmBluetoothManager.STATUS_UNKNOWN);
+			processConnectStatusChanged(status);
+		}
+	}
+};
 ```
 
