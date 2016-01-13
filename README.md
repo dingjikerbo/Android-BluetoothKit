@@ -1,5 +1,19 @@
 # BluetoothCommon
 
+首先要在Application的onCreate中初始化BluetoothManager.
+
+```
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        BluetoothManager.init(this);
+    }
+}
+```
+
 一、蓝牙扫描
 ------
 
