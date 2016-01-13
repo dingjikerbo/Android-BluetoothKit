@@ -9,13 +9,17 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.xiaomi.smarthome.bluetooth.Response;
-import com.xiaomi.smarthome.device.bluetooth.connect.BLEConnectManager;
-import com.xiaomi.smarthome.device.bluetooth.connect.request.Code;
-import com.xiaomi.smarthome.device.bluetooth.utils.BluetoothConstants;
-import com.xiaomi.smarthome.device.bluetooth.utils.BluetoothLog;
-import com.xiaomi.smarthome.device.bluetooth.utils.BluetoothUtils;
-import com.xiaomi.smarthome.device.bluetooth.utils.ByteUtils;
+import com.dingjikerbo.bluetooth.library.connect.BLEConnectManager;
+import com.dingjikerbo.bluetooth.library.connect.request.Code;
+import com.dingjikerbo.bluetooth.library.connect.response.BleConnectResponse;
+import com.dingjikerbo.bluetooth.library.connect.response.BleNotifyResponse;
+import com.dingjikerbo.bluetooth.library.connect.response.BleResponse;
+import com.dingjikerbo.bluetooth.library.connect.response.BleWriteResponse;
+import com.dingjikerbo.bluetooth.library.security.BLECipher;
+import com.dingjikerbo.bluetooth.library.utils.BluetoothConstants;
+import com.dingjikerbo.bluetooth.library.utils.BluetoothLog;
+import com.dingjikerbo.bluetooth.library.utils.BluetoothUtils;
+import com.dingjikerbo.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
 
@@ -50,7 +54,7 @@ public class BleSecurityRegister {
         BLEConnectManager.connect(mDeviceMac, mBleConnectResponse);
     }
 
-    private final Response.BleConnectResponse mBleConnectResponse = new Response.BleConnectResponse() {
+    private final BleConnectResponse mBleConnectResponse = new BleConnectResponse() {
         @Override
         public void onResponse(int code, Bundle data) {
             // TODO Auto-generated method stub
@@ -80,7 +84,7 @@ public class BleSecurityRegister {
 
         BLEConnectManager.write(mDeviceMac, BluetoothConstants.MISERVICE,
                 BluetoothConstants.CHARACTER_EVENT,
-                ByteUtils.fromInt(SESSION_START), new Response.BleWriteResponse() {
+                ByteUtils.fromInt(SESSION_START), new BleWriteResponse() {
 
                     @Override
                     public void onResponse(int code, Void data) {
@@ -111,7 +115,7 @@ public class BleSecurityRegister {
         registerBleNotifyReceiver();
     }
 
-    private final Response.BleNotifyResponse mBleNotifyResponse = new Response.BleNotifyResponse() {
+    private final BleNotifyResponse mBleNotifyResponse = new BleNotifyResponse() {
         @Override
         public void onResponse(int code, Void data) {
             // TODO Auto-generated method stub
@@ -162,7 +166,7 @@ public class BleSecurityRegister {
         byte[] t1 = BLECipher.encrypt(key1, mToken);
 
         BLEConnectManager.write(mDeviceMac, BluetoothConstants.MISERVICE,
-                BluetoothConstants.CHARACTER_TOKEN, t1, new Response.BleWriteResponse() {
+                BluetoothConstants.CHARACTER_TOKEN, t1, new BleWriteResponse() {
 
                     @Override
                     public void onResponse(int code, Void data) {
@@ -198,7 +202,7 @@ public class BleSecurityRegister {
 
         BLEConnectManager.write(mDeviceMac, BluetoothConstants.MISERVICE,
                 BluetoothConstants.CHARACTER_TOKEN, bytes,
-                new Response.BleWriteResponse() {
+                new BleWriteResponse() {
 
                     @Override
                     public void onResponse(int code, Void data) {
@@ -230,7 +234,7 @@ public class BleSecurityRegister {
 
     };
 
-    public interface BleRegisterResponse extends Response.BleResponse<byte[]> {
+    public interface BleRegisterResponse extends BleResponse<byte[]> {
 
     };
 

@@ -156,4 +156,11 @@ public class BluetoothUtils extends BaseManager {
         }
         return "unknown";
     }
+
+    public static byte[] generateToken() {
+        long now = System.currentTimeMillis();
+        double rand = RandomUtils.randFloat();
+        String original = String.format("token.%d.%f", now, rand);
+        return MD5Utils.MD5_12(original);
+    }
 }

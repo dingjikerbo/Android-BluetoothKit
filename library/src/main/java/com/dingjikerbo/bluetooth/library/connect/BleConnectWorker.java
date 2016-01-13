@@ -63,187 +63,6 @@ public class BleConnectWorker {
     private int mConnectStatus;
 
     private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
-    private final BluetoothGattCallback mConnectCallback = new BluetoothGattCallback() {
-
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status,
-                                            int newState) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onConnectionStateChange: status = %d, newState = %d",
-                    status, newState));
-
-            if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
-                setConnectStatus(BluetoothConstants.STATUS_DEVICE_CONNECTED);
-                gatt.discoverServices();
-            } else if (isGattErrorOrFailure(status)) {
-                processGattFailed();
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                processDisconnected();
-            } else {
-                /**
-                 * 什么也不做
-                 */
-                BluetoothLog.w(">>> strange state");
-            }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d("onServicesDiscovered " + status);
-
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                processServiceReady();
-            } else {
-                processGattFailed();
-            }
-
-        }
-
-        private boolean isGattErrorOrFailure(int status) {
-            return status == BluetoothGatt.GATT_FAILURE || status == BluetoothConstants.GATT_ERROR;
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic, int status) {
-            // TODO Auto-generated method stub
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (mCurrentRequest != null && mCurrentRequest instanceof BleReadRequest) {
-                    mCurrentRequest.putExtra(BluetoothConstants.KEY_BYTES, characteristic.getValue());
-                    dispatchRequestResult(BluetoothConstants.SUCCESS);
-                } else {
-                    BluetoothLog.w("onCharacteristicRead: current request invalid");
-                }
-
-            } else if (isGattErrorOrFailure(status)) {
-                processGattFailed();
-            } else {
-                dispatchRequestResult(BluetoothConstants.FAILED);
-            }
-        }
-
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          BluetoothGattCharacteristic characteristic, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onCharacteristicWrite %s, status = %d",
-                    characteristic.getUuid(), status));
-
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (mCurrentRequest != null && mCurrentRequest instanceof BleWriteRequest) {
-                    mCurrentRequest.putExtra(BluetoothConstants.KEY_BYTES, characteristic.getValue());
-                    dispatchRequestResult(BluetoothConstants.SUCCESS);
-                } else {
-                    BluetoothLog.w("current request unknown");
-                }
-
-            } else if (isGattErrorOrFailure(status)) {
-                processGattFailed();
-            } else {
-                dispatchRequestResult(BluetoothConstants.FAILED);
-            }
-        }
-
-        private void broadcastCharacterChanged(UUID service, UUID character,
-                                               byte[] value) {
-            Intent intent = new Intent(
-                    BluetoothConstants.ACTION_CHARACTER_CHANGED);
-            intent.putExtra(BluetoothConstants.KEY_DEVICE_ADDRESS,
-                    mBluetoothDevice.getAddress());
-            intent.putExtra(BluetoothConstants.KEY_SERVICE_UUID, service);
-            intent.putExtra(BluetoothConstants.KEY_CHARACTER_UUID, character);
-            intent.putExtra(BluetoothConstants.KEY_CHARACTER_VALUE, value);
-            LocalBroadcastManager.getInstance(BluetoothManager.getContext()).sendBroadcast(
-                    intent);
-
-            BluetoothLog
-                    .d(String
-                            .format("broadcastCharacterChanged for %s\n>>> service = %s\n>>> character = %s\n>>> value = %s",
-                                    mBluetoothDevice.getAddress(), service,
-                                    character, ByteUtils.byteToString(value)));
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt,
-                                            BluetoothGattCharacteristic characteristic) {
-            // TODO Auto-generated method stub
-            byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
-
-            BluetoothLog
-                    .d(String
-                            .format("onCharacteristicChanged: \n>>> uuid = %s\n>>> value = (%s)",
-                                    characteristic.getUuid(),
-                                    ByteUtils.byteToString(value)));
-
-            BluetoothGattService service = characteristic.getService();
-
-            if (service != null) {
-                broadcastCharacterChanged(service.getUuid(),
-                        characteristic.getUuid(), value);
-            } else {
-                BluetoothLog.e("onCharacteristicChanged: service null");
-            }
-        }
-
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt,
-                                      BluetoothGattDescriptor descriptor, int status) {
-            // TODO Auto-generated method stub
-            BluetoothGattCharacteristic descChar = descriptor
-                    .getCharacteristic();
-
-            BluetoothLog.d(String.format("onDescriptorWrite status = %d",
-                    status));
-
-            BluetoothLog.v(String.format(
-                    ">>> character: %s\n>>> descriptor: %s", descChar.getUuid(),
-                    descriptor.getUuid()));
-
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (mCurrentRequest != null) {
-                    BluetoothGattCharacteristic character = getCharacter(mCurrentRequest);
-                    if (character != null && character == descChar) {
-                        if (mCurrentRequest instanceof BleNotifyRequest
-                                || mCurrentRequest instanceof BleUnnotifyRequest) {
-                            dispatchRequestResult(BluetoothConstants.SUCCESS);
-                        } else {
-                            BluetoothLog
-                                    .w("onDescriptorWrite illegal request");
-                        }
-                    } else {
-                        BluetoothLog
-                                .w("onDescriptorWrite illegal character");
-                    }
-                } else {
-                    BluetoothLog
-                            .e("current request null");
-                }
-            } else if (isGattErrorOrFailure(status)) {
-                processGattFailed();
-            } else {
-                dispatchRequestResult(BluetoothConstants.FAILED);
-            }
-        }
-
-        @Override
-        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-            BluetoothLog.v(String.format("onReadRemoteRssi rssi = %d, status = %d", rssi, status));
-
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (mCurrentRequest != null && mCurrentRequest instanceof BleReadRssiRequest) {
-                    mCurrentRequest.putExtra(BluetoothConstants.KEY_RSSI, rssi);
-                    dispatchRequestResult(BluetoothConstants.SUCCESS);
-                } else {
-                    BluetoothLog.e("onReadRemoteRssi: current request invalid");
-                }
-            } else {
-                BluetoothLog.w("onReadRemoteRssi failed");
-            }
-        }
-    };
 
     private BleConnectWorker(String mac, IBleRunner runner,
                              IBleDispatch dispatcher) {
@@ -350,18 +169,7 @@ public class BleConnectWorker {
                 break;
 
             case BluetoothConstants.MSG_DISCONNECTED:
-
-                /**
-                 * 连接断开了
-                 * 如果当前没有请求，则关掉gatt
-                 * 否则只是设置并广播状态
-                 */
-                if (mCurrentRequest != null) {
-                    setConnectStatus(BluetoothConstants.STATUS_DEVICE_DISCONNECTED);
-                    broadcastConnectStatus(BluetoothConstants.STATUS_DISCONNECTED);
-                } else {
-                    closeBluetoothGatt();
-                }
+                closeBluetoothGatt();
 
                 break;
         }
@@ -373,7 +181,7 @@ public class BleConnectWorker {
         setConnectStatus(BluetoothConstants.STATUS_DEVICE_SERVICE_READY);
         broadcastConnectStatus(BluetoothConstants.STATUS_CONNECTED);
 
-        refreshDeviceProfile();
+        refreshServiceProfile();
 
         if (mCurrentRequest != null && mCurrentRequest.isConnectRequest()) {
             Set<UUID> set = mDeviceProfile.keySet();
@@ -394,10 +202,10 @@ public class BleConnectWorker {
         mWorkerHandler.obtainMessage(BluetoothConstants.MSG_DISCONNECTED).sendToTarget();
     }
 
-    private void refreshDeviceProfile() {
+    private void refreshServiceProfile() {
         BluetoothLog.v("refreshDeviceProfile");
 
-        if (!isServiceReady()) {
+        if (!isServiceReady() || isServiceProfileReady()) {
             return;
         }
 
@@ -425,6 +233,10 @@ public class BleConnectWorker {
 
         mDeviceProfile.clear();
         mDeviceProfile.putAll(newProfiles);
+    }
+
+    private boolean isServiceProfileReady() {
+        return !mDeviceProfile.isEmpty();
     }
 
     private BluetoothGattCharacteristic getCharacter(UUID serviceId,
@@ -716,6 +528,8 @@ public class BleConnectWorker {
             mBluetoothGatt.close();
             mBluetoothGatt = null;
 
+            mDeviceProfile.clear();
+
             /**
              * 假如建立连接后discoverService等待回调时超时了，则状态是connected，
              * 但是会closeGatt，所以这里应该重置状态
@@ -760,4 +574,192 @@ public class BleConnectWorker {
     private void notifyWorkerResult(boolean result) {
         mBleDispatcher.notifyWorkerResult(result);
     }
+
+    private final BluetoothGattCallback mConnectCallback = new BluetoothGattCallback() {
+
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status,
+                                            int newState) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d(String.format(
+                    "onConnectionStateChange: status = %d, newState = %d",
+                    status, newState));
+
+            if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
+                setConnectStatus(BluetoothConstants.STATUS_DEVICE_CONNECTED);
+
+                if (isServiceProfileReady()) {
+                    processServiceReady();
+                } else {
+                    gatt.discoverServices();
+                }
+
+            } else if (isGattErrorOrFailure(status)) {
+                processGattFailed();
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                processDisconnected();
+            } else {
+                /**
+                 * 什么也不做
+                 */
+                BluetoothLog.w(">>> strange state");
+            }
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d("onServicesDiscovered " + status);
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                processServiceReady();
+            } else {
+                processGattFailed();
+            }
+
+        }
+
+        private boolean isGattErrorOrFailure(int status) {
+            return status == BluetoothGatt.GATT_FAILURE || status == BluetoothConstants.GATT_ERROR;
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt,
+                                         BluetoothGattCharacteristic characteristic, int status) {
+            // TODO Auto-generated method stub
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (mCurrentRequest != null && mCurrentRequest instanceof BleReadRequest) {
+                    mCurrentRequest.putExtra(BluetoothConstants.KEY_BYTES, characteristic.getValue());
+                    dispatchRequestResult(BluetoothConstants.SUCCESS);
+                } else {
+                    BluetoothLog.w("onCharacteristicRead: current request invalid");
+                }
+
+            } else if (isGattErrorOrFailure(status)) {
+                processGattFailed();
+            } else {
+                dispatchRequestResult(BluetoothConstants.FAILED);
+            }
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt,
+                                          BluetoothGattCharacteristic characteristic, int status) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d(String.format(
+                    "onCharacteristicWrite %s, status = %d",
+                    characteristic.getUuid(), status));
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (mCurrentRequest != null && mCurrentRequest instanceof BleWriteRequest) {
+                    mCurrentRequest.putExtra(BluetoothConstants.KEY_BYTES, characteristic.getValue());
+                    dispatchRequestResult(BluetoothConstants.SUCCESS);
+                } else {
+                    BluetoothLog.w("current request unknown");
+                }
+
+            } else if (isGattErrorOrFailure(status)) {
+                processGattFailed();
+            } else {
+                dispatchRequestResult(BluetoothConstants.FAILED);
+            }
+        }
+
+        private void broadcastCharacterChanged(UUID service, UUID character,
+                                               byte[] value) {
+            Intent intent = new Intent(
+                    BluetoothConstants.ACTION_CHARACTER_CHANGED);
+            intent.putExtra(BluetoothConstants.KEY_DEVICE_ADDRESS,
+                    mBluetoothDevice.getAddress());
+            intent.putExtra(BluetoothConstants.KEY_SERVICE_UUID, service);
+            intent.putExtra(BluetoothConstants.KEY_CHARACTER_UUID, character);
+            intent.putExtra(BluetoothConstants.KEY_CHARACTER_VALUE, value);
+            LocalBroadcastManager.getInstance(BluetoothManager.getContext()).sendBroadcast(
+                    intent);
+
+            BluetoothLog
+                    .d(String
+                            .format("broadcastCharacterChanged for %s\n>>> service = %s\n>>> character = %s\n>>> value = %s",
+                                    mBluetoothDevice.getAddress(), service,
+                                    character, ByteUtils.byteToString(value)));
+        }
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt,
+                                            BluetoothGattCharacteristic characteristic) {
+            // TODO Auto-generated method stub
+            byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
+
+            BluetoothLog
+                    .d(String
+                            .format("onCharacteristicChanged: \n>>> uuid = %s\n>>> value = (%s)",
+                                    characteristic.getUuid(),
+                                    ByteUtils.byteToString(value)));
+
+            BluetoothGattService service = characteristic.getService();
+
+            if (service != null) {
+                broadcastCharacterChanged(service.getUuid(),
+                        characteristic.getUuid(), value);
+            } else {
+                BluetoothLog.e("onCharacteristicChanged: service null");
+            }
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt,
+                                      BluetoothGattDescriptor descriptor, int status) {
+            // TODO Auto-generated method stub
+            BluetoothGattCharacteristic descChar = descriptor
+                    .getCharacteristic();
+
+            BluetoothLog.d(String.format("onDescriptorWrite status = %d",
+                    status));
+
+            BluetoothLog.v(String.format(
+                    ">>> character: %s\n>>> descriptor: %s", descChar.getUuid(),
+                    descriptor.getUuid()));
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (mCurrentRequest != null) {
+                    BluetoothGattCharacteristic character = getCharacter(mCurrentRequest);
+                    if (character != null && character == descChar) {
+                        if (mCurrentRequest instanceof BleNotifyRequest
+                                || mCurrentRequest instanceof BleUnnotifyRequest) {
+                            dispatchRequestResult(BluetoothConstants.SUCCESS);
+                        } else {
+                            BluetoothLog
+                                    .w("onDescriptorWrite illegal request");
+                        }
+                    } else {
+                        BluetoothLog
+                                .w("onDescriptorWrite illegal character");
+                    }
+                } else {
+                    BluetoothLog
+                            .e("current request null");
+                }
+            } else if (isGattErrorOrFailure(status)) {
+                processGattFailed();
+            } else {
+                dispatchRequestResult(BluetoothConstants.FAILED);
+            }
+        }
+
+        @Override
+        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+            BluetoothLog.v(String.format("onReadRemoteRssi rssi = %d, status = %d", rssi, status));
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (mCurrentRequest != null && mCurrentRequest instanceof BleReadRssiRequest) {
+                    mCurrentRequest.putExtra(BluetoothConstants.KEY_RSSI, rssi);
+                    dispatchRequestResult(BluetoothConstants.SUCCESS);
+                } else {
+                    BluetoothLog.e("onReadRemoteRssi: current request invalid");
+                }
+            } else {
+                BluetoothLog.w("onReadRemoteRssi failed");
+            }
+        }
+    };
 }

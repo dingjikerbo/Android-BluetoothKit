@@ -1,8 +1,8 @@
-package com.xiaomi.smarthome.device.bluetooth.security;
+package com.dingjikerbo.bluetooth.library.security;
 
 import android.text.TextUtils;
 
-import com.xiaomi.smarthome.device.bluetooth.utils.ByteUtils;
+import com.dingjikerbo.bluetooth.library.utils.ByteUtils;
 
 /**
  * Created by liwentian on 2016/1/8.

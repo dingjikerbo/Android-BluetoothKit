@@ -37,4 +37,39 @@ public class ByteUtils {
     public static boolean isEmpty(byte[] bytes) {
         return bytes == null || bytes.length == 0;
     }
+
+    public static byte[] fromInt(int n) {
+        byte[] bytes = new byte[4];
+
+        for (int i = 0; i < 4; i++) {
+            bytes[i] = (byte) (n >>> (i * 8));
+        }
+
+        return bytes;
+    }
+
+    public static boolean byteEquals(byte[] lbytes, byte[] rbytes) {
+        if (lbytes == null && rbytes == null) {
+            return true;
+        }
+
+        if (lbytes == null || rbytes == null) {
+            return false;
+        }
+
+        int llen = lbytes.length;
+        int rlen = rbytes.length;
+
+        if (llen != rlen) {
+            return false;
+        }
+
+        for (int i = 0; i < llen; i++) {
+            if (lbytes[i] != rbytes[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
