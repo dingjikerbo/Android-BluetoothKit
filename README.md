@@ -14,6 +14,8 @@ public class MyApplication extends Application {
 }
 ```
 
+然后导入ble_lib.jar和libblecipher.so即可，demo工程中的jniLibs下有各个平台的so。
+
 一、蓝牙扫描
 ------
 
