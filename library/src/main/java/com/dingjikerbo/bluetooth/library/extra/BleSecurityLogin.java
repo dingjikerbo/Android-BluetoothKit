@@ -1,4 +1,4 @@
-package com.dingjikerbo.bluetooth.library.security;
+package com.dingjikerbo.bluetooth.library.extra;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,13 +9,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.dingjikerbo.bluetooth.library.BaseManager;
+import com.dingjikerbo.bluetooth.library.response.BleConnectResponse;
+import com.dingjikerbo.bluetooth.library.response.BleLoginResponse;
+import com.dingjikerbo.bluetooth.library.response.BleNotifyResponse;
+import com.dingjikerbo.bluetooth.library.response.BleWriteResponse;
+import com.dingjikerbo.bluetooth.library.utils.BaseManager;
 import com.dingjikerbo.bluetooth.library.connect.BLEConnectManager;
 import com.dingjikerbo.bluetooth.library.connect.request.Code;
-import com.dingjikerbo.bluetooth.library.connect.response.BleConnectResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleNotifyResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleWriteResponse;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothConstants;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothLog;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothUtils;
@@ -229,10 +229,6 @@ public class BleSecurityLogin extends BaseManager {
         }
 
     };
-
-    public interface BleLoginResponse extends BleResponse<Void> {
-
-    }
 
     private void dispatchLoginResult(int code) {
         BluetoothLog.d("dispatchLoginResult " + Code.toString(code));

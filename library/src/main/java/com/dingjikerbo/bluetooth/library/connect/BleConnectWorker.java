@@ -16,7 +16,6 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.dingjikerbo.bluetooth.library.BluetoothManager;
-import com.dingjikerbo.bluetooth.library.WarningException;
 import com.dingjikerbo.bluetooth.library.connect.request.BleConnectRequest;
 import com.dingjikerbo.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.dingjikerbo.bluetooth.library.connect.request.BleNotifyRequest;
@@ -28,6 +27,7 @@ import com.dingjikerbo.bluetooth.library.connect.request.BleWriteRequest;
 import com.dingjikerbo.bluetooth.library.connect.request.Code;
 import com.dingjikerbo.bluetooth.library.connect.request.IBleDispatch;
 import com.dingjikerbo.bluetooth.library.connect.request.IBleRunner;
+import com.dingjikerbo.bluetooth.library.exception.WarningException;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothConstants;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothLog;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothUtils;

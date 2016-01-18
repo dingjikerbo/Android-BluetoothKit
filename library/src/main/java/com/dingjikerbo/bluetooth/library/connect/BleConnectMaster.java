@@ -7,12 +7,12 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.dingjikerbo.bluetooth.library.connect.request.IBleRunner;
-import com.dingjikerbo.bluetooth.library.connect.response.BleConnectResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleNotifyResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleReadResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleReadRssiResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleWriteResponse;
+import com.dingjikerbo.bluetooth.library.response.BleConnectResponse;
+import com.dingjikerbo.bluetooth.library.response.BleNotifyResponse;
+import com.dingjikerbo.bluetooth.library.response.BleReadResponse;
+import com.dingjikerbo.bluetooth.library.response.BleReadRssiResponse;
+import com.dingjikerbo.bluetooth.library.response.BleResponse;
+import com.dingjikerbo.bluetooth.library.response.BleWriteResponse;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothConstants;
 
 import java.util.UUID;

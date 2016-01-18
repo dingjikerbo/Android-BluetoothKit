@@ -1,4 +1,4 @@
-package com.dingjikerbo.bluetooth.library.connect.response;
+package com.dingjikerbo.bluetooth.library.response;
 
 /**
  * Created by liwentian on 2015/12/31.

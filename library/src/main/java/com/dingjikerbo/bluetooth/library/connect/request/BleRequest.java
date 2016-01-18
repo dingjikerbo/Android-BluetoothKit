@@ -3,7 +3,7 @@ package com.dingjikerbo.bluetooth.library.connect.request;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.dingjikerbo.bluetooth.library.connect.response.BleResponse;
+import com.dingjikerbo.bluetooth.library.response.BleResponse;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothConstants;
 import com.dingjikerbo.bluetooth.library.utils.ByteUtils;
 

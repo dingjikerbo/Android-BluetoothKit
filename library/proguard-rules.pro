@@ -15,3 +15,22 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+
+-dontshrink
+
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+
+-keep class com.dingjikerbo.bluetooth.library.BluetoothManager {
+     *;
+}
+
+-keep class com.dingjikerbo.bluetooth.library.BluetoothManager$* {
+     *;
+}
+
+-keep class com.dingjikerbo.bluetooth.library.response.BleResponse {
+     <methods>;
+}
+
+-keep interface * extends com.dingjikerbo.bluetooth.library.response.BleResponse

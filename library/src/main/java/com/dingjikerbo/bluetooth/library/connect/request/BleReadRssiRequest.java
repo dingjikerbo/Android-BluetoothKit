@@ -1,6 +1,6 @@
 package com.dingjikerbo.bluetooth.library.connect.request;
 
-import com.dingjikerbo.bluetooth.library.connect.response.BleReadRssiResponse;
+import com.dingjikerbo.bluetooth.library.response.BleReadRssiResponse;
 
 /**
  * Created by liwentian on 2015/12/23.

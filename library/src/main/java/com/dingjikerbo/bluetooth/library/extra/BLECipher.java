@@ -1,4 +1,4 @@
-package com.dingjikerbo.bluetooth.library.security;
+package com.dingjikerbo.bluetooth.library.extra;
 
 import android.text.TextUtils;
 

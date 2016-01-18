@@ -1,4 +1,4 @@
-package com.xiaomi.smarthome.device.bluetooth.security;
+package com.dingjikerbo.bluetooth.library.extra;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,11 +11,10 @@ import android.os.Message;
 
 import com.dingjikerbo.bluetooth.library.connect.BLEConnectManager;
 import com.dingjikerbo.bluetooth.library.connect.request.Code;
-import com.dingjikerbo.bluetooth.library.connect.response.BleConnectResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleNotifyResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleWriteResponse;
-import com.dingjikerbo.bluetooth.library.security.BLECipher;
+import com.dingjikerbo.bluetooth.library.response.BleConnectResponse;
+import com.dingjikerbo.bluetooth.library.response.BleNotifyResponse;
+import com.dingjikerbo.bluetooth.library.response.BleRegisterResponse;
+import com.dingjikerbo.bluetooth.library.response.BleWriteResponse;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothConstants;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothLog;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothUtils;
@@ -231,10 +230,6 @@ public class BleSecurityRegister {
                     break;
             }
         }
-
-    };
-
-    public interface BleRegisterResponse extends BleResponse<byte[]> {
 
     };
 

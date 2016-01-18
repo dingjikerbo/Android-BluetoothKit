@@ -1,6 +1,6 @@
 package com.dingjikerbo.bluetooth.library.connect.request;
 
-import com.dingjikerbo.bluetooth.library.connect.response.BleWriteResponse;
+import com.dingjikerbo.bluetooth.library.response.BleWriteResponse;
 
 import java.util.UUID;
 

@@ -4,11 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.dingjikerbo.bluetooth.library.connect.BLEConnectManager;
-import com.dingjikerbo.bluetooth.library.connect.response.BleConnectResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleNotifyResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleReadResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleReadRssiResponse;
-import com.dingjikerbo.bluetooth.library.connect.response.BleWriteResponse;
+import com.dingjikerbo.bluetooth.library.response.BleConnectResponse;
+import com.dingjikerbo.bluetooth.library.response.BleNotifyResponse;
+import com.dingjikerbo.bluetooth.library.response.BleReadResponse;
+import com.dingjikerbo.bluetooth.library.response.BleReadRssiResponse;
+import com.dingjikerbo.bluetooth.library.response.BleWriteResponse;
 import com.dingjikerbo.bluetooth.library.utils.BluetoothUtils;
 
 import java.util.UUID;

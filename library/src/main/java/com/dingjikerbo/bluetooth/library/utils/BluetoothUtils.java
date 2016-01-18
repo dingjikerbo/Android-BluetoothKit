@@ -14,7 +14,6 @@ import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import com.dingjikerbo.bluetooth.library.BaseManager;
 import com.dingjikerbo.bluetooth.library.connect.XmBluetoothDevice;
 
 import java.util.ArrayList;

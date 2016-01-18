@@ -2,7 +2,7 @@ package com.dingjikerbo.bluetooth.library.connect.request;
 
 import android.os.Bundle;
 
-import com.dingjikerbo.bluetooth.library.connect.response.BleConnectResponse;
+import com.dingjikerbo.bluetooth.library.response.BleConnectResponse;
 
 public class BleConnectRequest extends BleRequest<Bundle> {
 
