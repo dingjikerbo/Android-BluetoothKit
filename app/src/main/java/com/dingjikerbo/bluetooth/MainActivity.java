@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.dingjikerbo.bluetooth.library.BluetoothManager;
-import com.dingjikerbo.bluetooth.library.BluetoothManager.Code;
-import com.dingjikerbo.bluetooth.library.response.BleConnectResponse;
+import com.inuker.bluetooth.library.BluetoothManager;
+import com.inuker.bluetooth.library.BluetoothManager.Code;
+import com.inuker.bluetooth.library.response.BleConnectResponse;
 
 public class MainActivity extends Activity {
 
