@@ -5,8 +5,9 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.inuker.bluetooth.library.BluetoothManager;
-import com.inuker.bluetooth.library.BluetoothManager.Code;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+
 
 public class MainActivity extends Activity {
 

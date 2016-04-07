@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library.response;
+package com.inuker.bluetooth.library.connect.response;
 
 import android.os.Bundle;
 

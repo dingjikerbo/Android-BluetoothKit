@@ -2,18 +2,14 @@ package com.inuker.bluetooth.library.connect;
 
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.connect.request.Code;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
-import com.inuker.bluetooth.library.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.response.BleReadResponse;
-import com.inuker.bluetooth.library.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.response.BleResponse;
-import com.inuker.bluetooth.library.response.BleWriteResponse;
-import com.inuker.bluetooth.library.utils.BluetoothUtils;
+import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponseDispatcher;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 
 public class BLEConnectManager {
@@ -33,10 +29,10 @@ public class BLEConnectManager {
         return master;
     }
 
-    public static void connect(String mac, XmBleResponse response) {
+    public static void connect(String mac, BleConnectResponse response) {
         if (!TextUtils.isEmpty(mac)) {
             BleConnectMaster master = getBleConnectMaster(mac);
-            master.connect(response);
+            master.connect(BleResponseDispatcher.newInstance(response));
         }
     }
 
@@ -47,24 +43,24 @@ public class BLEConnectManager {
         }
     }
 
-    public static void read(String mac, UUID service, UUID character, XmBleResponse response) {
+    public static void read(String mac, UUID service, UUID character, BleReadResponse response) {
         if (!TextUtils.isEmpty(mac) && service != null && character != null) {
             BleConnectMaster master = getBleConnectMaster(mac);
-            master.read(service, character, response);
+            master.read(service, character, BleResponseDispatcher.newInstance(response));
         }
     }
 
-    public static void write(String mac, UUID service, UUID character, byte[] bytes, XmBleResponse response) {
+    public static void write(String mac, UUID service, UUID character, byte[] bytes, BleWriteResponse response) {
         if (!TextUtils.isEmpty(mac) && service != null && character != null && bytes != null) {
             BleConnectMaster master = getBleConnectMaster(mac);
-            master.write(service, character, bytes, response);
+            master.write(service, character, bytes, BleResponseDispatcher.newInstance(response));
         }
     }
 
-    public static void notify(String mac, UUID service, UUID character, XmBleResponse response) {
+    public static void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
         if (!TextUtils.isEmpty(mac) && service != null && character != null) {
             BleConnectMaster master = getBleConnectMaster(mac);
-            master.notify(service, character, response);
+            master.notify(service, character, BleResponseDispatcher.newInstance(response));
         }
     }
 
@@ -75,10 +71,10 @@ public class BLEConnectManager {
         }
     }
 
-    public static void readRemoteRssi(String mac, XmBleResponse response) {
+    public static void readRemoteRssi(String mac, BleReadRssiResponse response) {
         if (!TextUtils.isEmpty(mac)) {
             BleConnectMaster master = getBleConnectMaster(mac);
-            master.readRemoteRssi(response);
+            master.readRemoteRssi(BleResponseDispatcher.newInstance(response));
         }
     }
 }

@@ -6,13 +6,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.inuker.bluetooth.library.connect.request.IBleRunner;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
-import com.inuker.bluetooth.library.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.response.BleReadResponse;
-import com.inuker.bluetooth.library.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.response.BleResponse;
-import com.inuker.bluetooth.library.response.BleWriteResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
 
 import java.util.UUID;
@@ -49,7 +43,7 @@ public class BleConnectMaster implements IBleRunner {
     }
 
     private void processDispatcherMessage(Message msg) {
-        XmBleResponse response = (XmBleResponse) msg.obj;
+        BleResponse response = (BleResponse) msg.obj;
         Bundle data = msg.getData();
 
         switch (msg.what) {
@@ -107,7 +101,7 @@ public class BleConnectMaster implements IBleRunner {
         }
     }
 
-    public void connect(XmBleResponse response) {
+    public void connect(BleResponse response) {
         sendMessageToDispatcher(BluetoothConstants.MSG_CONNECT, response);
     }
 
@@ -115,14 +109,14 @@ public class BleConnectMaster implements IBleRunner {
         sendMessageToDispatcher(BluetoothConstants.MSG_DISCONNECT);
     }
 
-    public void read(UUID service, UUID character, XmBleResponse response) {
+    public void read(UUID service, UUID character, BleResponse response) {
         Bundle data = new Bundle();
         data.putSerializable(BluetoothConstants.KEY_SERVICE_UUID, service);
         data.putSerializable(BluetoothConstants.KEY_CHARACTER_UUID, character);
         sendMessageToDispatcher(BluetoothConstants.MSG_READ, response, data);
     }
 
-    public void write(UUID service, UUID character, byte[] bytes, XmBleResponse response) {
+    public void write(UUID service, UUID character, byte[] bytes, BleResponse response) {
         Bundle data = new Bundle();
         data.putSerializable(BluetoothConstants.KEY_SERVICE_UUID, service);
         data.putSerializable(BluetoothConstants.KEY_CHARACTER_UUID, character);
@@ -130,7 +124,7 @@ public class BleConnectMaster implements IBleRunner {
         sendMessageToDispatcher(BluetoothConstants.MSG_WRITE, response, data);
     }
 
-    public void notify(UUID service, UUID character, XmBleResponse response) {
+    public void notify(UUID service, UUID character, BleResponse response) {
         Bundle data = new Bundle();
         data.putSerializable(BluetoothConstants.KEY_SERVICE_UUID, service);
         data.putSerializable(BluetoothConstants.KEY_CHARACTER_UUID, character);
@@ -144,7 +138,7 @@ public class BleConnectMaster implements IBleRunner {
         sendMessageToDispatcher(BluetoothConstants.MSG_UNNOTIFY, null, data);
     }
 
-    public void readRemoteRssi(XmBleResponse response) {
+    public void readRemoteRssi(BleResponse response) {
         sendMessageToDispatcher(BluetoothConstants.MSG_READ_RSSI, response);
     }
 

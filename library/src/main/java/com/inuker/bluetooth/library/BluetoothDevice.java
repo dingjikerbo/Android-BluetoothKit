@@ -1,18 +1,17 @@
-package com.inuker.bluetooth.library.connect;
+package com.inuker.bluetooth.library;
 
-import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
  * ApiLevel:5 蓝牙设备
  */
-public class XmBluetoothDevice implements Parcelable {
+public class BluetoothDevice implements Parcelable {
 
     /**
      * ApiLevel:5
      */
-    public BluetoothDevice device;
+    public android.bluetooth.BluetoothDevice device;
     /**
      * ApiLevel:5
      */
@@ -48,14 +47,14 @@ public class XmBluetoothDevice implements Parcelable {
     /**
      * ApiLevel:10
      */
-    public XmBluetoothDevice() {
+    public BluetoothDevice() {
 
     }
 
     /**
      * ApiLevel:10
      */
-    public XmBluetoothDevice(BluetoothDevice device, int deviceType) {
+    public BluetoothDevice(android.bluetooth.BluetoothDevice device, int deviceType) {
         this.device = device;
         this.deviceType = deviceType;
     }
@@ -63,7 +62,7 @@ public class XmBluetoothDevice implements Parcelable {
     /**
      * ApiLevel:10
      */
-    public XmBluetoothDevice(BluetoothDevice device, int rssi, byte[] scanRecord, int deviceType) {
+    public BluetoothDevice(android.bluetooth.BluetoothDevice device, int rssi, byte[] scanRecord, int deviceType) {
         this.device = device;
         this.rssi = rssi;
         this.scanRecord = scanRecord;
@@ -96,8 +95,8 @@ public class XmBluetoothDevice implements Parcelable {
         dest.writeString(this.name);
     }
 
-    public XmBluetoothDevice(Parcel in) {
-        this.device = in.readParcelable(BluetoothDevice.class.getClassLoader());
+    public BluetoothDevice(Parcel in) {
+        this.device = in.readParcelable(android.bluetooth.BluetoothDevice.class.getClassLoader());
         this.rssi = in.readInt();
         this.isConnected = in.readByte() != 0;
         this.scanRecord = in.createByteArray();
@@ -105,13 +104,13 @@ public class XmBluetoothDevice implements Parcelable {
         this.name = in.readString();
     }
 
-    public static final Creator<XmBluetoothDevice> CREATOR = new Creator<XmBluetoothDevice>() {
-        public XmBluetoothDevice createFromParcel(Parcel source) {
-            return new XmBluetoothDevice(source);
+    public static final Creator<BluetoothDevice> CREATOR = new Creator<BluetoothDevice>() {
+        public BluetoothDevice createFromParcel(Parcel source) {
+            return new BluetoothDevice(source);
         }
 
-        public XmBluetoothDevice[] newArray(int size) {
-            return new XmBluetoothDevice[size];
+        public BluetoothDevice[] newArray(int size) {
+            return new BluetoothDevice[size];
         }
     };
 }

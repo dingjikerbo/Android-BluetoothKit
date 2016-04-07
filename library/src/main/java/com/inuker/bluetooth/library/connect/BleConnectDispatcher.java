@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -13,14 +14,7 @@ import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
-import com.inuker.bluetooth.library.connect.request.Code;
-import com.inuker.bluetooth.library.connect.request.IBleDispatch;
-import com.inuker.bluetooth.library.connect.request.IBleRunner;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
-import com.inuker.bluetooth.library.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.response.BleReadResponse;
-import com.inuker.bluetooth.library.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.response.BleWriteResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -30,15 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * 任务调度器，任务容错，重试等调度策略
- * 告诉worker要做什么就行了，worker忠实地去完成，并通知我结果
- * 这里面所有函数运行在一个线程中，所以不用考虑多线程
- * 这里最重要的是保证任务能依次执行，不能因为某个任务异常或超时或任何其他异常而中断
- * 任务之间要设置一个间隔，因为蓝牙处理速度不会那么快，任务积累多了会阻塞缓冲区，导致后面的任务收不到回调超时
- * 任务队列要设置一个上限，避免任务太多内存溢出
- * @author dingjikerbo
- */
 public class BleConnectDispatcher implements IBleDispatch {
 
     public static final int MSG_REQUEST_SUCCESS = 0x100;
@@ -60,7 +45,7 @@ public class BleConnectDispatcher implements IBleDispatch {
         BleConnectWorker.attch(mac, runner, this);
     }
 
-    public void connect(XmBleResponse response) {
+    public void connect(BleResponse response) {
         addNewRequest(new BleConnectRequest(response));
     }
 
@@ -68,16 +53,16 @@ public class BleConnectDispatcher implements IBleDispatch {
         addNewRequest(new BleDisconnectRequest());
     }
 
-    public void read(UUID service, UUID character, XmBleResponse response) {
+    public void read(UUID service, UUID character, BleResponse response) {
         addNewRequest(new BleReadRequest(service, character, response));
     }
 
     public void write(UUID service, UUID character, byte[] bytes,
-                      XmBleResponse response) {
+                      BleResponse response) {
         addNewRequest(new BleWriteRequest(service, character, bytes, response));
     }
 
-    public void notify(UUID service, UUID character, XmBleResponse response) {
+    public void notify(UUID service, UUID character, BleResponse response) {
         addNewRequest(new BleNotifyRequest(service, character, response));
     }
 
@@ -85,7 +70,7 @@ public class BleConnectDispatcher implements IBleDispatch {
         addNewRequest(new BleUnnotifyRequest(service, character));
     }
 
-    public void readRemoteRssi(XmBleResponse response) {
+    public void readRemoteRssi(BleResponse response) {
         addNewRequest(new BleReadRssiRequest(response));
     }
 

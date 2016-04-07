@@ -4,19 +4,18 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.connect.BLEConnectManager;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
-import com.inuker.bluetooth.library.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.response.BleReadResponse;
-import com.inuker.bluetooth.library.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.response.BleWriteResponse;
-import com.inuker.bluetooth.library.utils.BluetoothUtils;
+import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 
 import java.util.UUID;
 
 /**
  * Created by liwentian on 2015/10/29.
  */
-public class BluetoothManager {
+public class BluetoothManager extends BaseManager {
 
     public static final String ACTION_CONNECT_STATUS_CHANGED = "com.dingjikerbo.bluetooth.connect_status_changed";
     public static final String ACTION_CHARACTER_CHANGED = "com.dingjikerbo.bluetooth.character_changed";
@@ -29,14 +28,9 @@ public class BluetoothManager {
     public static final int STATUS_UNKNOWN = 0x5;
     public static final int STATUS_CONNECTED = 0x10;
     public static final int STATUS_DISCONNECTED = 0x20;
-    private static Context mContext;
 
     public static void init(Context context) {
-        mContext = context;
-    }
-
-    public static Context getContext() {
-        return mContext;
+        BaseManager.init(context);
     }
 
     public static void connect(String mac, BleConnectResponse response) {
@@ -69,29 +63,5 @@ public class BluetoothManager {
 
     public static void readRemoteRssi(String mac, BleReadRssiResponse response) {
         BLEConnectManager.readRemoteRssi(mac, response);
-    }
-
-    public static void openBluetoothSilently() {
-        BluetoothUtils.openBluetoothSilently();
-    }
-
-    public static void openBluetooth(Context context) {
-        BluetoothUtils.openBluetooth(context);
-    }
-
-    public static boolean isBluetoothOpen() {
-        return BluetoothUtils.isBluetoothEnabled();
-    }
-
-    public static class Code {
-        public static final int REQUEST_SUCCESS = 0;
-        public static final int REQUEST_FAILED = -1;
-        public static final int REQUEST_CANCELED = -2;
-        public static final int ILLEGAL_ARGUMENT = -3;
-        public static final int BLE_NOT_SUPPORTED = -4;
-        public static final int BLUETOOTH_DISABLED = -5;
-        public static final int CONNECTION_NOT_READY = -6;
-        public static final int REQUEST_TIMEDOUT = -7;
-        public static final int TOKEN_NOT_MATCHED = -10;
     }
 }

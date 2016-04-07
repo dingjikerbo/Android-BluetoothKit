@@ -13,9 +13,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 
-import com.inuker.bluetooth.library.BluetoothManager;
+import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -24,9 +23,7 @@ import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
-import com.inuker.bluetooth.library.connect.request.Code;
-import com.inuker.bluetooth.library.connect.request.IBleDispatch;
-import com.inuker.bluetooth.library.connect.request.IBleRunner;
+import com.inuker.bluetooth.library.utils.BaseManager;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -511,9 +508,6 @@ public class BleConnectWorker extends BaseManager {
     }
 
     private void setConnectStatus(int status) {
-//        BluetoothLog.d(String.format("setConnectStatus %d for %s",
-//                status, mBluetoothDevice.getAddress()));
-
         mConnectStatus = status;
     }
 
@@ -523,15 +517,6 @@ public class BleConnectWorker extends BaseManager {
             if (set != null) {
                 ArrayList<UUID> uuids = new ArrayList<UUID>(set);
                 request.putSerializableExtra(BluetoothConstants.KEY_UUIDS, uuids);
-            }
-
-            Map<UUID, BluetoothGattCharacteristic> miservice = mDeviceProfile.get(BluetoothConstants.MISERVICE);
-            if (miservice != null) {
-                Set<UUID> set2 = miservice.keySet();
-                if (set2 != null) {
-                    ArrayList<UUID> uuids2 = new ArrayList<UUID>(set2);
-                    request.putSerializableExtra(BluetoothConstants.KEY_MISERVICE_CHARACTERS, uuids2);
-                }
             }
         }
     }
@@ -630,11 +615,6 @@ public class BleConnectWorker extends BaseManager {
             onGattFailed();
         } else {
             dispatchRequestResult(BluetoothConstants.FAILED);
-        }
-
-        BluetoothGattService service = characteristic.getService();
-        if (service != null) {
-            broadcastCharacterWrite(service.getUuid(), characteristic.getUuid(), characteristic.getValue(), status);
         }
     }
 
@@ -766,18 +746,6 @@ public class BleConnectWorker extends BaseManager {
         intent.putExtra(BluetoothConstants.KEY_DEVICE_ADDRESS,
                 mBluetoothDevice.getAddress());
         intent.putExtra(BluetoothConstants.KEY_CONNECT_STATUS, status);
-        BluetoothUtils.sendBroadcast(intent);
-    }
-
-    private void broadcastCharacterWrite(UUID service, UUID character, byte[] value, int status) {
-        Intent intent = new Intent(
-                BluetoothConstants.ACTION_CHARACTER_WRITE);
-        intent.putExtra(BluetoothConstants.KEY_DEVICE_ADDRESS,
-                mBluetoothDevice.getAddress());
-        intent.putExtra(BluetoothConstants.KEY_SERVICE_UUID, service);
-        intent.putExtra(BluetoothConstants.KEY_CHARACTER_UUID, character);
-        intent.putExtra(BluetoothConstants.KEY_CHARACTER_VALUE, value);
-        intent.putExtra(BluetoothConstants.KEY_CHARACTER_WRITE_STATUS, status);
         BluetoothUtils.sendBroadcast(intent);
     }
 

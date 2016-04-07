@@ -2,7 +2,6 @@ package com.inuker.bluetooth.library.utils;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
@@ -14,7 +13,7 @@ import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.connect.XmBluetoothDevice;
+import com.inuker.bluetooth.library.BluetoothDevice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +105,7 @@ public class BluetoothUtils extends BaseManager {
         }
     }
 
-    public static BluetoothDevice getRemoteDevice(String mac) {
+    public static android.bluetooth.BluetoothDevice getRemoteDevice(String mac) {
         if (!TextUtils.isEmpty(mac)) {
             BluetoothAdapter adapter = getBluetoothLeAdapter();
             if (adapter != null) {
@@ -116,14 +115,14 @@ public class BluetoothUtils extends BaseManager {
         return null;
     }
 
-    public static XmBluetoothDevice getRemoteXmDevice(String mac) {
-        XmBluetoothDevice xmDevice = new XmBluetoothDevice();
+    public static BluetoothDevice getRemoteXmDevice(String mac) {
+        BluetoothDevice xmDevice = new BluetoothDevice();
         xmDevice.device = getRemoteDevice(mac);
         return xmDevice;
     }
 
-    public static List<BluetoothDevice> getConnectedBluetoothLeDevices() {
-        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
+    public static List<android.bluetooth.BluetoothDevice> getConnectedBluetoothLeDevices() {
+        List<android.bluetooth.BluetoothDevice> devices = new ArrayList<android.bluetooth.BluetoothDevice>();
 
         BluetoothManager manager = getBluetoothManager();
 
@@ -134,8 +133,8 @@ public class BluetoothUtils extends BaseManager {
         return devices;
     }
 
-    public static List<BluetoothDevice> getBondedBluetoothClassicDevices() {
-        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
+    public static List<android.bluetooth.BluetoothDevice> getBondedBluetoothClassicDevices() {
+        List<android.bluetooth.BluetoothDevice> devices = new ArrayList<android.bluetooth.BluetoothDevice>();
 
         BluetoothAdapter adapter = getBluetoothClassicAdapter();
 
@@ -148,9 +147,9 @@ public class BluetoothUtils extends BaseManager {
 
     public static String getType(int type) {
         switch (type) {
-            case XmBluetoothDevice.DEVICE_TYPE_BLE:
+            case BluetoothDevice.DEVICE_TYPE_BLE:
                 return "ble";
-            case XmBluetoothDevice.DEVICE_TYPE_CLASSIC:
+            case BluetoothDevice.DEVICE_TYPE_CLASSIC:
                 return "classic";
         }
         return "unknown";

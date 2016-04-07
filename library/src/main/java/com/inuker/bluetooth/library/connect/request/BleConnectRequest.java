@@ -1,12 +1,10 @@
 package com.inuker.bluetooth.library.connect.request;
 
-import android.os.Bundle;
-
-import com.inuker.bluetooth.library.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 
 public class BleConnectRequest extends BleRequest {
 
-    public BleConnectRequest(XmBleResponse response) {
+    public BleConnectRequest(BleResponse response) {
         super(response);
         mRequestType = REQUEST_TYPE_CONNECT;
     }

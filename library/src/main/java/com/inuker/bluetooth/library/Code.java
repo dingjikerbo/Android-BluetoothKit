@@ -1,7 +1,8 @@
-package com.inuker.bluetooth.library.connect.request;
+package com.inuker.bluetooth.library;
 
-import com.inuker.bluetooth.library.BluetoothManager;
-
+/**
+ * Created by dingjikerbo on 16/4/8.
+ */
 public class Code {
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_FAILED = -1;
@@ -11,6 +12,5 @@ public class Code {
     public static final int BLUETOOTH_DISABLED = -5;
     public static final int CONNECTION_NOT_READY = -6;
     public static final int REQUEST_TIMEDOUT = -7;
-    public static final int TOKEN_NOT_MATCHED = -10;
-    public static final int REQUEST_OVERFLOW = -11;
+    public static final int REQUEST_OVERFLOW = -8;
 }

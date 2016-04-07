@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library.connect.request;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
@@ -35,7 +35,7 @@ public abstract class BleRequest {
 
     protected byte[] mBytes;
 
-    protected XmBleResponse mResponse;
+    protected BleResponse mResponse;
 
     protected int mRetryLimit;
     protected int mRetryCount;
@@ -44,7 +44,7 @@ public abstract class BleRequest {
 
     protected Bundle mExtra;
 
-    public BleRequest(XmBleResponse response) {
+    public BleRequest(BleResponse response) {
         mResponse = response;
         mRetryLimit = getDefaultRetryLimit();
         mTimeoutLimit = DEFAULT_TIMEOUT_LIMIT;
@@ -103,7 +103,7 @@ public abstract class BleRequest {
         return isReadRequest() || isWriteRequest() || isNotifyRequest() || isUnnotifyRequest();
     }
 
-    public void setResponse(XmBleResponse response) {
+    public void setResponse(BleResponse response) {
         mResponse = response;
     }
 
@@ -234,7 +234,7 @@ public abstract class BleRequest {
         return DEFAULT_RETRY_LIMIT;
     }
 
-    public XmBleResponse getResponse() {
+    public BleResponse getResponse() {
         return mResponse;
     }
 }

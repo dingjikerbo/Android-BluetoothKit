@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library.connect.request;
+package com.inuker.bluetooth.library.connect;
 
 import android.os.Looper;
 
