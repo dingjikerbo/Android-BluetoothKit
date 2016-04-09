@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,67 +8,37 @@ import android.os.Parcelable;
  */
 public class BluetoothDevice implements Parcelable {
 
-    /**
-     * ApiLevel:5
-     */
     public android.bluetooth.BluetoothDevice device;
-    /**
-     * ApiLevel:5
-     */
+
     public int rssi;
-    /**
-     * ApiLevel:8
-     */
+
     public boolean isConnected;
-    /**
-     * ApiLevel:8
-     */
+
     public byte[] scanRecord;
-    /**
-     * ApiLevel:10
-     */
+
     public int deviceType;
 
-    /**
-     * ApiLevel:11
-     */
     public String name;
 
-    /**
-     * ApiLevel:10
-     */
     public static final int DEVICE_TYPE_CLASSIC = 1;
 
-    /**
-     * ApiLevel:10
-     */
     public static final int DEVICE_TYPE_BLE = 2;
 
-    /**
-     * ApiLevel:10
-     */
     public BluetoothDevice() {
 
     }
 
-    /**
-     * ApiLevel:10
-     */
     public BluetoothDevice(android.bluetooth.BluetoothDevice device, int deviceType) {
         this.device = device;
         this.deviceType = deviceType;
     }
 
-    /**
-     * ApiLevel:10
-     */
     public BluetoothDevice(android.bluetooth.BluetoothDevice device, int rssi, byte[] scanRecord, int deviceType) {
         this.device = device;
         this.rssi = rssi;
         this.scanRecord = scanRecord;
         this.deviceType = deviceType;
     }
-
 
     @Override
     public String toString() {

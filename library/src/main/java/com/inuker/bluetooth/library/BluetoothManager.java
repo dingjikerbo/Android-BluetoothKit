@@ -1,67 +1,67 @@
 package com.inuker.bluetooth.library;
 
-import android.content.Context;
-import android.text.TextUtils;
-
-import com.inuker.bluetooth.library.connect.BLEConnectManager;
-import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.connect.response.BleReadResponse;
-import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-
-import java.util.UUID;
+import android.os.RemoteException;
 
 /**
  * Created by liwentian on 2015/10/29.
  */
-public class BluetoothManager extends BaseManager {
+public class BluetoothManager extends IBluetoothManager.Stub {
 
-    public static final String ACTION_CONNECT_STATUS_CHANGED = "com.dingjikerbo.bluetooth.connect_status_changed";
-    public static final String ACTION_CHARACTER_CHANGED = "com.dingjikerbo.bluetooth.character_changed";
-    public static final String KEY_DEVICE_ADDRESS = "key_device_address";
-    public static final String KEY_CONNECT_STATUS = "key_connect_status";
-    public static final String KEY_SERVICE_UUID = "key_service_uuid";
-    public static final String KEY_CHARACTER_UUID = "key_character_uuid";
-    public static final String KEY_CHARACTER_VALUE = "key_character_value";
-    public static final String KEY_DEVICES = "devices";
-    public static final int STATUS_UNKNOWN = 0x5;
-    public static final int STATUS_CONNECTED = 0x10;
-    public static final int STATUS_DISCONNECTED = 0x20;
+    private static BluetoothManager sInstance;
 
-    public static void init(Context context) {
-        BaseManager.init(context);
+    private BluetoothManager() {
+
     }
 
-    public static void connect(String mac, BleConnectResponse response) {
-        if (TextUtils.isEmpty(mac)) {
-            return;
+    public static BluetoothManager getInstance() {
+        if (sInstance == null) {
+            synchronized (BluetoothManager.class) {
+                if (sInstance == null) {
+                    sInstance = new BluetoothManager();
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    @Override
+    public void connect(String mac, IBleResponse response) throws RemoteException {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        BLEConnectManager.connect(mac, response);
+        response.onResponse(1, null);
     }
 
-    public static void disconnect(String mac) {
-        BLEConnectManager.disconnect(mac);
+    @Override
+    public void disconnect(String mac) throws RemoteException {
+
     }
 
-    public static void read(String mac, UUID service, UUID character, BleReadResponse response) {
-        BLEConnectManager.read(mac, service, character, response);
+    @Override
+    public void read(String mac, int service, int character, IBleResponse response) throws RemoteException {
+
     }
 
-    public static void write(String mac, UUID service, UUID character, byte[] bytes, BleWriteResponse response) {
-        BLEConnectManager.write(mac, service, character, bytes, response);
+    @Override
+    public void write(String mac, int service, int character, byte[] bytes, IBleResponse response) throws RemoteException {
+
     }
 
-    public static void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
-        BLEConnectManager.notify(mac, service, character, response);
+    @Override
+    public void notify(String mac, int service, int character, IBleResponse response) throws RemoteException {
+
     }
 
-    public static void unnotify(String mac, UUID service, UUID character) {
-        BLEConnectManager.unnotify(mac, service, character);
+    @Override
+    public void unnotify(String mac, int service, int character) throws RemoteException {
+
     }
 
-    public static void readRemoteRssi(String mac, BleReadRssiResponse response) {
-        BLEConnectManager.readRemoteRssi(mac, response);
+    @Override
+    public void readRemoteRssi(String mac, IBleResponse response) throws RemoteException {
+
     }
 }

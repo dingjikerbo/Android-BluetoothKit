@@ -19,6 +19,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".Service1"
+            android:process=":Service1"/>
+
+        <service
+            android:name=".Service2"
+          />
     </application>
 
 </manifest>

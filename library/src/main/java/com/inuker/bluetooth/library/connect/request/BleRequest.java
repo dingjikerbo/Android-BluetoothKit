@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.connect.response.BleResponse;
-import com.inuker.bluetooth.library.utils.BluetoothConstants;
+import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.io.Serializable;
@@ -208,10 +208,6 @@ public abstract class BleRequest {
             }
         }
         return defaultValue;
-    }
-
-    public void setRequestCode(int code) {
-        putIntExtra(BluetoothConstants.KEY_CODE, code);
     }
 
     public void putSerializableExtra(String key, Serializable object) {
