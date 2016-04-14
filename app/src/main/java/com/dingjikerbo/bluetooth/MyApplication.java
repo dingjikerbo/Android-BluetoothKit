@@ -13,6 +13,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        BluetoothManager.init(this);
+        BluetoothManager.initial(this);
     }
 }
