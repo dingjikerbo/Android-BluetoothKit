@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.XmBleResponse;
-import com.inuker.bluetooth.library.connect.request.IBleRunner;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
 
 public class BleConnectMaster implements IBleRunner {
