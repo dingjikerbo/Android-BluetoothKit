@@ -7,7 +7,6 @@ import android.os.Message;
 
 import com.inuker.bluetooth.library.BaseManager;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
 /**
@@ -15,84 +14,83 @@ import com.inuker.bluetooth.library.utils.BluetoothUtils;
  */
 public class BluetoothSearchResponser extends BaseManager {
 
-	private static final int MSG_SEARCH_START = 0x40;
-	private static final int MSG_SEARCH_CANCEL = 0x50;
-	private static final int MSG_SEARCH_STOP = 0x60;
-	private static final int MSG_SEARCH_FOUND = 0x70;
+    private static final int MSG_SEARCH_START = 0x40;
+    private static final int MSG_SEARCH_CANCEL = 0x50;
+    private static final int MSG_SEARCH_STOP = 0x60;
+    private static final int MSG_SEARCH_FOUND = 0x70;
+    private final Handler mResponseHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            BluetoothSearchResponse response = (BluetoothSearchResponse) msg.obj;
 
-	private BluetoothSearchResponser() {
+            switch (msg.what) {
+                case MSG_SEARCH_START:
+                    response.onSearchStarted();
+                    break;
 
-	}
+                case MSG_SEARCH_CANCEL:
+                    response.onSearchCanceled();
+                    break;
 
-	public static BluetoothSearchResponser getInstance() {
-		return BluetoothSearchResponserHolder.instance;
-	}
+                case MSG_SEARCH_STOP:
+                    response.onSearchStopped();
+                    break;
 
-	private static class BluetoothSearchResponserHolder {
-		private static BluetoothSearchResponser instance = new BluetoothSearchResponser();
-	}
+                case MSG_SEARCH_FOUND:
+                    BluetoothSearchDevice device = msg.getData().getParcelable("device");
+                    response.onDeviceFounded(device);
+                    break;
 
-	public void notifySearchStarted(BluetoothSearchResponse response) {
-		Intent intent = new Intent(BluetoothConstants.ACTION_SEARCH_START);
-		BluetoothUtils.sendBroadcast(intent);
+                default:
+                    break;
 
-		mResponseHandler.obtainMessage(MSG_SEARCH_START, response)
-				.sendToTarget();
-	}
+            }
+        }
+    };
 
-	public void notifySearchStopped(BluetoothSearchResponse response) {
-		Intent intent = new Intent(BluetoothConstants.ACTION_SEARCH_STOP);
-		BluetoothUtils.sendBroadcast(intent);
+    private BluetoothSearchResponser() {
 
-		mResponseHandler.obtainMessage(MSG_SEARCH_STOP, response)
-				.sendToTarget();
-	}
+    }
 
-	public void notifySearchCanceled(BluetoothSearchResponse response) {
-		Intent intent = new Intent(BluetoothConstants.ACTION_SEARCH_STOP);
-		BluetoothUtils.sendBroadcast(intent);
+    public static BluetoothSearchResponser getInstance() {
+        return BluetoothSearchResponserHolder.instance;
+    }
 
-		mResponseHandler.obtainMessage(MSG_SEARCH_CANCEL, response)
-				.sendToTarget();
-	}
+    public void notifySearchStarted(BluetoothSearchResponse response) {
+        Intent intent = new Intent(BluetoothConstants.ACTION_SEARCH_START);
+        BluetoothUtils.sendBroadcast(intent);
 
-	public void notifyDeviceFounded(BluetoothSearchDevice device,
-			BluetoothSearchResponse response) {
-		Message msg = mResponseHandler
-				.obtainMessage(MSG_SEARCH_FOUND, response);
-		msg.getData().putParcelable("device", device);
-		msg.sendToTarget();
-	}
+        mResponseHandler.obtainMessage(MSG_SEARCH_START, response)
+                .sendToTarget();
+    }
 
-	private final Handler mResponseHandler = new Handler(Looper.getMainLooper()) {
-		@Override
-		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
-			BluetoothSearchResponse response = (BluetoothSearchResponse) msg.obj;
+    public void notifySearchStopped(BluetoothSearchResponse response) {
+        Intent intent = new Intent(BluetoothConstants.ACTION_SEARCH_STOP);
+        BluetoothUtils.sendBroadcast(intent);
 
-			switch (msg.what) {
-			case MSG_SEARCH_START:
-				response.onSearchStarted();
-				break;
+        mResponseHandler.obtainMessage(MSG_SEARCH_STOP, response)
+                .sendToTarget();
+    }
 
-			case MSG_SEARCH_CANCEL:
-				response.onSearchCanceled();
-				break;
+    public void notifySearchCanceled(BluetoothSearchResponse response) {
+        Intent intent = new Intent(BluetoothConstants.ACTION_SEARCH_STOP);
+        BluetoothUtils.sendBroadcast(intent);
 
-			case MSG_SEARCH_STOP:
-				response.onSearchStopped();
-				break;
+        mResponseHandler.obtainMessage(MSG_SEARCH_CANCEL, response)
+                .sendToTarget();
+    }
 
-			case MSG_SEARCH_FOUND:
-				BluetoothSearchDevice device = msg.getData().getParcelable("device");
-				response.onDeviceFounded(device);
-				break;
+    public void notifyDeviceFounded(BluetoothSearchDevice device,
+                                    BluetoothSearchResponse response) {
+        Message msg = mResponseHandler
+                .obtainMessage(MSG_SEARCH_FOUND, response);
+        msg.getData().putParcelable("device", device);
+        msg.sendToTarget();
+    }
 
-			default:
-				break;
-
-			}
-		}
-	};
+    private static class BluetoothSearchResponserHolder {
+        private static BluetoothSearchResponser instance = new BluetoothSearchResponser();
+    }
 
 }

@@ -22,6 +22,7 @@ public class BluetoothLog {
 
     /**
      * 错误日志
+     *
      * @param msg
      */
     public static void e(String msg) {
@@ -30,6 +31,7 @@ public class BluetoothLog {
 
     /**
      * 这个是能看到函数内部的运行状况
+     *
      * @param msg
      */
     public static void v(String msg) {
@@ -38,6 +40,7 @@ public class BluetoothLog {
 
     /**
      * 这个是能看到函数的执行路径
+     *
      * @param msg
      */
     public static void d(String msg) {
@@ -46,6 +49,7 @@ public class BluetoothLog {
 
     /**
      * 重要日志，为了醒目所以标注warning
+     *
      * @param msg
      */
     public static void w(String msg) {

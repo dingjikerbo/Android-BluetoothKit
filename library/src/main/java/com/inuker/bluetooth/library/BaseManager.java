@@ -10,16 +10,12 @@ public class BaseManager {
 
     private static Context mContext;
 
-    static void setContext(Context context) {
-        mContext = context;
-    }
-
     public static Context getContext() {
         return mContext;
     }
 
-    public String getName() {
-        return getClass().getSimpleName();
+    static void setContext(Context context) {
+        mContext = context;
     }
 
     public static void post(Runnable runnable) {
@@ -31,5 +27,9 @@ public class BaseManager {
             mHandler = new Handler(Looper.getMainLooper());
         }
         mHandler.postDelayed(runnable, delay);
+    }
+
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

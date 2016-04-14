@@ -20,14 +20,15 @@ import java.util.concurrent.Executor;
 public final class BleDevicePropCache extends BaseManager implements IBlePropCacher {
 
     private static final String PREFS_TAG = "ble_device_prop_cache";
-
+    private static final Executor SERIAL_EXECUTOR = new SerialExecutor();
+    private static BleDevicePropCache sInstance;
     private String mCurrentTag;
     private SharedPreferences mSharedPreferences;
     private HashMap<String, BleDeviceProp> mPropCache;
 
-    private static BleDevicePropCache sInstance;
-
-    private static final Executor SERIAL_EXECUTOR = new SerialExecutor();
+    private BleDevicePropCache() {
+        mPropCache = new HashMap<String, BleDeviceProp>();
+    }
 
     public static BleDevicePropCache getInstance() {
         if (sInstance == null) {
@@ -40,8 +41,12 @@ public final class BleDevicePropCache extends BaseManager implements IBlePropCac
         return sInstance;
     }
 
-    private BleDevicePropCache() {
-        mPropCache = new HashMap<String, BleDeviceProp>();
+    public static void compatibleSave(SharedPreferences sp, final String key, final String value) {
+        sp.edit().putString(key, value).commit();
+    }
+
+    private static String getPrefsTag() {
+        return String.format("%s.%s", PREFS_TAG, "bush");
     }
 
     public void reloadIfNeeded() {
@@ -297,18 +302,6 @@ public final class BleDevicePropCache extends BaseManager implements IBlePropCac
         });
     }
 
-    private interface IPropSetter {
-        void setProp(BleDeviceProp prop);
-    }
-
-    private interface IPropGetter<T> {
-        T getProp(BleDeviceProp prop);
-    }
-
-    public interface IPropTraverse {
-        boolean onTraverse(String mac, BleDeviceProp prop);
-    }
-
     private <T> T getProp(String mac, IPropGetter<T> getter) {
         if (TextUtils.isEmpty(mac)) {
             return null;
@@ -348,8 +341,36 @@ public final class BleDevicePropCache extends BaseManager implements IBlePropCac
         });
     }
 
-    public static void compatibleSave(SharedPreferences sp, final String key, final String value) {
-        sp.edit().putString(key, value).commit();
+    private void executeSerialCacheTask(final BleCacheTask task) {
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+                task.executeOnExecutor(SERIAL_EXECUTOR);
+            }
+        });
+    }
+
+    private void executeCacheTask(final BleCacheTask task) {
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        });
+    }
+
+    private interface IPropSetter {
+        void setProp(BleDeviceProp prop);
+    }
+
+    private interface IPropGetter<T> {
+        T getProp(BleDeviceProp prop);
+    }
+
+    public interface IPropTraverse {
+        boolean onTraverse(String mac, BleDeviceProp prop);
     }
 
     private static class SerialExecutor implements Executor {
@@ -387,29 +408,5 @@ public final class BleDevicePropCache extends BaseManager implements IBlePropCac
             doInBackground();
             return null;
         }
-    }
-
-    private void executeSerialCacheTask(final BleCacheTask task) {
-        post(new Runnable() {
-
-            @Override
-            public void run() {
-                task.executeOnExecutor(SERIAL_EXECUTOR);
-            }
-        });
-    }
-
-    private void executeCacheTask(final BleCacheTask task) {
-        post(new Runnable() {
-
-            @Override
-            public void run() {
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
-        });
-    }
-
-    private static String getPrefsTag() {
-        return String.format("%s.%s", PREFS_TAG, "bush");
     }
 }

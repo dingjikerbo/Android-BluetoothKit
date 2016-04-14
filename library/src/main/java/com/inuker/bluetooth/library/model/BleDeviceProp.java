@@ -1,7 +1,5 @@
 package com.inuker.bluetooth.library.model;
 
-import android.os.Parcelable;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,12 +42,37 @@ public class BleDeviceProp implements Serializable {
 
     /**
      * 扩展项，某些设备特定的一些缓存数据，Json格式
+     *
      * @return
      */
     private JSONObject extras;
 
     public BleDeviceProp() {
         extras = new JSONObject();
+    }
+
+    public static BleDeviceProp fromJson(String json) {
+        try {
+            BleDeviceProp prop = new BleDeviceProp();
+            JSONObject jsonObj = new JSONObject(json);
+            prop.name = jsonObj.optString("name");
+            prop.did = jsonObj.optString("did");
+            prop.desc = jsonObj.optString("desc");
+            prop.model = jsonObj.optString("model");
+            prop.productId = jsonObj.optInt("productId");
+            prop.boundStatus = jsonObj.optInt("boundStatus");
+
+            JSONObject extras = jsonObj.optJSONObject("extras");
+            if (extras != null) {
+                prop.extras = extras;
+            }
+
+            return prop;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public String getName() {
@@ -169,29 +192,5 @@ public class BleDeviceProp implements Serializable {
             e.printStackTrace();
         }
         return jsonObj.toString();
-    }
-
-    public static BleDeviceProp fromJson(String json) {
-        try {
-            BleDeviceProp prop = new BleDeviceProp();
-            JSONObject jsonObj = new JSONObject(json);
-            prop.name = jsonObj.optString("name");
-            prop.did = jsonObj.optString("did");
-            prop.desc = jsonObj.optString("desc");
-            prop.model = jsonObj.optString("model");
-            prop.productId = jsonObj.optInt("productId");
-            prop.boundStatus = jsonObj.optInt("boundStatus");
-
-            JSONObject extras = jsonObj.optJSONObject("extras");
-            if (extras != null) {
-                prop.extras = extras;
-            }
-
-            return prop;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 }

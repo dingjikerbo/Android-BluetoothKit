@@ -27,14 +27,11 @@ public class BleResponseWrapper implements BleResponse<Bundle> {
 
         if (mResponse instanceof BleConnectResponse) {
             mResponse.onResponse(code, bundle);
-        }
-        else if (mResponse instanceof BleReadResponse) {
+        } else if (mResponse instanceof BleReadResponse) {
             mResponse.onResponse(code, bundle != null ? bundle.getByteArray(BluetoothConstants.KEY_BYTES) : null);
-        }
-        else if (mResponse instanceof BleReadRssiResponse) {
+        } else if (mResponse instanceof BleReadRssiResponse) {
             mResponse.onResponse(code, bundle != null ? bundle.getInt(BluetoothConstants.KEY_RSSI) : 0);
-        }
-        else {
+        } else {
             mResponse.onResponse(code, null);
         }
     }

@@ -1,12 +1,5 @@
 package com.inuker.bluetooth.library.connect;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -36,6 +29,13 @@ import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.inuker.bluetooth.library.utils.TestUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * 直接面向master，所以所有操作处于单线程中，不涉及同步的问题
  * 这是个基础层，不涉及任务出错重试等容错机制，容错可在上层做
@@ -45,9 +45,8 @@ import com.inuker.bluetooth.library.utils.TestUtils;
  */
 public class BleConnectWorker extends BaseManager {
 
-    private static final int MSG_REQUEST_TIMEOUT = 0x120;
     public static final int MSG_SCHEDULE_NEXT = 0x160;
-
+    private static final int MSG_REQUEST_TIMEOUT = 0x120;
     /**
      * 这些消息是蓝牙回调中发的，要保证回调都在工作线程里处理
      */
@@ -67,15 +66,76 @@ public class BleConnectWorker extends BaseManager {
     private BleRequest mCurrentRequest;
 
     private Handler mWorkerHandler;
+    private final BluetoothGattCallback mConnectCallback = new BluetoothGattCallback() {
 
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status,
+                                            int newState) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d(String.format(
+                    "onConnectionStateChange: status = %d, newState = %d",
+                    status, newState));
+
+            sendWorkerMessage(MSG_CONNECT_CHANGE, status, newState, null);
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d("onServicesDiscovered " + status);
+            sendWorkerMessage(MSG_SERVICE_DISCOVER, status, 0, null);
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt,
+                                         BluetoothGattCharacteristic characteristic, int status) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d(String.format(
+                    "onCharacteristicRead %s\n>>> status = %d, value = %s",
+                    characteristic.getUuid(), status,
+                    ByteUtils.byteToString(characteristic.getValue())));
+
+            sendWorkerMessage(MSG_CHARACTER_READ, status, 0, characteristic);
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt,
+                                          final BluetoothGattCharacteristic characteristic, final int status) {
+            // TODO Auto-generated method stub
+            BluetoothLog.d(String.format(
+                    "onCharacteristicWrite %s, status = %d",
+                    characteristic.getUuid(), status));
+
+            sendWorkerMessage(MSG_CHARACTER_WRITE, status, 0, characteristic);
+        }
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt,
+                                            BluetoothGattCharacteristic characteristic) {
+            // TODO Auto-generated method stub
+            BluetoothLog.v(String.format("onCharacteristicChanged: \n>>> uuid = %s\n>>> value = (%s)",
+                    characteristic.getUuid(),
+                    ByteUtils.byteToString(characteristic.getValue())));
+
+            sendWorkerMessage(MSG_CHARACTER_CHANGE, 0, 0, characteristic);
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt,
+                                      BluetoothGattDescriptor descriptor, int status) {
+            // TODO Auto-generated method stub
+            BluetoothLog.v(String.format("onDescriptorWrite status = %d", status));
+            sendWorkerMessage(MSG_DESCRIPTOR_WRITE, status, 0, descriptor);
+        }
+
+        @Override
+        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+            BluetoothLog.v(String.format("onReadRemoteRssi rssi = %d, status = %d", rssi, status));
+            sendWorkerMessage(MSG_READ_RSSI, status, rssi, null);
+        }
+    };
     private int mConnectStatus;
-
     private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
-
-    public static BleConnectWorker attch(String mac, IBleRunner runner,
-                                           IBleDispatch dispatcher) {
-        return new BleConnectWorker(mac, runner, dispatcher);
-    }
 
     private BleConnectWorker(String mac, IBleRunner runner,
                              IBleDispatch dispatcher) {
@@ -111,6 +171,11 @@ public class BleConnectWorker extends BaseManager {
         };
 
         mBleDispatcher.notifyHandlerReady(mWorkerHandler);
+    }
+
+    public static BleConnectWorker attch(String mac, IBleRunner runner,
+                                         IBleDispatch dispatcher) {
+        return new BleConnectWorker(mac, runner, dispatcher);
     }
 
     private void processWorkerMessage(Message msg) {
@@ -161,16 +226,26 @@ public class BleConnectWorker extends BaseManager {
 
     private String getMessage(int msg) {
         switch (msg) {
-            case MSG_SCHEDULE_NEXT: return "MSG_SCHEDULE_NEXT";
-            case MSG_REQUEST_TIMEOUT: return "MSG_REQUEST_TIMEOUT";
-            case MSG_CONNECT_CHANGE: return "MSG_CONNECT_CHANGE";
-            case MSG_SERVICE_DISCOVER: return "MSG_SERVICE_DISCOVER";
-            case MSG_CHARACTER_READ: return "MSG_CHARACTER_READ";
-            case MSG_CHARACTER_WRITE: return "MSG_CHARACTER_WRITE";
-            case MSG_CHARACTER_CHANGE: return "MSG_CHARACTER_CHANGE";
-            case MSG_DESCRIPTOR_WRITE: return "MSG_DESCRIPTOR_WRITE";
-            case MSG_READ_RSSI: return "MSG_READ_RSSI";
-            default: return "unknown message";
+            case MSG_SCHEDULE_NEXT:
+                return "MSG_SCHEDULE_NEXT";
+            case MSG_REQUEST_TIMEOUT:
+                return "MSG_REQUEST_TIMEOUT";
+            case MSG_CONNECT_CHANGE:
+                return "MSG_CONNECT_CHANGE";
+            case MSG_SERVICE_DISCOVER:
+                return "MSG_SERVICE_DISCOVER";
+            case MSG_CHARACTER_READ:
+                return "MSG_CHARACTER_READ";
+            case MSG_CHARACTER_WRITE:
+                return "MSG_CHARACTER_WRITE";
+            case MSG_CHARACTER_CHANGE:
+                return "MSG_CHARACTER_CHANGE";
+            case MSG_DESCRIPTOR_WRITE:
+                return "MSG_DESCRIPTOR_WRITE";
+            case MSG_READ_RSSI:
+                return "MSG_READ_RSSI";
+            default:
+                return "unknown message";
         }
     }
 
@@ -460,6 +535,7 @@ public class BleConnectWorker extends BaseManager {
 
     /**
      * 当worker在任何环节出现任何异常，都会调用本函数通知dispatcher
+     *
      * @param result
      */
     private void dispatchRequestResult(boolean result) {
@@ -666,75 +742,6 @@ public class BleConnectWorker extends BaseManager {
             dispatchRequestResult(BluetoothConstants.FAILED);
         }
     }
-
-    private final BluetoothGattCallback mConnectCallback = new BluetoothGattCallback() {
-
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status,
-                                            int newState) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onConnectionStateChange: status = %d, newState = %d",
-                    status, newState));
-
-            sendWorkerMessage(MSG_CONNECT_CHANGE, status, newState, null);
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d("onServicesDiscovered " + status);
-            sendWorkerMessage(MSG_SERVICE_DISCOVER, status, 0, null);
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onCharacteristicRead %s\n>>> status = %d, value = %s",
-                    characteristic.getUuid(), status,
-                    ByteUtils.byteToString(characteristic.getValue())));
-
-            sendWorkerMessage(MSG_CHARACTER_READ, status, 0, characteristic);
-        }
-
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          final BluetoothGattCharacteristic characteristic, final int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onCharacteristicWrite %s, status = %d",
-                    characteristic.getUuid(), status));
-
-            sendWorkerMessage(MSG_CHARACTER_WRITE, status, 0, characteristic);
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt,
-                                            BluetoothGattCharacteristic characteristic) {
-            // TODO Auto-generated method stub
-            BluetoothLog.v(String.format("onCharacteristicChanged: \n>>> uuid = %s\n>>> value = (%s)",
-                    characteristic.getUuid(),
-                    ByteUtils.byteToString(characteristic.getValue())));
-
-            sendWorkerMessage(MSG_CHARACTER_CHANGE, 0, 0, characteristic);
-        }
-
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt,
-                                      BluetoothGattDescriptor descriptor, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.v(String.format("onDescriptorWrite status = %d", status));
-            sendWorkerMessage(MSG_DESCRIPTOR_WRITE, status, 0, descriptor);
-        }
-
-        @Override
-        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-            BluetoothLog.v(String.format("onReadRemoteRssi rssi = %d, status = %d", rssi, status));
-            sendWorkerMessage(MSG_READ_RSSI, status, rssi, null);
-        }
-    };
 
     private void sendWorkerMessage(int what, int arg1, int arg2, Object obj) {
         mWorkerHandler.obtainMessage(what, arg1, arg2, obj).sendToTarget();

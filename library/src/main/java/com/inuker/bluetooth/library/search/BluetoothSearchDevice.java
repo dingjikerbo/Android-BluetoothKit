@@ -9,60 +9,34 @@ import android.os.Parcelable;
  */
 public class BluetoothSearchDevice implements Parcelable {
 
-    /**
-     * ApiLevel:5
-     */
-    public BluetoothDevice device;
-    /**
-     * ApiLevel:5
-     */
-    public int rssi;
-    /**
-     * ApiLevel:8
-     */
-    public boolean isConnected;
-    /**
-     * ApiLevel:8
-     */
-    public byte[] scanRecord;
-    /**
-     * ApiLevel:10
-     */
-    public int deviceType;
+    public static final int DEVICE_TYPE_CLASSIC = 1;
+    public static final int DEVICE_TYPE_BLE = 2;
+    public static final Creator<BluetoothSearchDevice> CREATOR = new Creator<BluetoothSearchDevice>() {
+        public BluetoothSearchDevice createFromParcel(Parcel source) {
+            return new BluetoothSearchDevice(source);
+        }
 
-    /**
-     * ApiLevel:11
-     */
+        public BluetoothSearchDevice[] newArray(int size) {
+            return new BluetoothSearchDevice[size];
+        }
+    };
+    public BluetoothDevice device;
+    public int rssi;
+    public boolean isConnected;
+    public byte[] scanRecord;
+    public int deviceType;
     public String name;
 
-    /**
-     * ApiLevel:10
-     */
-    public static final int DEVICE_TYPE_CLASSIC = 1;
-
-    /**
-     * ApiLevel:10
-     */
-    public static final int DEVICE_TYPE_BLE = 2;
-
-    /**
-     * ApiLevel:10
-     */
     public BluetoothSearchDevice() {
 
     }
 
-    /**
-     * ApiLevel:10
-     */
     public BluetoothSearchDevice(BluetoothDevice device, int deviceType) {
         this.device = device;
         this.deviceType = deviceType;
     }
 
-    /**
-     * ApiLevel:10
-     */
+
     public BluetoothSearchDevice(BluetoothDevice device, int rssi, byte[] scanRecord, int deviceType) {
         this.device = device;
         this.rssi = rssi;
@@ -70,6 +44,14 @@ public class BluetoothSearchDevice implements Parcelable {
         this.deviceType = deviceType;
     }
 
+    public BluetoothSearchDevice(Parcel in) {
+        this.device = in.readParcelable(BluetoothDevice.class.getClassLoader());
+        this.rssi = in.readInt();
+        this.isConnected = in.readByte() != 0;
+        this.scanRecord = in.createByteArray();
+        this.deviceType = in.readInt();
+        this.name = in.readString();
+    }
 
     @Override
     public String toString() {
@@ -95,23 +77,4 @@ public class BluetoothSearchDevice implements Parcelable {
         dest.writeInt(this.deviceType);
         dest.writeString(this.name);
     }
-
-    public BluetoothSearchDevice(Parcel in) {
-        this.device = in.readParcelable(BluetoothDevice.class.getClassLoader());
-        this.rssi = in.readInt();
-        this.isConnected = in.readByte() != 0;
-        this.scanRecord = in.createByteArray();
-        this.deviceType = in.readInt();
-        this.name = in.readString();
-    }
-
-    public static final Creator<BluetoothSearchDevice> CREATOR = new Creator<BluetoothSearchDevice>() {
-        public BluetoothSearchDevice createFromParcel(Parcel source) {
-            return new BluetoothSearchDevice(source);
-        }
-
-        public BluetoothSearchDevice[] newArray(int size) {
-            return new BluetoothSearchDevice[size];
-        }
-    };
 }

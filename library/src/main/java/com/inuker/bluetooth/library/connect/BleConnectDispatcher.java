@@ -1,9 +1,5 @@
 package com.inuker.bluetooth.library.connect;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +19,10 @@ import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 /**
  * 任务调度器，任务容错，重试等调度策略
  * 告诉worker要做什么就行了，worker忠实地去完成，并通知我结果
@@ -30,6 +30,7 @@ import com.inuker.bluetooth.library.utils.ListUtils;
  * 这里最重要的是保证任务能依次执行，不能因为某个任务异常或超时或任何其他异常而中断
  * 任务之间要设置一个间隔，因为蓝牙处理速度不会那么快，任务积累多了会阻塞缓冲区，导致后面的任务收不到回调超时
  * 任务队列要设置一个上限，避免任务太多内存溢出
+ *
  * @author dingjikerbo
  */
 public class BleConnectDispatcher implements IBleDispatch {
@@ -38,19 +39,41 @@ public class BleConnectDispatcher implements IBleDispatch {
     public static final int MSG_REQUEST_FAILED = 0x110;
 
     private static final int MAX_REQUEST_COUNT = 100;
+    private final Handler mResponseHandler = new Handler(Looper.getMainLooper()) {
 
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            BleRequest request = null;
+
+            if (msg != null && msg.obj instanceof BleRequest) {
+                request = (BleRequest) msg.obj;
+            }
+
+            switch (msg.what) {
+                case MSG_REQUEST_SUCCESS:
+                    request.onResponse(Code.REQUEST_SUCCESS, request.getBundle());
+
+                    break;
+
+                case MSG_REQUEST_FAILED:
+                    request.onResponse(request.getIntExtra(BluetoothConstants.KEY_CODE, Code.REQUEST_FAILED), null);
+
+                    break;
+            }
+        }
+    };
     private Handler mWorkerHandler;
-
     private List<BleRequest> mBleWorkList;
     private BleRequest mCurrentRequest;
-
-    public static BleConnectDispatcher newInstance(String mac, IBleRunner runner) {
-        return new BleConnectDispatcher(mac, runner);
-    }
 
     private BleConnectDispatcher(String mac, IBleRunner runner) {
         mBleWorkList = new ArrayList<BleRequest>();
         BleConnectWorker.attch(mac, runner, this);
+    }
+
+    public static BleConnectDispatcher newInstance(String mac, IBleRunner runner) {
+        return new BleConnectDispatcher(mac, runner);
     }
 
     public void connect(BleResponseWrapper response) {
@@ -160,31 +183,6 @@ public class BleConnectDispatcher implements IBleDispatch {
         request.setRequestCode(Code.REQUEST_OVERFLOW);
         sendMessageToResponseHandler(MSG_REQUEST_FAILED, request);
     }
-
-    private final Handler mResponseHandler = new Handler(Looper.getMainLooper()) {
-
-        @Override
-        public void handleMessage(Message msg) {
-            // TODO Auto-generated method stub
-            BleRequest request = null;
-
-            if (msg != null && msg.obj instanceof BleRequest) {
-                request = (BleRequest) msg.obj;
-            }
-
-            switch (msg.what) {
-                case MSG_REQUEST_SUCCESS:
-                    request.onResponse(Code.REQUEST_SUCCESS, request.getBundle());
-
-                    break;
-
-                case MSG_REQUEST_FAILED:
-                    request.onResponse(request.getIntExtra(BluetoothConstants.KEY_CODE, Code.REQUEST_FAILED), null);
-
-                    break;
-            }
-        }
-    };
 
     @Override
     public void notifyWorkerResult(BleRequest request, boolean result) {

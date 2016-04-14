@@ -7,7 +7,7 @@ import java.util.Arrays;
  */
 public class ByteUtils {
 
-    public static final byte[] EMPTY_BYTES = new byte[] {};
+    public static final byte[] EMPTY_BYTES = new byte[]{};
 
     public static final int BYTE_MAX = 0xff;
 
@@ -22,7 +22,7 @@ public class ByteUtils {
     /**
      * @param bytes 原始byte数组
      * @param start 前闭合区间
-     * @param end 后闭合区间
+     * @param end   后闭合区间
      * @return 返回位于区间内的byte子数组
      */
     public static byte[] getBytes(byte[] bytes, int start, int end) {
@@ -113,7 +113,7 @@ public class ByteUtils {
     /**
      * @param data
      * @param index
-     * @param flag true小端， false大端
+     * @param flag  true小端， false大端
      * @return
      */
     public static boolean getBit(byte data, int index, boolean flag) {

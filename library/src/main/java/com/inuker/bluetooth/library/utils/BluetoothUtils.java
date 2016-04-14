@@ -1,12 +1,6 @@
 package com.inuker.bluetooth.library.utils;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
@@ -21,22 +15,25 @@ import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.BaseManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BluetoothUtils extends BaseManager {
 
-	private static android.bluetooth.BluetoothManager mBluetoothManager;
-	private static BluetoothAdapter mBluetoothLeAdapter;
-	private static BluetoothAdapter mBluetoothClassicAdapter;
+    private static android.bluetooth.BluetoothManager mBluetoothManager;
+    private static BluetoothAdapter mBluetoothLeAdapter;
+    private static BluetoothAdapter mBluetoothClassicAdapter;
 
-	public static boolean isBleSupported() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
-				&& getContext().getPackageManager().hasSystemFeature(
+    public static boolean isBleSupported() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
+                && getContext().getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_BLUETOOTH_LE);
-	}
+    }
 
-	public static boolean isBluetoothEnabled() {
-		BluetoothAdapter adapter = getBluetoothClassicAdapter();
-		return adapter != null && adapter.isEnabled();
-	}
+    public static boolean isBluetoothEnabled() {
+        BluetoothAdapter adapter = getBluetoothClassicAdapter();
+        return adapter != null && adapter.isEnabled();
+    }
 
     public static LocalBroadcastManager getLocalBroadcastManager() {
         return LocalBroadcastManager.getInstance(getContext());
@@ -78,35 +75,35 @@ public class BluetoothUtils extends BaseManager {
         getContext().sendBroadcast(intent);
     }
 
-	public static android.bluetooth.BluetoothManager getBluetoothManager() {
-		if (isBleSupported()) {
-			if (mBluetoothManager == null) {
-				mBluetoothManager = (android.bluetooth.BluetoothManager) getContext()
-						.getSystemService(Context.BLUETOOTH_SERVICE);
-			}
-			return mBluetoothManager;
-		}
-		return null;
-	}
+    public static android.bluetooth.BluetoothManager getBluetoothManager() {
+        if (isBleSupported()) {
+            if (mBluetoothManager == null) {
+                mBluetoothManager = (android.bluetooth.BluetoothManager) getContext()
+                        .getSystemService(Context.BLUETOOTH_SERVICE);
+            }
+            return mBluetoothManager;
+        }
+        return null;
+    }
 
-	public static BluetoothAdapter getBluetoothLeAdapter() {
-		if (mBluetoothLeAdapter == null) {
+    public static BluetoothAdapter getBluetoothLeAdapter() {
+        if (mBluetoothLeAdapter == null) {
             android.bluetooth.BluetoothManager manager = getBluetoothManager();
-			if (manager != null) {
-				mBluetoothLeAdapter = manager.getAdapter();
-			}
-		}
-		return mBluetoothLeAdapter;
-	}
+            if (manager != null) {
+                mBluetoothLeAdapter = manager.getAdapter();
+            }
+        }
+        return mBluetoothLeAdapter;
+    }
 
-	public static BluetoothAdapter getBluetoothClassicAdapter() {
-		if (mBluetoothClassicAdapter == null) {
-			mBluetoothClassicAdapter = BluetoothAdapter.getDefaultAdapter();
-		}
-		return mBluetoothClassicAdapter;
-	}
+    public static BluetoothAdapter getBluetoothClassicAdapter() {
+        if (mBluetoothClassicAdapter == null) {
+            mBluetoothClassicAdapter = BluetoothAdapter.getDefaultAdapter();
+        }
+        return mBluetoothClassicAdapter;
+    }
 
-	public static BluetoothDevice getRemoteDevice(String mac) {
+    public static BluetoothDevice getRemoteDevice(String mac) {
         if (!TextUtils.isEmpty(mac)) {
             BluetoothAdapter adapter = getBluetoothLeAdapter();
             if (adapter != null) {
@@ -116,29 +113,29 @@ public class BluetoothUtils extends BaseManager {
         return null;
     }
 
-	public static List<BluetoothDevice> getConnectedBluetoothLeDevices() {
-		List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
+    public static List<BluetoothDevice> getConnectedBluetoothLeDevices() {
+        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
 
         android.bluetooth.BluetoothManager manager = getBluetoothManager();
 
-		if (manager != null) {
-			devices.addAll(manager.getConnectedDevices(BluetoothProfile.GATT));
-		}
+        if (manager != null) {
+            devices.addAll(manager.getConnectedDevices(BluetoothProfile.GATT));
+        }
 
-		return devices;
-	}
+        return devices;
+    }
 
-	public static List<BluetoothDevice> getBondedBluetoothClassicDevices() {
-		List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
+    public static List<BluetoothDevice> getBondedBluetoothClassicDevices() {
+        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
 
-		BluetoothAdapter adapter = getBluetoothClassicAdapter();
+        BluetoothAdapter adapter = getBluetoothClassicAdapter();
 
-		if (adapter != null) {
-			devices.addAll(adapter.getBondedDevices());
-		}
+        if (adapter != null) {
+            devices.addAll(adapter.getBondedDevices());
+        }
 
-		return devices;
-	}
+        return devices;
+    }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static boolean isDeviceConnected(String mac) {
