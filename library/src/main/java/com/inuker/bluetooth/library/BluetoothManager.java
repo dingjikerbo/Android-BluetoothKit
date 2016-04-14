@@ -24,7 +24,7 @@ public class BluetoothManager extends BaseManager {
             return;
         }
 
-        BLEConnectManager.connect(mac, new XmBleResponse(response));
+        BLEConnectManager.connect(mac, new BleResponseWrapper(response));
     }
 
     public static void disconnect(String mac) {
@@ -32,15 +32,15 @@ public class BluetoothManager extends BaseManager {
     }
 
     public static void read(String mac, UUID service, UUID character, final BleReadResponse response) {
-        BLEConnectManager.read(mac, service, character, new XmBleResponse(response));
+        BLEConnectManager.read(mac, service, character, new BleResponseWrapper(response));
     }
 
     public static void write(String mac, UUID service, UUID character, byte[] bytes, BleWriteResponse response) {
-        BLEConnectManager.write(mac, service, character, bytes, new XmBleResponse(response));
+        BLEConnectManager.write(mac, service, character, bytes, new BleResponseWrapper(response));
     }
 
     public static void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
-        BLEConnectManager.notify(mac, service, character, new XmBleResponse(response));
+        BLEConnectManager.notify(mac, service, character, new BleResponseWrapper(response));
     }
 
     public static void unnotify(String mac, UUID service, UUID character) {
@@ -48,6 +48,6 @@ public class BluetoothManager extends BaseManager {
     }
 
     public static void readRemoteRssi(String mac, final BleReadRssiResponse response) {
-        BLEConnectManager.readRemoteRssi(mac, new XmBleResponse(response));
+        BLEConnectManager.readRemoteRssi(mac, new BleResponseWrapper(response));
     }
 }

@@ -9,7 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.inuker.bluetooth.library.XmBleResponse;
+import com.inuker.bluetooth.library.BleResponseWrapper;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -53,7 +53,7 @@ public class BleConnectDispatcher implements IBleDispatch {
         BleConnectWorker.attch(mac, runner, this);
     }
 
-    public void connect(XmBleResponse response) {
+    public void connect(BleResponseWrapper response) {
         addNewRequest(new BleConnectRequest(response));
     }
 
@@ -61,16 +61,16 @@ public class BleConnectDispatcher implements IBleDispatch {
         addNewRequest(new BleDisconnectRequest());
     }
 
-    public void read(UUID service, UUID character, XmBleResponse response) {
+    public void read(UUID service, UUID character, BleResponseWrapper response) {
         addNewRequest(new BleReadRequest(service, character, response));
     }
 
     public void write(UUID service, UUID character, byte[] bytes,
-                      XmBleResponse response) {
+                      BleResponseWrapper response) {
         addNewRequest(new BleWriteRequest(service, character, bytes, response));
     }
 
-    public void notify(UUID service, UUID character, XmBleResponse response) {
+    public void notify(UUID service, UUID character, BleResponseWrapper response) {
         addNewRequest(new BleNotifyRequest(service, character, response));
     }
 
@@ -78,7 +78,7 @@ public class BleConnectDispatcher implements IBleDispatch {
         addNewRequest(new BleUnnotifyRequest(service, character));
     }
 
-    public void readRemoteRssi(XmBleResponse response) {
+    public void readRemoteRssi(BleResponseWrapper response) {
         addNewRequest(new BleReadRssiRequest(response));
     }
 

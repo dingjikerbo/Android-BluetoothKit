@@ -2,7 +2,7 @@ package com.inuker.bluetooth.library.connect;
 
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.XmBleResponse;
+import com.inuker.bluetooth.library.BleResponseWrapper;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class BLEConnectManager {
         return master;
     }
 
-    public static void connect(String mac, XmBleResponse response) {
+    public static void connect(String mac, BleResponseWrapper response) {
         if (!TextUtils.isEmpty(mac)) {
             BleConnectMaster master = getBleConnectMaster(mac);
             master.connect(response);
@@ -40,21 +40,21 @@ public class BLEConnectManager {
         }
     }
 
-    public static void read(String mac, UUID service, UUID character, XmBleResponse response) {
+    public static void read(String mac, UUID service, UUID character, BleResponseWrapper response) {
         if (!TextUtils.isEmpty(mac) && service != null && character != null) {
             BleConnectMaster master = getBleConnectMaster(mac);
             master.read(service, character, response);
         }
     }
 
-    public static void write(String mac, UUID service, UUID character, byte[] bytes, XmBleResponse response) {
+    public static void write(String mac, UUID service, UUID character, byte[] bytes, BleResponseWrapper response) {
         if (!TextUtils.isEmpty(mac) && service != null && character != null && bytes != null) {
             BleConnectMaster master = getBleConnectMaster(mac);
             master.write(service, character, bytes, response);
         }
     }
 
-    public static void notify(String mac, UUID service, UUID character, XmBleResponse response) {
+    public static void notify(String mac, UUID service, UUID character, BleResponseWrapper response) {
         if (!TextUtils.isEmpty(mac) && service != null && character != null) {
             BleConnectMaster master = getBleConnectMaster(mac);
             master.notify(service, character, response);
@@ -68,7 +68,7 @@ public class BLEConnectManager {
         }
     }
 
-    public static void readRemoteRssi(String mac, XmBleResponse response) {
+    public static void readRemoteRssi(String mac, BleResponseWrapper response) {
         if (!TextUtils.isEmpty(mac)) {
             BleConnectMaster master = getBleConnectMaster(mac);
             master.readRemoteRssi(response);

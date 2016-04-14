@@ -43,7 +43,6 @@ import com.inuker.bluetooth.library.utils.TestUtils;
  *
  * @author liwentian
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BleConnectWorker extends BaseManager {
 
     private static final int MSG_REQUEST_TIMEOUT = 0x120;

@@ -11,11 +11,11 @@ import com.inuker.bluetooth.library.utils.BluetoothConstants;
 /**
  * Created by liwentian on 2016/3/10.
  */
-public class XmBleResponse implements BleResponse<Bundle> {
+public class BleResponseWrapper implements BleResponse<Bundle> {
 
     public BleResponse mResponse;
 
-    public XmBleResponse(BleResponse response) {
+    public BleResponseWrapper(BleResponse response) {
         mResponse = response;
     }
 

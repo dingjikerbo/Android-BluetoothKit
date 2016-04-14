@@ -1,6 +1,6 @@
 package com.inuker.bluetooth.library.connect.request;
 
-import com.inuker.bluetooth.library.XmBleResponse;
+import com.inuker.bluetooth.library.BleResponseWrapper;
 
 import java.util.UUID;
 
@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 public class BleNotifyRequest extends BleRequest {
 
-    public BleNotifyRequest(UUID service, UUID character, XmBleResponse response) {
+    public BleNotifyRequest(UUID service, UUID character, BleResponseWrapper response) {
         super(response);
         mRequestType = REQUEST_TYPE_NOTIFY;
         mServiceUUID = service;
