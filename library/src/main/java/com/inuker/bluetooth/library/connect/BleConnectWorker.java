@@ -1,5 +1,12 @@
 package com.inuker.bluetooth.library.connect;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,9 +20,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 
-import com.inuker.bluetooth.library.BluetoothManager;
+import com.inuker.bluetooth.library.BaseManager;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -31,14 +37,7 @@ import com.inuker.bluetooth.library.utils.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.inuker.bluetooth.library.utils.TestUtils;
 
 /**
  * 直接面向master，所以所有操作处于单线程中，不涉及同步的问题
@@ -78,7 +77,7 @@ public class BleConnectWorker extends BaseManager {
     private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
 
     public static BleConnectWorker attch(String mac, IBleRunner runner,
-                                         IBleDispatch dispatcher) {
+                                           IBleDispatch dispatcher) {
         return new BleConnectWorker(mac, runner, dispatcher);
     }
 
@@ -180,8 +179,6 @@ public class BleConnectWorker extends BaseManager {
     }
 
     private void refreshServiceProfile() {
-        BluetoothLog.v("refreshDeviceProfile");
-
         List<BluetoothGattService> services = mBluetoothGatt.getServices();
 
         Map<UUID, Map<UUID, BluetoothGattCharacteristic>> newProfiles = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
@@ -267,9 +264,9 @@ public class BleConnectWorker extends BaseManager {
      * @param request
      */
     private void processRequest(BleRequest request) {
-        BluetoothLog.w(String.format(
+        BluetoothLog.v(String.format(
                 "processRequest %s\n>>> current status = %s",
-                request.toString(), getStatus(mConnectStatus)));
+                request.toString(), TestUtils.getStatus(mConnectStatus)));
 
         mCurrentRequest = request;
 
@@ -376,9 +373,11 @@ public class BleConnectWorker extends BaseManager {
                     .getDescriptor(UUID
                             .fromString(BluetoothConstants.CLIENT_CHARACTERISTIC_CONFIG));
 
-            descriptor
-                    .setValue(flag ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                            : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+            if (descriptor != null) {
+                descriptor
+                        .setValue(flag ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+            }
 
             result = mBluetoothGatt.writeDescriptor(descriptor);
         } else {
@@ -394,7 +393,7 @@ public class BleConnectWorker extends BaseManager {
                 request.getServiceUUID(), request.getCharacterUUID()));
 
         if (!isServiceReady()) {
-            BluetoothLog.w(String.format("connect status invalid: %d", mConnectStatus));
+            BluetoothLog.w(String.format("connect status invalid: %s", TestUtils.getStatus(mConnectStatus)));
             dispatchRequestResult(BluetoothConstants.FAILED);
         } else {
             BluetoothGattCharacteristic character = getCharacter(request);
@@ -468,7 +467,7 @@ public class BleConnectWorker extends BaseManager {
      * @param result
      */
     private void dispatchRequestResult(boolean result) {
-        BluetoothLog.w("dispatchRequestResult " + result + "\n");
+        BluetoothLog.v("dispatchRequestResult " + result + "\n");
 
         stopRequestTiming();
 
@@ -504,16 +503,15 @@ public class BleConnectWorker extends BaseManager {
 
         if (mBluetoothGatt == null) {
             mBluetoothGatt = mBluetoothDevice.connectGatt(
-                    BluetoothUtils.getContext(), false, mConnectCallback);
+                    getContext(), false, mConnectCallback);
         }
 
         return mBluetoothGatt;
     }
 
     private void setConnectStatus(int status) {
-//        BluetoothLog.d(String.format("setConnectStatus %d for %s",
-//                status, mBluetoothDevice.getAddress()));
-
+//        BluetoothLog.d(String.format("setConnectStatus %s for %s",
+//                TestUtils.getStatus(status), mBluetoothDevice.getAddress()));
         mConnectStatus = status;
     }
 
@@ -522,16 +520,7 @@ public class BleConnectWorker extends BaseManager {
             Set<UUID> set = mDeviceProfile.keySet();
             if (set != null) {
                 ArrayList<UUID> uuids = new ArrayList<UUID>(set);
-                request.putSerializableExtra(BluetoothConstants.KEY_UUIDS, uuids);
-            }
-
-            Map<UUID, BluetoothGattCharacteristic> miservice = mDeviceProfile.get(BluetoothConstants.MISERVICE);
-            if (miservice != null) {
-                Set<UUID> set2 = miservice.keySet();
-                if (set2 != null) {
-                    ArrayList<UUID> uuids2 = new ArrayList<UUID>(set2);
-                    request.putSerializableExtra(BluetoothConstants.KEY_MISERVICE_CHARACTERS, uuids2);
-                }
+                request.putSerializableExtra(BluetoothConstants.KEY_SERVICE_UUID, uuids);
             }
         }
     }
@@ -699,7 +688,6 @@ public class BleConnectWorker extends BaseManager {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             // TODO Auto-generated method stub
             BluetoothLog.d("onServicesDiscovered " + status);
-
             sendWorkerMessage(MSG_SERVICE_DISCOVER, status, 0, null);
         }
 
@@ -741,13 +729,13 @@ public class BleConnectWorker extends BaseManager {
         public void onDescriptorWrite(BluetoothGatt gatt,
                                       BluetoothGattDescriptor descriptor, int status) {
             // TODO Auto-generated method stub
+            BluetoothLog.v(String.format("onDescriptorWrite status = %d", status));
             sendWorkerMessage(MSG_DESCRIPTOR_WRITE, status, 0, descriptor);
         }
 
         @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             BluetoothLog.v(String.format("onReadRemoteRssi rssi = %d, status = %d", rssi, status));
-
             sendWorkerMessage(MSG_READ_RSSI, status, rssi, null);
         }
     };
@@ -791,14 +779,5 @@ public class BleConnectWorker extends BaseManager {
         intent.putExtra(BluetoothConstants.KEY_CHARACTER_UUID, character);
         intent.putExtra(BluetoothConstants.KEY_CHARACTER_VALUE, value);
         BluetoothUtils.sendBroadcast(intent);
-    }
-
-    private String getStatus(int status) {
-        switch (status) {
-            case BluetoothConstants.STATUS_DEVICE_CONNECTED: return "STATUS_CONNECTED";
-            case BluetoothConstants.STATUS_DEVICE_DISCONNECTED: return "STATUS_DEVICE_DISCONNECTED";
-            case BluetoothConstants.STATUS_DEVICE_SERVICE_READY: return "STATUS_DEVICE_SERVICE_READY";
-            default: return "unknown " + status;
-        }
     }
 }

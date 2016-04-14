@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library.connect.request;
 
-import com.inuker.bluetooth.library.response.BleWriteResponse;
+import com.inuker.bluetooth.library.XmBleResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse2;
 
 import java.util.UUID;
 
@@ -20,6 +21,6 @@ public class BleWriteRequest extends BleRequest {
     }
 
     public boolean withNoResponse() {
-        return mResponse.mResponse instanceof Response.BleWriteResponse2;
+        return mResponse.mResponse instanceof BleWriteResponse2;
     }
 }

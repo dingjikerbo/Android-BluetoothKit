@@ -2,14 +2,7 @@ package com.inuker.bluetooth.library.connect;
 
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.connect.request.Code;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
-import com.inuker.bluetooth.library.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.response.BleReadResponse;
-import com.inuker.bluetooth.library.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.response.BleResponse;
-import com.inuker.bluetooth.library.response.BleWriteResponse;
-import com.inuker.bluetooth.library.utils.BluetoothUtils;
+import com.inuker.bluetooth.library.XmBleResponse;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -81,5 +74,15 @@ public class BLEConnectManager {
             master.readRemoteRssi(response);
         }
     }
-}
 
+    public static void disconnectAllDevices() {
+        Collection<BleConnectMaster> masters = mBleConnectWorkerMap.values();
+        Iterator<BleConnectMaster> iterator = masters.iterator();
+        while (iterator.hasNext()) {
+            BleConnectMaster master = iterator.next();
+            if (master != null) {
+                master.disconnect();
+            }
+        }
+    }
+}

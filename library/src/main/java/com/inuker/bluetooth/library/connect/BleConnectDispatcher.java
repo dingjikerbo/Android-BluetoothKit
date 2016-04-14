@@ -1,10 +1,15 @@
 package com.inuker.bluetooth.library.connect;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.inuker.bluetooth.library.XmBleResponse;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -16,19 +21,10 @@ import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.connect.request.Code;
 import com.inuker.bluetooth.library.connect.request.IBleDispatch;
 import com.inuker.bluetooth.library.connect.request.IBleRunner;
-import com.inuker.bluetooth.library.response.BleConnectResponse;
-import com.inuker.bluetooth.library.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.response.BleReadResponse;
-import com.inuker.bluetooth.library.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.response.BleWriteResponse;
 import com.inuker.bluetooth.library.utils.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * 任务调度器，任务容错，重试等调度策略
