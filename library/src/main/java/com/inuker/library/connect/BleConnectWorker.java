@@ -513,8 +513,6 @@ public class BleConnectWorker extends BaseManager {
     }
 
     private void setConnectStatus(int status) {
-//        BluetoothLog.d(String.format("setConnectStatus %s for %s",
-//                TestUtils.getStatus(status), mBluetoothDevice.getAddress()));
         mConnectStatus = status;
     }
 

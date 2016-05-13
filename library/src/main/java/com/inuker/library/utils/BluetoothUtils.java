@@ -3,6 +3,7 @@ package com.inuker.library.utils;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,11 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.inuker.library.BaseManager;
+import com.inuker.library.search.BluetoothSearchResult;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by liwentian on 2016/5/13.
@@ -108,6 +114,46 @@ public class BluetoothUtils  extends BaseManager {
             }
         }
         return null;
+    }
+
+    public static List<BluetoothSearchResult> getConnectedBluetoothLeDevices() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            return ListUtils.getEmptyList();
+        }
+
+        List<BluetoothSearchResult> results = new ArrayList<BluetoothSearchResult>();
+
+        android.bluetooth.BluetoothManager manager = getBluetoothManager();
+
+        if (manager != null) {
+            List<BluetoothDevice> devices = manager.getConnectedDevices(BluetoothProfile.GATT);
+            for (BluetoothDevice device : devices) {
+                BluetoothSearchResult result = new BluetoothSearchResult(device);
+                result.setBleDevice();
+                result.setName(device.getName());
+                results.add(result);
+            }
+        }
+
+        return results;
+    }
+
+    public static List<BluetoothSearchResult> getBondedBluetoothClassicDevices() {
+        List<BluetoothSearchResult> results = new ArrayList<BluetoothSearchResult>();
+
+        BluetoothAdapter adapter = getBluetoothClassicAdapter();
+
+        if (adapter != null) {
+            Set<BluetoothDevice> devices = adapter.getBondedDevices();
+            for (BluetoothDevice device : devices) {
+                BluetoothSearchResult result = new BluetoothSearchResult(device);
+                result.setClassicDevice();
+                result.setName(device.getName());
+                results.add(result);
+            }
+        }
+
+        return results;
     }
 
 }
