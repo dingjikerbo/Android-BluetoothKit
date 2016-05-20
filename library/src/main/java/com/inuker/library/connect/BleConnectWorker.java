@@ -507,6 +507,7 @@ public class BleConnectWorker extends BaseManager {
         if (mBluetoothGatt == null) {
             mBluetoothGatt = mBluetoothDevice.connectGatt(
                     BluetoothUtils.getContext(), false, mConnectCallback);
+            BluetoothUtils.refreshDeviceCache(mBluetoothGatt);
         }
 
         return mBluetoothGatt;

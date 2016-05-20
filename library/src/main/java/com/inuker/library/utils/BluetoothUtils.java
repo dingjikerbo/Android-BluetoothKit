@@ -2,6 +2,7 @@ package com.inuker.library.utils;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
@@ -15,6 +16,7 @@ import android.text.TextUtils;
 import com.inuker.library.BaseManager;
 import com.inuker.library.search.BluetoothSearchResult;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -154,6 +156,23 @@ public class BluetoothUtils  extends BaseManager {
         }
 
         return results;
+    }
+
+    public static boolean refreshDeviceCache(BluetoothGatt gatt){
+        BluetoothLog.w("refreshDeviceCache");
+
+        try {
+            if (gatt != null) {
+                Method refresh = BluetoothGatt.class.getMethod("refresh");
+                if (refresh != null) {
+                    refresh.setAccessible(true);
+                    return (boolean) refresh.invoke(gatt, new Object[0]);
+                }
+            }
+        } catch (Exception e) {
+            BluetoothLog.e(e);
+        }
+        return false;
     }
 
 }
