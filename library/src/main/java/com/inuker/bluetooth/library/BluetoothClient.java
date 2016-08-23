@@ -5,11 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.connect.response.BleResponseImpl;
+import com.inuker.bluetooth.library.connect.response.BleResponseStub;
+import com.inuker.bluetooth.library.utils.ProxyUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Created by dingjikerbo on 16/4/8.
@@ -18,15 +24,26 @@ public class BluetoothClient {
 
     private Context mContext;
 
-    private final Object sLock = new Object();
+    private IBluetoothService mBluetoothManager;
 
-    private IBluetoothManager mBluetoothManager;
+    private static BluetoothClient sInstance;
 
-    public BluetoothClient(Context context) {
+    private BluetoothClient(Context context) {
         mContext = context.getApplicationContext();
     }
 
-    private void checkService() {
+    public static BluetoothClient getInstance(Context context) {
+        if (sInstance == null) {
+            synchronized (BluetoothClient.class) {
+                if (sInstance == null) {
+                    sInstance = new BluetoothClient(context);
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    private void bindService() {
         if (mBluetoothManager != null) {
             return;
         }
@@ -34,54 +51,29 @@ public class BluetoothClient {
         Intent intent = new Intent();
         intent.setClass(mContext, BluetoothService.class);
         mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-
-        synchronized (sLock) {
-            try {
-                sLock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mBluetoothManager = IBluetoothManager.Stub.asInterface(service);
-
-            try {
-                service.linkToDeath(mDeathRecipient, 0);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-
-            synchronized (sLock) {
-                sLock.notifyAll();
-            }
+            mBluetoothManager = IBluetoothService.Stub.asInterface(service);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mBluetoothManager = null;
+            bindService();
         }
     };
 
-    private final IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
-        @Override
-        public void binderDied() {
-            mBluetoothManager = null;
-        }
-    };
+    public void connect(String mac, BleResponse response) {
+        Bundle args = new Bundle();
+        args.putString(BluetoothConstants.EXTRA_MAC, mac);
 
-    public void connect(String mac, BleConnectResponse response) {
-        checkService();
-
-        if (mBluetoothManager != null) {
-            try {
-                mBluetoothManager.connect(mac, BleResponseImpl.newInstance(response));
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+        try {
+            mBluetoothManager.callBluetoothApi(BluetoothConstants.CODE_CONNECT, args, response);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 }

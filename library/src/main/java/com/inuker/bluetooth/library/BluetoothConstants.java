@@ -2,7 +2,7 @@ package com.inuker.bluetooth.library;
 
 public class BluetoothConstants {
 
-    public static final int GATT_ERROR = 133;
+    public static final int CODE_CONNECT = 1;
 
-    public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
+    public static final String EXTRA_MAC = "extra.mac";
 }

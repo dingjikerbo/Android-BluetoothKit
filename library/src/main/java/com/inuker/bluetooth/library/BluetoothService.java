@@ -17,6 +17,6 @@ public class BluetoothService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return BluetoothManager.getInstance();
+        return BluetoothServiceImpl.getInstance();
     }
 }
