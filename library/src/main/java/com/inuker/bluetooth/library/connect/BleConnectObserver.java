@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.connect;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 

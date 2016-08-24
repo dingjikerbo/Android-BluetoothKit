@@ -1,10 +1,8 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.connect;
 
 import android.support.v4.util.ArrayMap;
 
-import com.inuker.bluetooth.library.BleConnectMaster;
-import com.inuker.bluetooth.library.BleResponse;
-import com.inuker.bluetooth.library.IBleConnectMaster;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 
 import java.util.UUID;
 

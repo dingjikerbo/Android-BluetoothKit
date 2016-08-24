@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.connect.response;
 
 import com.inuker.bluetooth.library.IResponse;
 

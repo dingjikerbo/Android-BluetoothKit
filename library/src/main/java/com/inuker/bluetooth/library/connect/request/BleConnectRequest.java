@@ -1,6 +1,6 @@
 package com.inuker.bluetooth.library.connect.request;
 
-import com.inuker.bluetooth.library.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 
 public class BleConnectRequest extends BleRequest {
 

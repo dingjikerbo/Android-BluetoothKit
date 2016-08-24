@@ -1,10 +1,11 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils;

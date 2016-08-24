@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.connect;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
@@ -16,6 +16,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.inuker.bluetooth.library.BluetoothConstants;
+import com.inuker.bluetooth.library.BluetoothService;
+import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;

@@ -1,4 +1,6 @@
-package com.inuker.bluetooth.library;
+package com.inuker.bluetooth.library.connect;
+
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 
 import java.util.UUID;
 

@@ -6,6 +6,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.inuker.bluetooth.library.connect.BleConnectManager;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
+
 import java.util.UUID;
 
 /**

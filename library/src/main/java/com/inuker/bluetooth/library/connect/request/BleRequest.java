@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library.connect.request;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
