@@ -6,54 +6,85 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 
+import com.inuker.bluetooth.library.utils.ProxyUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BluetoothClient implements IBluetoothApi {
+public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
+
+    private static final String TAG = BluetoothClient.class.getSimpleName();
 
     private Context mContext;
 
-    private IBluetoothService mBluetoothManager;
+    private IBluetoothService mBluetoothService;
 
-    private static BluetoothClient sInstance;
+    private static IBluetoothApi sInstance;
+
+    private CountDownLatch mCountDownLatch;
+
+    private HandlerThread mWorkerThread;
+    private Handler mWorkerHandler;
 
     private BluetoothClient(Context context) {
         mContext = context.getApplicationContext();
+
+        mWorkerThread = new HandlerThread(TAG);
+        mWorkerThread.start();
+        mWorkerHandler = new Handler(mWorkerThread.getLooper());
     }
 
-    public static BluetoothClient getInstance(Context context) {
+    public static IBluetoothApi getInstance(Context context) {
         if (sInstance == null) {
             synchronized (BluetoothClient.class) {
                 if (sInstance == null) {
-                    sInstance = new BluetoothClient(context);
+                    BluetoothClient client = new BluetoothClient(context);
+                    sInstance = ProxyUtils.newProxyInstance(client, IBluetoothApi.class, client);
                 }
             }
         }
         return sInstance;
     }
 
-    private void bindService() {
+    private IBluetoothService getBluetoothService() {
+        if (mBluetoothService == null) {
+            bindServiceSync();
+        }
+        return mBluetoothService;
+    }
+
+    private void bindServiceSync() {
         Intent intent = new Intent();
         intent.setClass(mContext, BluetoothService.class);
         mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        waitBluetoothManagerReady();
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mBluetoothManager = IBluetoothService.Stub.asInterface(service);
+            mBluetoothService = IBluetoothService.Stub.asInterface(service);
+            notifyBluetoothManagerReady();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mBluetoothManager = null;
-            bindService();
+            mBluetoothService = null;
         }
     };
 
@@ -117,10 +148,48 @@ public class BluetoothClient implements IBluetoothApi {
 
     private void safeCallBluetoothApi(int code, Bundle args, BleResponse response) {
         try {
-            mBluetoothManager.callBluetoothApi(BluetoothConstants.CODE_WRITE, args, response);
-        } catch (RemoteException e) {
+            IBluetoothService service = getBluetoothService();
+            if (service != null) {
+                service.callBluetoothApi(code, args, response);
+            } else {
+                response.onResponse(Code.SERVICE_EXCEPTION, null);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    public boolean onPreCalled(final Object object, final Method method, final Object[] args) {
+        mWorkerHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    Log.i("bush", "onPreCalled " + method.getName());
+                    method.invoke(object, args);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return false;
+    }
+
+    private void notifyBluetoothManagerReady() {
+        if (mCountDownLatch != null) {
+            mCountDownLatch.countDown();
+            mCountDownLatch = null;
+        }
+    }
+
+    private void waitBluetoothManagerReady() {
+        mCountDownLatch = new CountDownLatch(1);
+
+        try {
+            mCountDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
