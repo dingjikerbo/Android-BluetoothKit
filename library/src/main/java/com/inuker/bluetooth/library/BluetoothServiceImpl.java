@@ -6,8 +6,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
-import com.inuker.BleConnectManager;
-
 import java.util.UUID;
 
 /**

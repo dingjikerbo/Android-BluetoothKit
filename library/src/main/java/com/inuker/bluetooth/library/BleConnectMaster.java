@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/8/24.
+ * Created by dingjikerbo on 16/8/24.
  */
 public class BleConnectMaster implements IBleConnectMaster {
 
@@ -184,7 +184,7 @@ public class BleConnectMaster implements IBleConnectMaster {
     }
 
     @Override
-    public void readRemoteRssi(BleResponse response) {
+    public void readRssi(BleResponse response) {
         mBleConnectDispatcher.readRemoteRssi(response);
     }
 

@@ -1,4 +1,4 @@
-package com.inuker;
+package com.inuker.bluetooth.library;
 
 import android.support.v4.util.ArrayMap;
 
@@ -9,7 +9,7 @@ import com.inuker.bluetooth.library.IBleConnectMaster;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/8/24.
+ * Created by dingjikerbo on 2016/8/24.
  */
 public class BleConnectManager {
 

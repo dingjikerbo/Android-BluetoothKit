@@ -29,6 +29,26 @@ public class BluetoothUtils {
         return BluetoothService.getContext();
     }
 
+    public static void registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+        registerGlobalReceiver(receiver, filter);
+    }
+
+    private static void registerGlobalReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+        getContext().registerReceiver(receiver, filter);
+    }
+
+    public static void sendBroadcast(Intent intent) {
+        sendGlobalBroadcast(intent);
+    }
+
+    public static void sendBroadcast(String action) {
+        sendGlobalBroadcast(new Intent(action));
+    }
+
+    private static void sendGlobalBroadcast(Intent intent) {
+        getContext().sendBroadcast(intent);
+    }
+
     public static boolean isBleSupported() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
                 && getContext().getPackageManager().hasSystemFeature(

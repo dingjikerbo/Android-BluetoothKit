@@ -168,7 +168,7 @@ public class BleConnectDispatcher implements IBleDispatch {
                     break;
 
                 case MSG_REQUEST_FAILED:
-                    request.onResponse(request.getIntExtra(BluetoothConstants.KEY_CODE, Code.REQUEST_FAILED), request.getBundle());
+                    request.onResponse(request.getIntExtra(BluetoothConstants.EXTRA_CODE, Code.REQUEST_FAILED), request.getBundle());
 
                     break;
             }
