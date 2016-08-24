@@ -14,4 +14,5 @@ public class BluetoothConstants {
     public static final String EXTRA_SERVICE_UUID = "extra.service.uuid";
     public static final String EXTRA_CHARACTER_UUID = "extra.character.uuid";
     public static final String EXTRA_BYTE_VALUE = "extra.byte.value";
+    public static final String EXTRA_CODE = "extra.code";
 }

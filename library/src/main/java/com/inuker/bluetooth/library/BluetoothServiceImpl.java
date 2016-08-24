@@ -6,12 +6,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.inuker.BleConnectManager;
+
 import java.util.UUID;
 
 /**
  * Created by liwentian on 2015/10/29.
  */
-public class BluetoothServiceImpl extends IBluetoothService.Stub implements Handler.Callback, IBluetoothApi {
+public class BluetoothServiceImpl extends IBluetoothService.Stub implements Handler.Callback {
 
     private static BluetoothServiceImpl sInstance;
 
@@ -50,68 +52,33 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
         switch (msg.what) {
             case BluetoothConstants.CODE_CONNECT:
-                connect(mac, response);
+                BleConnectManager.connect(mac, response);
                 break;
 
             case BluetoothConstants.CODE_DISCONNECT:
-                disconnect(mac);
+                BleConnectManager.disconnect(mac);
                 break;
 
             case BluetoothConstants.CODE_READ:
-                read(mac, service, character, response);
+                BleConnectManager.read(mac, service, character, response);
                 break;
 
             case BluetoothConstants.CODE_WRITE:
-                write(mac, service, character, value, response);
+                BleConnectManager.write(mac, service, character, value, response);
                 break;
 
             case BluetoothConstants.CODE_NOTIFY:
-                notify(mac, service, character, response);
+                BleConnectManager.notify(mac, service, character, response);
                 break;
 
             case BluetoothConstants.CODE_UNNOTIFY:
-                unnotify(mac, service, character, response);
+                BleConnectManager.unnotify(mac, service, character);
                 break;
 
             case BluetoothConstants.CODE_READ_RSSI:
-                readRssi(mac, response);
+                BleConnectManager.readRssi(mac, response);
                 break;
         }
         return true;
-    }
-
-    @Override
-    public void connect(String mac, BleResponse response) {
-
-    }
-
-    @Override
-    public void disconnect(String mac) {
-
-    }
-
-    @Override
-    public void read(String mac, UUID service, UUID character, BleResponse response) {
-
-    }
-
-    @Override
-    public void write(String mac, UUID service, UUID character, byte[] value, BleResponse response) {
-
-    }
-
-    @Override
-    public void notify(String mac, UUID service, UUID character, BleResponse response) {
-
-    }
-
-    @Override
-    public void unnotify(String mac, UUID service, UUID character, BleResponse response) {
-
-    }
-
-    @Override
-    public void readRssi(String mac, BleResponse response) {
-
     }
 }

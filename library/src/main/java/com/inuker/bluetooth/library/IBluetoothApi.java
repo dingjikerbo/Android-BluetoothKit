@@ -17,7 +17,7 @@ public interface IBluetoothApi {
 
     void notify(String mac, UUID service, UUID character, BleResponse response);
 
-    void unnotify(String mac, UUID service, UUID character, BleResponse response);
+    void unnotify(String mac, UUID service, UUID character);
 
     void readRssi(String mac, BleResponse response);
 }

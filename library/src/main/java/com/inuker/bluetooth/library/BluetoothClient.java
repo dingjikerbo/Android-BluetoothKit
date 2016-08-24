@@ -131,12 +131,12 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
     }
 
     @Override
-    public void unnotify(String mac, UUID service, UUID character, BleResponse response) {
+    public void unnotify(String mac, UUID service, UUID character) {
         Bundle args = new Bundle();
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
         args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
         args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(BluetoothConstants.CODE_UNNOTIFY, args, response);
+        safeCallBluetoothApi(BluetoothConstants.CODE_UNNOTIFY, args, null);
     }
 
     @Override

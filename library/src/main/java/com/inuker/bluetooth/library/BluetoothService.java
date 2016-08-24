@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -10,9 +11,17 @@ import android.support.annotation.Nullable;
  */
 public class BluetoothService extends Service {
 
+    private static Context mContext;
+
+    public static Context getContext() {
+        return mContext;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mContext = getApplicationContext();
     }
 
     @Override
