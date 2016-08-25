@@ -17,7 +17,6 @@ public class BleNotifyRequest extends BleRequest implements WriteDescriptorListe
 
     public BleNotifyRequest(UUID service, UUID character, BleResponse response) {
         super(response);
-        mRequestType = REQUEST_TYPE_NOTIFY;
         mServiceUUID = service;
         mCharacterUUID = character;
     }

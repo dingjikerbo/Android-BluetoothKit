@@ -15,7 +15,6 @@ public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
     public BleReadRssiRequest(BleResponse response) {
         super(response);
-        mRequestType = REQUEST_TYPE_READ_RSSI;
     }
 
     @Override
@@ -29,7 +28,7 @@ public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
         switch (getConnectStatus()) {
             case STATUS_DEVICE_SERVICE_READY:
-                if (readRssi()) {
+                if (readRemoteRssi()) {
                     registerGattResponseListener(this);
                 } else {
                     notifyRequestResult(Code.REQUEST_FAILED, null);

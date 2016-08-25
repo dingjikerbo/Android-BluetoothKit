@@ -17,7 +17,6 @@ public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorLis
 
     public BleUnnotifyRequest(UUID service, UUID character, BleResponse response) {
         super(response);
-        mRequestType = REQUEST_TYPE_UNNOTIFY;
         mServiceUUID = service;
         mCharacterUUID = character;
     }

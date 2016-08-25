@@ -15,14 +15,9 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
     public BleWriteRequest(UUID service, UUID character, byte[] bytes,
                            BleResponse response) {
         super(response);
-        mRequestType = REQUEST_TYPE_WRITE;
         mServiceUUID = service;
         mCharacterUUID = character;
         mBytes = bytes;
-    }
-
-    public byte[] getBytes() {
-        return mBytes;
     }
 
     @Override
@@ -46,7 +41,7 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
 
     @Override
     int getGattResponseListenerId() {
-        return 0;
+        return GATT_RESP_CHARACTER_WRITE;
     }
 
     @Override

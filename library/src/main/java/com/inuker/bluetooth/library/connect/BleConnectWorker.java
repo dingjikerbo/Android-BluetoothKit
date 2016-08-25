@@ -6,7 +6,9 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -181,7 +183,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public boolean readRssi() {
+    public boolean readRemoteRssi() {
         return mBluetoothGatt.readRemoteRssi();
     }
 
@@ -284,7 +286,12 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-
+        if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
+            setConnectStatus(STATUS_DEVICE_CONNECTED);
+            mBluetoothGatt.discoverServices();
+        } else {
+            closeBluetoothGatt();
+        }
     }
 
     private <T> T getGattResponseListener(int id) {
@@ -293,6 +300,9 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        setConnectStatus(STATUS_DEVICE_SERVICE_READY);
+        refreshServiceProfile();
+
         ServiceDiscoverListener listener = getGattResponseListener(GATT_RESP_SERVICE_DISCOVER);
         if (listener != null) {
             listener.onServicesDiscovered(status);
@@ -316,8 +326,13 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-
+    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
+        Intent intent = new Intent(BluetoothConstants.ACTION_CHARACTER_CHANGED);
+        intent.putExtra(BluetoothConstants.EXTRA_MAC, mBluetoothDevice.getAddress());
+        intent.putExtra(BluetoothConstants.EXTRA_SERVICE_UUID, characteristic.getService().getUuid());
+        intent.putExtra(BluetoothConstants.EXTRA_CHARACTER_UUID, characteristic.getUuid());
+        intent.putExtra(BluetoothConstants.EXTRA_BYTE_VALUE, value);
+        BluetoothUtils.sendBroadcast(intent);
     }
 
     @Override

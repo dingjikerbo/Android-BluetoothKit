@@ -11,7 +11,6 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
 
     public BleConnectRequest(BleResponse response) {
         super(response);
-        mRequestType = REQUEST_TYPE_CONNECT;
     }
 
     @Override
@@ -20,10 +19,6 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
         return 2;
     }
 
-    /**
-     * 红米note 2上发现service特别慢，这里给超时延长点
-     * @return
-     */
     @Override
     public int getTimeoutLimit() {
         return 30000;

@@ -17,7 +17,6 @@ public class BleReadRequest extends BleRequest implements ReadCharacterListener 
 
     public BleReadRequest(UUID service, UUID character, BleResponse response) {
         super(response);
-        mRequestType = REQUEST_TYPE_READ;
         mServiceUUID = service;
         mCharacterUUID = character;
     }

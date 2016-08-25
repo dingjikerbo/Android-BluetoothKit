@@ -38,7 +38,7 @@ public class BluetoothGattResponse extends BluetoothGattCallback {
 
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        response.onCharacteristicChanged(gatt, characteristic);
+        response.onCharacteristicChanged(gatt, characteristic, characteristic.getValue());
     }
 
     @Override
