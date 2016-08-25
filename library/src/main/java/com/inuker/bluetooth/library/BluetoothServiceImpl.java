@@ -73,7 +73,7 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
                 break;
 
             case BluetoothConstants.CODE_UNNOTIFY:
-                BleConnectManager.unnotify(mac, service, character);
+                BleConnectManager.unnotify(mac, service, character, response);
                 break;
 
             case BluetoothConstants.CODE_READ_RSSI:

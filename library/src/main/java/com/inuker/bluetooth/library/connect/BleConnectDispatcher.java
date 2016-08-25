@@ -72,8 +72,8 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
     }
 
     @Override
-    public void unnotify(UUID service, UUID character) {
-        addNewRequest(new BleUnnotifyRequest(service, character));
+    public void unnotify(UUID service, UUID character, BleResponse response) {
+        addNewRequest(new BleUnnotifyRequest(service, character, response));
     }
 
     @Override

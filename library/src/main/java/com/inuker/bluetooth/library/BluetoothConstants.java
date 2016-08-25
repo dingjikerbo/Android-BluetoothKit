@@ -28,7 +28,5 @@ public class BluetoothConstants {
     public static final String ACTION_CONNECT_STATUS_CHANGED = "action.connect_status_changed";
     public static final String ACTION_CHARACTER_CHANGED = "action.character_changed";
 
-    public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
-
     public static final int GATT_ERROR = 133;
 }

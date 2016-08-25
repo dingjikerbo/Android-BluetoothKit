@@ -19,7 +19,7 @@ public interface IBleConnectMaster {
 
     void notify(UUID service, UUID character, BleResponse response);
 
-    void unnotify(UUID service, UUID character);
+    void unnotify(UUID service, UUID character, BleResponse response);
 
     void readRssi(BleResponse response);
 }

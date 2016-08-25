@@ -68,8 +68,8 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     }
 
     @Override
-    public void unnotify(UUID service, UUID character) {
-        getConnectDispatcher().unnotify(service, character);
+    public void unnotify(UUID service, UUID character, BleResponse response) {
+        getConnectDispatcher().unnotify(service, character, response);
     }
 
     @Override

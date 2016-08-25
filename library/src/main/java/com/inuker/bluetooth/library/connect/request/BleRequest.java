@@ -1,8 +1,14 @@
 package com.inuker.bluetooth.library.connect.request;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
+import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -10,8 +16,7 @@ import com.inuker.bluetooth.library.utils.ByteUtils;
 import java.io.Serializable;
 import java.util.UUID;
 
-@SuppressWarnings("rawtypes")
-public abstract class BleRequest {
+public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Callback {
 
     public static final int REQUEST_TYPE_CONNECT = 0x1;
     public static final int REQUEST_TYPE_READ = 0x2;
@@ -20,6 +25,8 @@ public abstract class BleRequest {
     public static final int REQUEST_TYPE_NOTIFY = 0x16;
     public static final int REQUEST_TYPE_UNNOTIFY = 0x32;
     public static final int REQUEST_TYPE_READ_RSSI = 0x64;
+
+    private static final int MSG_REQUEST_TIMEOUT = 0x22;
 
     private static final int DEFAULT_TIMEOUT_LIMIT = 10000;
 
@@ -44,11 +51,17 @@ public abstract class BleRequest {
 
     protected Bundle mExtra;
 
+    private Handler mHandler;
+
+    protected IBleRequestProcessor mProcessor;
+
     public BleRequest(BleResponse response) {
         mResponse = response;
         mRetryLimit = getDefaultRetryLimit();
         mTimeoutLimit = DEFAULT_TIMEOUT_LIMIT;
         mExtra = new Bundle();
+
+        mHandler = new Handler(Looper.myLooper(), this);
     }
 
     public int getRequestType() {
@@ -222,6 +235,10 @@ public abstract class BleRequest {
         }
     }
 
+    public void setProcessor(IBleRequestProcessor mProcessor) {
+        mProcessor = mProcessor;
+    }
+
     public Bundle getExtra() {
         return mExtra;
     }
@@ -236,6 +253,83 @@ public abstract class BleRequest {
 
     public BleResponse getResponse() {
         return mResponse;
+    }
+
+    @Override
+    public void process(IBleRequestProcessor processor) {
+        mProcessor = processor;
+
+        Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
+        mHandler.sendMessageDelayed(msg, getTimeoutLimit());
+    }
+
+    @Override
+    public void registerGattResponseListener(int responseId, GattResponseListener listener) {
+        mProcessor.registerGattResponseListener(responseId, listener);
+    }
+
+    protected void registerGattResponseListener(GattResponseListener listener) {
+        mProcessor.registerGattResponseListener(getGattResponseListenerId(), listener);
+    }
+
+    @Override
+    public void unregisterGattResponseListener(int responseId) {
+        mProcessor.unregisterGattResponseListener(responseId);
+    }
+
+    @Override
+    public int getConnectStatus() {
+        return mProcessor.getConnectStatus();
+    }
+
+    @Override
+    public void notifyRequestResult(int code, Bundle data) {
+        unregisterGattResponseListener(getGattResponseListenerId());
+        mProcessor.notifyRequestResult(code, data);
+    }
+
+    @Override
+    public boolean openBluetoothGatt() {
+        return mProcessor.openBluetoothGatt();
+    }
+
+    @Override
+    public void closeBluetoothGatt() {
+        mProcessor.closeBluetoothGatt();
+    }
+
+    @Override
+    public boolean readCharacteristic(UUID service, UUID character) {
+        return mProcessor.readCharacteristic(service, character);
+    }
+
+    int getGattResponseListenerId() {
+        return 0;
+    }
+
+    @Override
+    public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
+        return mProcessor.writeCharacteristic(service, character, value);
+    }
+
+    @Override
+    public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
+        return mProcessor.setCharacteristicNotification(service, character, enable);
+    }
+
+    @Override
+    public boolean readRssi() {
+        return mProcessor.readRssi();
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_REQUEST_TIMEOUT:
+                notifyRequestResult(Code.REQUEST_TIMEDOUT, null);
+                break;
+        }
+        return true;
     }
 }
 

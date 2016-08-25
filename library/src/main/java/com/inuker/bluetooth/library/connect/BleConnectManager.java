@@ -63,8 +63,8 @@ public class BleConnectManager {
         getBleConnectMaster(mac).notify(service, character, response);
     }
 
-    public static void unnotify(String mac, UUID service, UUID character) {
-        getBleConnectMaster(mac).unnotify(service, character);
+    public static void unnotify(String mac, UUID service, UUID character, BleResponse response) {
+        getBleConnectMaster(mac).unnotify(service, character, response);
     }
 
     public static void readRssi(String mac, BleResponse response) {

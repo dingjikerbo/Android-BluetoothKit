@@ -1,64 +1,50 @@
 package com.inuker.bluetooth.library.connect;
 
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothProfile;
-import android.content.Intent;
-import android.os.Build;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.RequiresPermission;
+import android.util.SparseArray;
 
 import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.BluetoothService;
 import com.inuker.bluetooth.library.Code;
-import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
-import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
-import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
-import com.inuker.bluetooth.library.connect.request.BleReadRequest;
-import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
+import com.inuker.bluetooth.library.connect.gatt.BluetoothGattResponse;
+import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
+import com.inuker.bluetooth.library.connect.gatt.IBluetoothGattResponse;
+import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
+import com.inuker.bluetooth.library.connect.gatt.ReadRssiListener;
+import com.inuker.bluetooth.library.connect.gatt.ServiceDiscoverListener;
+import com.inuker.bluetooth.library.connect.gatt.WriteCharacterListener;
+import com.inuker.bluetooth.library.connect.gatt.WriteDescriptorListener;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
-import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
-import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
-import com.inuker.bluetooth.library.utils.ByteUtils;
+import com.inuker.bluetooth.library.utils.ProxyUtils;
+import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BleConnectWorker implements Handler.Callback {
+public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor, IBluetoothGattResponse, ProxyUtils.ProxyHandler, GattResponseListener {
 
-    private static final int MSG_REQUEST_TIMEOUT = 0x120;
     public static final int MSG_SCHEDULE_NEXT = 0x160;
-
-    private static final int MSG_CONNECT_CHANGE = 0x11;
-    private static final int MSG_SERVICE_DISCOVER = 0x21;
-    private static final int MSG_CHARACTER_READ = 0x41;
-    private static final int MSG_CHARACTER_WRITE = 0x51;
-    private static final int MSG_CHARACTER_CHANGE = 0x61;
-    private static final int MSG_DESCRIPTOR_WRITE = 0x71;
-    private static final int MSG_READ_RSSI = 0x81;
-
-    private static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
-    private static final int STATUS_DEVICE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
-    private static final int STATUS_DEVICE_SERVICE_READY = 0x13;
+    public static final int MSG_GATT_RESPONSE = 0x180;
 
     private BluetoothGatt mBluetoothGatt;
     private BluetoothDevice mBluetoothDevice;
@@ -70,6 +56,10 @@ public class BleConnectWorker implements Handler.Callback {
     private Handler mWorkerHandler;
 
     private volatile int mConnectStatus;
+
+    private SparseArray<GattResponseListener> mGattResponseListeners;
+
+    private IBluetoothGattResponse mBluetoothGattResponse;
 
     private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
 
@@ -83,10 +73,13 @@ public class BleConnectWorker implements Handler.Callback {
         BluetoothAdapter adapter = BluetoothUtils.getBluetoothLeAdapter();
         mBluetoothDevice = adapter.getRemoteDevice(mac);
 
-        mDeviceProfile = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
-
         mWorkerHandler = new Handler(Looper.myLooper(), this);
         mBleDispatcher.notifyHandlerReady(mWorkerHandler);
+
+        mGattResponseListeners = new SparseArray<GattResponseListener>();
+        mBluetoothGattResponse = ProxyUtils.newProxyInstance(this, IBluetoothGattResponse.class, this);
+
+        mDeviceProfile = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
     }
 
     private void refreshServiceProfile() {
@@ -116,268 +109,39 @@ public class BleConnectWorker implements Handler.Callback {
         mDeviceProfile.putAll(newProfiles);
     }
 
-    private BluetoothGattCharacteristic getCharacter(UUID serviceId,
-                                                     UUID characterId) {
-        BluetoothGattCharacteristic character = null;
+    private BluetoothGattCharacteristic getCharacter(UUID service, UUID character, byte[] value) {
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+        if (characteristic != null) {
+            characteristic.setValue(value);
+        }
+        return characteristic;
+    }
 
-        if (serviceId != null && characterId != null) {
-            Map<UUID, BluetoothGattCharacteristic> characters = mDeviceProfile
-                    .get(serviceId);
+    private BluetoothGattCharacteristic getCharacter(UUID service, UUID character) {
+        BluetoothGattCharacteristic characteristic = null;
+
+        if (service != null && character != null) {
+            Map<UUID, BluetoothGattCharacteristic> characters = mDeviceProfile.get(service);
             if (characters != null) {
-                character = characters.get(characterId);
-            } else {
-                BluetoothLog.e(String.format(
-                        "getCharacter: service %s not exist", serviceId));
+                characteristic = characters.get(character);
             }
         }
 
-        if (character == null) {
-            BluetoothLog.e("getCharacter: return null");
-        }
-
-        return character;
+        return characteristic;
     }
 
-    private BluetoothGattCharacteristic getCharacter(BleRequest request) {
-        return getCharacter(request.getServiceUUID(),
-                request.getCharacterUUID());
-    }
-
-    /**
-     * 处理连接请求
-     */
-    private void processConnectRequest(BleConnectRequest request) {
-        switch (mConnectStatus) {
-            case STATUS_DEVICE_CONNECTED:
-                throw new IllegalStateException("status impossible");
-
-            case STATUS_DEVICE_SERVICE_READY:
-                setConnectRequestExtra(request);
-                dispatchRequestResult(true);
-                break;
-
-            default:
-                if (mBluetoothGatt == null) {
-                    mBluetoothGatt = openNewBluetoothGatt();
-                } else {
-                    throw new IllegalStateException("status impossible");
-                }
-        }
-    }
-
-    private boolean isServiceReady() {
-        return mConnectStatus == STATUS_DEVICE_SERVICE_READY;
-    }
-
-    /**
-     * 处理请求，根据请求类型进行分发
-     *
-     * @param request
-     */
     private void processRequest(BleRequest request) {
-        BluetoothLog.v(String.format(
-                "processRequest %s >>> current status = %s",
-                request.toString(), getConnectStatusText(mConnectStatus)));
-
         mCurrentRequest = request;
 
-        startRequestTiming();
-
-        switch (request.getRequestType()) {
-            case BleRequest.REQUEST_TYPE_CONNECT:
-                processConnectRequest((BleConnectRequest) request);
-                break;
-            case BleRequest.REQUEST_TYPE_READ:
-                processReadRequest((BleReadRequest) request);
-                break;
-            case BleRequest.REQUEST_TYPE_WRITE:
-                processWriteRequest((BleWriteRequest) request);
-                break;
-            case BleRequest.REQUEST_TYPE_DISCONNECT:
-                processDisconnectRequest((BleDisconnectRequest) request);
-                break;
-            case BleRequest.REQUEST_TYPE_NOTIFY:
-                processNotifyRequest((BleNotifyRequest) request);
-                break;
-            case BleRequest.REQUEST_TYPE_UNNOTIFY:
-                processUnnotifyRequest((BleUnnotifyRequest) request);
-                break;
-            case BleRequest.REQUEST_TYPE_READ_RSSI:
-                processReadRssiRequest((BleReadRssiRequest) request);
-                break;
-            default:
-                throw new IllegalArgumentException("unknown request type");
-        }
-    }
-
-    private void processReadRequest(BleReadRequest request) {
-        BluetoothLog.d(String.format(
-                "processReadRequest: service = %s, character = %s",
-                request.getServiceUUID(), request.getCharacterUUID()));
-
-        if (!isServiceReady()) {
+        try {
+            mCurrentRequest.process(this);
+        } catch (Exception e) {
+            BluetoothLog.w(e);
             dispatchRequestResult(false);
-        } else {
-            BluetoothGattCharacteristic character = getCharacter(request);
-
-            if (character != null) {
-                if (!mBluetoothGatt.readCharacteristic(character)) {
-                    BluetoothLog.w("readCharacteristic return false");
-                    onGattFailed();
-                }
-            } else {
-                BluetoothLog.e("character not found");
-                dispatchRequestResult(false);
-            }
         }
     }
 
-    private void processWriteRequest(BleWriteRequest request) {
-        BluetoothLog.d(String.format("processWriteRequest: service = %s, character = %s, value = 0x%s",
-                request.getServiceUUID(),
-                request.getCharacterUUID(),
-                ByteUtils.byteToString(request.getBytes())));
-
-        if (!isServiceReady()) {
-            dispatchRequestResult(false);
-        } else {
-            BluetoothGattCharacteristic character = getCharacter(request);
-            if (character != null) {
-                if (request.getBytes() != null) {
-                    character.setValue(request.getBytes());
-                } else {
-                    throw new IllegalArgumentException("bytes to write null");
-                }
-
-                if (!mBluetoothGatt.writeCharacteristic(character)) {
-                    BluetoothLog.w("writeCharacteristic return false");
-                    onGattFailed();
-                }
-            } else {
-                dispatchRequestResult(false);
-            }
-        }
-    }
-
-    /**
-     * 处理断开连接请求
-     *
-     * @param request
-     */
-    private void processDisconnectRequest(BleDisconnectRequest request) {
-        closeBluetoothGatt();
-        dispatchRequestResult(true);
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private boolean setCharacteristicNotification(BluetoothGatt gatt,
-                                                  BluetoothGattCharacteristic characteristic, boolean flag) {
-        boolean result = gatt.setCharacteristicNotification(characteristic,
-                flag);
-
-        if (result) {
-            BluetoothGattDescriptor descriptor = characteristic
-                    .getDescriptor(UUID
-                            .fromString(BluetoothConstants.CLIENT_CHARACTERISTIC_CONFIG));
-
-            if (descriptor != null) {
-                descriptor
-                        .setValue(flag ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-            }
-
-            result = mBluetoothGatt.writeDescriptor(descriptor);
-        } else {
-            BluetoothLog.w("setCharacteristicNotification failed");
-        }
-
-        return result;
-    }
-
-    private void processNotifyRequest(BleNotifyRequest request) {
-        BluetoothLog.d(String.format(
-                "processNotifyRequest: service = %s, character = %s",
-                request.getServiceUUID(), request.getCharacterUUID()));
-
-        if (!isServiceReady()) {
-            BluetoothLog.w(String.format("connect status invalid: %d", mConnectStatus));
-            dispatchRequestResult(false);
-        } else {
-            BluetoothGattCharacteristic character = getCharacter(request);
-
-            if (character != null) {
-                if (!setCharacteristicNotification(mBluetoothGatt, character, true)) {
-                    BluetoothLog.w("setCharacteristicNotification return false");
-                    onGattFailed();
-                }
-            } else {
-                BluetoothLog.e("character not found");
-                dispatchRequestResult(false);
-            }
-        }
-    }
-
-    private void processUnnotifyRequest(BleUnnotifyRequest request) {
-        BluetoothLog.d(String.format(
-                "processUnnotifyRequest: service = %s, character = %s",
-                request.getServiceUUID(), request.getCharacterUUID()));
-
-        if (!isServiceReady()) {
-            dispatchRequestResult(false);
-        } else {
-            BluetoothGattCharacteristic character = getCharacter(request);
-
-            if (character != null) {
-                if (!setCharacteristicNotification(mBluetoothGatt, character,
-                        false)) {
-                    BluetoothLog
-                            .w("setCharacteristicNotification return false");
-                    onGattFailed();
-                }
-            } else {
-                BluetoothLog.e("character not found");
-                dispatchRequestResult(false);
-            }
-        }
-    }
-
-    private void processReadRssiRequest(BleReadRssiRequest request) {
-        BluetoothLog.d("processReadRssiRequest");
-
-        if (!isServiceReady()) {
-            dispatchRequestResult(false);
-        } else {
-            if (!mBluetoothGatt.readRemoteRssi()) {
-                BluetoothLog.w("readRemoteRssi return false");
-                onGattFailed();
-            }
-        }
-    }
-
-    /**
-     * 任务开始计时，每个任务有超时取消。防止有些任务失败后收不到任何回调， 导致队列后的任务全部阻塞
-     */
-    private void startRequestTiming() {
-        mWorkerHandler.sendEmptyMessageDelayed(MSG_REQUEST_TIMEOUT,
-                mCurrentRequest.getTimeoutLimit());
-    }
-
-    /**
-     * 当任务收到回调后，不管成功还是失败，都会停止计时
-     */
-    private void stopRequestTiming() {
-        mWorkerHandler.removeMessages(MSG_REQUEST_TIMEOUT);
-    }
-
-    /**
-     * 当worker在任何环节出现任何异常，都会调用本函数通知dispatcher
-     * @param result
-     */
     private void dispatchRequestResult(boolean result) {
-//        BluetoothLog.v("dispatchRequestResult " + result + "\n");
-
-        stopRequestTiming();
-
         BleRequest request = mCurrentRequest;
 
         mCurrentRequest = null;
@@ -385,39 +149,43 @@ public class BleConnectWorker implements Handler.Callback {
         mBleDispatcher.notifyWorkerResult(request, result);
     }
 
-    private void closeBluetoothGatt() {
-        if (mBluetoothGatt != null) {
-            BluetoothLog.d("closeBluetoothGatt");
-
-            mBluetoothGatt.close();
-            mBluetoothGatt = null;
-
-            mDeviceProfile.clear();
-
-            /**
-             * 假如建立连接后discoverService等待回调时超时了，则状态是connected，
-             * 但是会closeGatt，所以这里应该重置状态
-             */
-            setConnectStatus(STATUS_DEVICE_DISCONNECTED);
-            broadcastConnectStatus(BluetoothConstants.STATUS_DISCONNECTED);
-        }
+    @Override
+    public boolean readCharacteristic(UUID service, UUID character) {
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+        return characteristic != null ? mBluetoothGatt.readCharacteristic(characteristic) : false;
     }
 
-    private BluetoothGatt openNewBluetoothGatt() {
-        BluetoothLog.d("openNewBluetoothGatt");
-
-        closeBluetoothGatt();
-
-        if (mBluetoothGatt == null) {
-            mBluetoothGatt = mBluetoothDevice.connectGatt(
-                    BluetoothService.getContext(), false, mConnectCallback);
-            refreshDeviceCache(mBluetoothGatt);
-        }
-
-        return mBluetoothGatt;
+    @Override
+    public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
+        return characteristic != null ? mBluetoothGatt.writeCharacteristic(characteristic) : false;
     }
 
-    private boolean refreshDeviceCache(BluetoothGatt gatt){
+    @Override
+    public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null || !mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+            return false;
+        }
+
+        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
+
+        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+
+        if (descriptor == null || !descriptor.setValue(value)) {
+            return false;
+        }
+
+        return mBluetoothGatt.writeDescriptor(descriptor);
+    }
+
+    @Override
+    public boolean readRssi() {
+        return mBluetoothGatt.readRemoteRssi();
+    }
+
+    private boolean refreshDeviceCache(BluetoothGatt gatt) {
         try {
             if (gatt != null) {
                 Method refresh = BluetoothGatt.class.getMethod("refresh");
@@ -433,25 +201,7 @@ public class BleConnectWorker implements Handler.Callback {
     }
 
     private void setConnectStatus(int status) {
-//        BluetoothLog.d(String.format("setConnectStatus %s for %s",
-//                TestUtils.getStatus(status), mBluetoothDevice.getAddress()));
         mConnectStatus = status;
-    }
-
-    private void setConnectRequestUuidExtra(BleRequest request) {
-        if (mDeviceProfile != null && request != null) {
-            Set<UUID> set = mDeviceProfile.keySet();
-            if (set != null) {
-                ArrayList<UUID> uuids = new ArrayList<UUID>(set);
-                request.putSerializableExtra(BluetoothConstants.EXTRA_SERVICE_UUID, uuids);
-            }
-        }
-    }
-
-    private void setConnectRequestExtra(BleRequest request) {
-        if (request != null && request.isConnectRequest()) {
-            setConnectRequestUuidExtra(request);
-        }
     }
 
     private void onScheduleNext(BleRequest newRequest) {
@@ -464,300 +214,139 @@ public class BleConnectWorker implements Handler.Callback {
         }
     }
 
-    /**
-     * 可能任务出错了，或者连接中断了
-     * 都要关掉gatt并启动下一个任务
-     */
-    private void onGattFailed() {
-        closeBluetoothGatt();
-        dispatchRequestResult(false);
-    }
+    private void processMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_SCHEDULE_NEXT:
+                onScheduleNext((BleRequest) msg.obj);
+                break;
 
-    private void onRequestTimeout() {
-        closeBluetoothGatt();
-
-        if (mCurrentRequest != null) {
-            mCurrentRequest.setRequestCode(Code.REQUEST_TIMEDOUT);
-            dispatchRequestResult(false);
-        } else {
-            throw new IllegalStateException("timeout but no request ongoing");
+            case MSG_GATT_RESPONSE:
+                ProxyBulk.safeInvoke(msg.obj);
+                break;
         }
     }
 
-    private void onConnectionStateChange(int status, int newState) {
-        if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
-            setConnectStatus(STATUS_DEVICE_CONNECTED);
-            BluetoothLog.v(String.format("discoverServices"));
-            mBluetoothGatt.discoverServices();
-        } else {
-            if (mCurrentRequest != null && mCurrentRequest.isConnectRequest()) {
-                mCurrentRequest.putIntExtra(BluetoothConstants.EXTRA_STATUS, status);
-                mCurrentRequest.putIntExtra(BluetoothConstants.EXTRA_STATE, newState);
-            }
-            onGattFailed();
+    @Override
+    public void registerGattResponseListener(int responseId, GattResponseListener listener) {
+        if (responseId > 0 && listener != null) {
+            mGattResponseListeners.put(responseId, listener);
         }
     }
 
-    private void onServicesDiscovered(int status) {
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            setConnectStatus(STATUS_DEVICE_SERVICE_READY);
-            broadcastConnectStatus(BluetoothConstants.STATUS_CONNECTED);
-
-            refreshServiceProfile();
-
-            if (mCurrentRequest != null && mCurrentRequest.isConnectRequest()) {
-                setConnectRequestExtra(mCurrentRequest);
-                dispatchRequestResult(true);
-            } else {
-                throw new IllegalStateException("onServiceDiscover but not connect request");
-            }
-        } else {
-            onGattFailed();
+    @Override
+    public void unregisterGattResponseListener(int responseId) {
+        if (responseId > 0) {
+            mGattResponseListeners.remove(responseId);
         }
     }
 
-    private void onCharacteristicRead(int status, BluetoothGattCharacteristic characteristic) {
-        byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
+    @Override
+    public void notifyRequestResult(int code, Bundle data) {
+        dispatchRequestResult(code == Code.REQUEST_SUCCESS);
+    }
 
-        if (mCurrentRequest == null || !mCurrentRequest.isReadRequest()) {
-            BluetoothLog.w("onCharacteristicRead: current not read request");
-            return;
+    @Override
+    public int getConnectStatus() {
+        return mConnectStatus;
+    }
+
+    @Override
+    public boolean openBluetoothGatt() {
+        if (mBluetoothGatt != null) {
+            closeBluetoothGatt();
+            mBluetoothGatt = null;
         }
 
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            mCurrentRequest.putByteArrayExtra(BluetoothConstants.EXTRA_BYTE_VALUE, value);
-            dispatchRequestResult(true);
-        } else if (isGattErrorOrFailure(status)) {
-            onGattFailed();
-        } else {
-            dispatchRequestResult(false);
+        if (mBluetoothGatt == null) {
+            mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false,
+                    new BluetoothGattResponse(mBluetoothGattResponse));
+            refreshDeviceCache(mBluetoothGatt);
+        }
+
+        return mBluetoothGatt != null;
+    }
+
+    @Override
+    public void closeBluetoothGatt() {
+        if (mBluetoothGatt != null) {
+            mBluetoothGatt.close();
+            mBluetoothGatt = null;
+
+            mDeviceProfile.clear();
+
+            setConnectStatus(STATUS_DEVICE_DISCONNECTED);
         }
     }
 
-    private void onCharacteristicWrite(int status, BluetoothGattCharacteristic characteristic) {
-        if (mCurrentRequest == null || !mCurrentRequest.isWriteRequest()) {
-            BluetoothLog.w("onCharacteristicWrite: current not write request");
-            return;
-        }
+    private Context getContext() {
+        return BluetoothService.getContext();
+    }
 
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            mCurrentRequest.putByteArrayExtra(BluetoothConstants.EXTRA_BYTE_VALUE, characteristic.getValue());
-            dispatchRequestResult(true);
-        } else if (isGattErrorOrFailure(status)) {
-            onGattFailed();
-        } else {
-            dispatchRequestResult(false);
+    @Override
+    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+
+    }
+
+    private <T> T getGattResponseListener(int id) {
+        return (T) mGattResponseListeners.get(id);
+    }
+
+    @Override
+    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        ServiceDiscoverListener listener = getGattResponseListener(GATT_RESP_SERVICE_DISCOVER);
+        if (listener != null) {
+            listener.onServicesDiscovered(status);
         }
     }
 
-    private void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value) {
-        value = ByteUtils.getNonEmptyByte(value);
-
-        BluetoothGattService service = characteristic.getService();
-
-        if (service != null) {
-            broadcastCharacterChanged(service.getUuid(), characteristic.getUuid(), value);
+    @Override
+    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        ReadCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_READ);
+        if (listener != null) {
+            listener.onCharacteristicRead(characteristic, status);
         }
     }
 
-    private void onDescriptorWrite(int status, BluetoothGattDescriptor descriptor) {
-        BluetoothGattCharacteristic descChar = descriptor.getCharacteristic();
-
-        if (mCurrentRequest == null ||
-                (!mCurrentRequest.isNotifyRequest() && !mCurrentRequest.isUnnotifyRequest())) {
-            BluetoothLog.w("onDescriptorWrite: current not notify/unnotify request");
-            return;
-        }
-
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            if (getCharacter(mCurrentRequest) == descChar) {
-                dispatchRequestResult(true);
-            }
-        } else if (isGattErrorOrFailure(status)) {
-            onGattFailed();
-        } else {
-            dispatchRequestResult(false);
+    @Override
+    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        WriteCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_WRITE);
+        if (listener != null) {
+            listener.onCharacteristicWrite(characteristic, status);
         }
     }
 
-    private void onReadRemoteRssi(int status, int rssi) {
-        if (mCurrentRequest == null || !mCurrentRequest.isReadRssiRequest()) {
-            BluetoothLog.w("onReadRemoteRssi: current not readRssi request");
-            return;
-        }
+    @Override
+    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
 
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            mCurrentRequest.putIntExtra(BluetoothConstants.EXTRA_RSSI, rssi);
-            dispatchRequestResult(true);
-        } else {
-            dispatchRequestResult(false);
+    }
+
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        WriteDescriptorListener listener = getGattResponseListener(GATT_RESP_DESCRIPTOR_WRITE);
+        if (listener != null) {
+            listener.onDescriptorWrite(status, descriptor);
         }
     }
 
-    private final BluetoothGattCallback mConnectCallback = new BluetoothGattCallback() {
-
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status,
-                                            int newState) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onConnectionStateChange: status = %d, newState = %d",
-                    status, newState));
-
-            sendWorkerMessage(MSG_CONNECT_CHANGE, status, newState, null);
+    @Override
+    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+        ReadRssiListener listener = getGattResponseListener(GATT_RESP_READ_RSSI);
+        if (listener != null) {
+            listener.onReadRemoteRssi(rssi, status);
         }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d("onServicesDiscovered " + status);
-
-            if (!isServiceReady() && !mWorkerHandler.hasMessages(MSG_SERVICE_DISCOVER)) {
-                sendWorkerMessage(MSG_SERVICE_DISCOVER, status, 0, null);
-            }
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onCharacteristicRead %s\n>>> status = %d, value = %s",
-                    characteristic.getUuid(), status,
-                    ByteUtils.byteToString(characteristic.getValue())));
-
-            sendWorkerMessage(MSG_CHARACTER_READ, status, 0, characteristic);
-        }
-
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          final BluetoothGattCharacteristic characteristic, final int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.d(String.format(
-                    "onCharacteristicWrite %s, status = %d",
-                    characteristic.getUuid(), status));
-
-            sendWorkerMessage(MSG_CHARACTER_WRITE, status, 0, characteristic);
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt,
-                                            BluetoothGattCharacteristic characteristic) {
-            // TODO Auto-generated method stub
-            BluetoothLog.v(String.format("onCharacteristicChanged: \n>>> uuid = %s\n>>> value = (%s)",
-                    characteristic.getUuid(),
-                    ByteUtils.byteToString(characteristic.getValue())));
-
-            Bundle data = new Bundle();
-            data.putByteArray(BluetoothConstants.EXTRA_BYTE_VALUE, characteristic.getValue());
-            sendWorkerMessage(MSG_CHARACTER_CHANGE, 0, 0, characteristic, data);
-        }
-
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt,
-                                      BluetoothGattDescriptor descriptor, int status) {
-            // TODO Auto-generated method stub
-            BluetoothLog.v(String.format("onDescriptorWrite status = %d", status));
-            sendWorkerMessage(MSG_DESCRIPTOR_WRITE, status, 0, descriptor);
-        }
-
-        @Override
-        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-            BluetoothLog.v(String.format("onReadRemoteRssi rssi = %d, status = %d", rssi, status));
-            sendWorkerMessage(MSG_READ_RSSI, status, rssi, null);
-        }
-    };
-
-    private void sendWorkerMessage(int what, int arg1, int arg2, Object obj) {
-        mWorkerHandler.obtainMessage(what, arg1, arg2, obj).sendToTarget();
     }
 
-    private void sendWorkerMessage(int what, int arg1, int arg2, Object obj, Bundle data) {
-        Message msg = mWorkerHandler.obtainMessage(what, arg1, arg2, obj);
-        msg.setData(data);
-        msg.sendToTarget();
-    }
-
-    private boolean isGattErrorOrFailure(int status) {
-        return status == BluetoothGatt.GATT_FAILURE || status == BluetoothConstants.GATT_ERROR;
-    }
-
-    private void broadcastConnectStatus(int status) {
-        Intent intent = new Intent(
-                BluetoothConstants.ACTION_CONNECT_STATUS_CHANGED);
-        intent.putExtra(BluetoothConstants.EXTRA_MAC,
-                mBluetoothDevice.getAddress());
-        intent.putExtra(BluetoothConstants.EXTRA_STATUS, status);
-        BluetoothUtils.sendBroadcast(intent);
-    }
-
-    private void broadcastCharacterChanged(UUID service, UUID character,
-                                           byte[] value) {
-        Intent intent = new Intent(
-                BluetoothConstants.ACTION_CHARACTER_CHANGED);
-        intent.putExtra(BluetoothConstants.EXTRA_MAC,
-                mBluetoothDevice.getAddress());
-        intent.putExtra(BluetoothConstants.EXTRA_SERVICE_UUID, service);
-        intent.putExtra(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
-        intent.putExtra(BluetoothConstants.EXTRA_BYTE_VALUE, value);
-        BluetoothUtils.sendBroadcast(intent);
-    }
-
-    private String getConnectStatusText(int status) {
-        switch (status) {
-            case STATUS_DEVICE_SERVICE_READY:
-                return "STATUS_DEVICE_SERVICE_READY";
-            case STATUS_DEVICE_CONNECTED:
-                return "STATUS_DEVICE_CONNECTED";
-            case STATUS_DEVICE_DISCONNECTED:
-                return "STATUS_DEVICE_DISCONNECTED";
-            default:
-                return "unknown";
-        }
+    @Override
+    public boolean onPreCalled(Object object, Method method, Object[] args) {
+        mWorkerHandler.obtainMessage(MSG_GATT_RESPONSE,
+                new ProxyBulk(object, method, args)).sendToTarget();
+        return false;
     }
 
     @Override
     public boolean handleMessage(Message msg) {
         try {
-            switch (msg.what) {
-                case MSG_SCHEDULE_NEXT:
-                    onScheduleNext((BleRequest) msg.obj);
-                    break;
-
-                case MSG_REQUEST_TIMEOUT:
-                    onRequestTimeout();
-                    break;
-
-                case MSG_CONNECT_CHANGE:
-                    onConnectionStateChange(msg.arg1, msg.arg2);
-                    break;
-
-                case MSG_SERVICE_DISCOVER:
-                    onServicesDiscovered(msg.arg1);
-                    break;
-
-                case MSG_CHARACTER_READ:
-                    onCharacteristicRead(msg.arg1, (BluetoothGattCharacteristic) msg.obj);
-                    break;
-
-                case MSG_CHARACTER_WRITE:
-                    onCharacteristicWrite(msg.arg1, (BluetoothGattCharacteristic) msg.obj);
-                    break;
-
-                case MSG_CHARACTER_CHANGE:
-                    Bundle data = msg.getData();
-                    byte[] value = (data != null ? data.getByteArray(BluetoothConstants.EXTRA_BYTE_VALUE) : null);
-                    onCharacteristicChanged((BluetoothGattCharacteristic) msg.obj, value);
-                    break;
-
-                case MSG_DESCRIPTOR_WRITE:
-                    onDescriptorWrite(msg.arg1, (BluetoothGattDescriptor) msg.obj);
-                    break;
-
-                case MSG_READ_RSSI:
-                    onReadRemoteRssi(msg.arg1, msg.arg2);
-                    break;
-            }
+            processMessage(msg);
         } catch (Throwable e) {
             BluetoothLog.e(e);
             dispatchRequestResult(false);
