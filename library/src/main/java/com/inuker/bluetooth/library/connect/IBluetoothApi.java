@@ -9,17 +9,11 @@ import java.util.UUID;
  */
 public interface IBluetoothApi {
 
-    void connect(String mac, BleResponse response);
-
-    void disconnect(String mac);
-
-    void read(String mac, UUID service, UUID character, BleResponse response);
-
-    void write(String mac, UUID service, UUID character, byte[] value, BleResponse response);
-
-    void notify(String mac, UUID service, UUID character, BleResponse response);
-
-    void unnotify(String mac, UUID service, UUID character);
-
-    void readRssi(String mac, BleResponse response);
+    int CODE_CONNECT = 1;
+    int CODE_DISCONNECT = 2;
+    int CODE_READ = 3;
+    int CODE_WRITE = 4;
+    int CODE_NOTIFY = 5;
+    int CODE_UNNOTIFY = 6;
+    int CODE_READ_RSSI = 7;
 }

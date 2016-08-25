@@ -32,9 +32,9 @@ public class ProxyUtils {
     }
 
     public static class ProxyBulk {
-        Object object;
-        Method method;
-        Object[] args;
+        public Object object;
+        public Method method;
+        public Object[] args;
 
         public ProxyBulk(Object object, Method method, Object[] args) {
             this.object = object;

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dingjikerbo.bluetooth">
+    package="com.inuker.bluetooth">
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".MyApplication"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
@@ -20,13 +19,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".Service1"
-            android:process=":Service1"/>
-
-        <service
-            android:name=".Service2"
-          />
     </application>
 
 </manifest>

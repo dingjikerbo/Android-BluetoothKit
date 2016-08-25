@@ -286,6 +286,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+        BluetoothLog.v(String.format("onConnectionStateChange status = %d, newState = %d", status, newState));
         if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
             setConnectStatus(STATUS_DEVICE_CONNECTED);
             mBluetoothGatt.discoverServices();
@@ -300,6 +301,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        BluetoothLog.v(String.format("onServicesDiscovered status = %d", status));
+
         setConnectStatus(STATUS_DEVICE_SERVICE_READY);
         refreshServiceProfile();
 
@@ -311,6 +314,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        BluetoothLog.v(String.format("onCharacteristicRead status = %d", status));
+
         ReadCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_READ);
         if (listener != null) {
             listener.onCharacteristicRead(characteristic, status);
@@ -319,6 +324,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        BluetoothLog.v(String.format("onCharacteristicWrite status = %d", status));
+
         WriteCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_WRITE);
         if (listener != null) {
             listener.onCharacteristicWrite(characteristic, status);
@@ -327,6 +334,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
+        BluetoothLog.v(String.format("onCharacteristicChanged"));
+
         Intent intent = new Intent(BluetoothConstants.ACTION_CHARACTER_CHANGED);
         intent.putExtra(BluetoothConstants.EXTRA_MAC, mBluetoothDevice.getAddress());
         intent.putExtra(BluetoothConstants.EXTRA_SERVICE_UUID, characteristic.getService().getUuid());

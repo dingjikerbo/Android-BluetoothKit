@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.inuker.bluetooth.library.connect.IBluetoothApi;
 import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 
 import java.lang.reflect.Method;
@@ -21,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
+public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandler {
 
     private static final String TAG = BluetoothClient.class.getSimpleName();
 
@@ -29,7 +30,7 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
 
     private IBluetoothService mBluetoothService;
 
-    private static IBluetoothApi sInstance;
+    private static IBluetoothClient sInstance;
 
     private CountDownLatch mCountDownLatch;
 
@@ -44,12 +45,12 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
         mWorkerHandler = new Handler(mWorkerThread.getLooper());
     }
 
-    public static IBluetoothApi getInstance(Context context) {
+    public static IBluetoothClient getInstance(Context context) {
         if (sInstance == null) {
             synchronized (BluetoothClient.class) {
                 if (sInstance == null) {
                     BluetoothClient client = new BluetoothClient(context);
-                    sInstance = ProxyUtils.newProxyInstance(client, IBluetoothApi.class, client);
+                    sInstance = ProxyUtils.newProxyInstance(client, IBluetoothClient.class, client);
                 }
             }
         }
@@ -64,6 +65,10 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
     }
 
     private void bindServiceSync() {
+        BluetoothLog.v(String.format("bindServiceSync"));
+
+        mCountDownLatch = new CountDownLatch(1);
+
         Intent intent = new Intent();
         intent.setClass(mContext, BluetoothService.class);
         mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -73,12 +78,14 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            BluetoothLog.v(String.format("onServiceConnected"));
             mBluetoothService = IBluetoothService.Stub.asInterface(service);
             notifyBluetoothManagerReady();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            BluetoothLog.v(String.format("onServiceDisconnected"));
             mBluetoothService = null;
         }
     };
@@ -87,14 +94,14 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
     public void connect(String mac, BleResponse response) {
         Bundle args = new Bundle();
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        safeCallBluetoothApi(BluetoothConstants.CODE_CONNECT, args, response);
+        safeCallBluetoothApi(CODE_CONNECT, args, response);
     }
 
     @Override
     public void disconnect(String mac) {
         Bundle args = new Bundle();
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        safeCallBluetoothApi(BluetoothConstants.CODE_DISCONNECT, args, null);
+        safeCallBluetoothApi(CODE_DISCONNECT, args, null);
     }
 
     @Override
@@ -103,7 +110,7 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
         args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
         args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(BluetoothConstants.CODE_READ, args, response);
+        safeCallBluetoothApi(CODE_READ, args, response);
     }
 
     @Override
@@ -113,7 +120,7 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
         args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
         args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
         args.putByteArray(BluetoothConstants.EXTRA_BYTE_VALUE, value);
-        safeCallBluetoothApi(BluetoothConstants.CODE_WRITE, args, response);
+        safeCallBluetoothApi(CODE_WRITE, args, response);
     }
 
     @Override
@@ -122,7 +129,7 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
         args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
         args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(BluetoothConstants.CODE_NOTIFY, args, response);
+        safeCallBluetoothApi(CODE_NOTIFY, args, response);
     }
 
     @Override
@@ -131,18 +138,20 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
         args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
         args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(BluetoothConstants.CODE_UNNOTIFY, args, null);
+        safeCallBluetoothApi(CODE_UNNOTIFY, args, null);
     }
 
     @Override
     public void readRssi(String mac, BleResponse response) {
         Bundle args = new Bundle();
         args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        safeCallBluetoothApi(BluetoothConstants.CODE_READ_RSSI, args, response);
+        safeCallBluetoothApi(CODE_READ_RSSI, args, response);
     }
 
     private void safeCallBluetoothApi(int code, Bundle args, BleResponse response) {
         try {
+            BluetoothLog.v(String.format("safeCallBluetoothApi code = %d", code));
+
             IBluetoothService service = getBluetoothService();
             if (service != null) {
                 service.callBluetoothApi(code, args, response);
@@ -179,8 +188,6 @@ public class BluetoothClient implements IBluetoothApi, ProxyUtils.ProxyHandler {
     }
 
     private void waitBluetoothManagerReady() {
-        mCountDownLatch = new CountDownLatch(1);
-
         try {
             mCountDownLatch.await();
         } catch (InterruptedException e) {

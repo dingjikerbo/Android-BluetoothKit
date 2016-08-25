@@ -4,6 +4,7 @@ package com.inuker.bluetooth.library;
  * Created by dingjikerbo on 16/4/8.
  */
 public class Code {
+
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_FAILED = -1;
     public static final int REQUEST_CANCELED = -2;

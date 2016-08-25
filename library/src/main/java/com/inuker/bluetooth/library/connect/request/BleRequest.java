@@ -11,6 +11,7 @@ import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.response.BleResponse;
 import com.inuker.bluetooth.library.BluetoothConstants;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.UUID;
 
@@ -134,12 +135,16 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
     public void process(IBleRequestProcessor processor) {
         mProcessor = processor;
 
+        BluetoothLog.v(String.format("process %s, connectStatus = %d",
+                getClass().getSimpleName(), getConnectStatus()));
+
         Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
         mHandler.sendMessageDelayed(msg, getTimeoutLimit());
     }
 
     @Override
     public void registerGattResponseListener(int responseId, GattResponseListener listener) {
+        BluetoothLog.v(String.format("registerGattResponseListener responseId = %d", responseId));
         mProcessor.registerGattResponseListener(responseId, listener);
     }
 
@@ -149,6 +154,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     @Override
     public void unregisterGattResponseListener(int responseId) {
+        BluetoothLog.v(String.format("unregisterGattResponseListener %d", responseId));
         mProcessor.unregisterGattResponseListener(responseId);
     }
 
@@ -159,22 +165,30 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     @Override
     public void notifyRequestResult(int code, Bundle data) {
+        BluetoothLog.v(String.format("%s.notifyRequestResult code = %d",
+                getClass().getSimpleName(), code));
+
+        mHandler.removeMessages(MSG_REQUEST_TIMEOUT);
+
         unregisterGattResponseListener(getGattResponseListenerId());
         mProcessor.notifyRequestResult(code, data);
     }
 
     @Override
     public boolean openBluetoothGatt() {
+        BluetoothLog.v(String.format("openBluetoothGatt"));
         return mProcessor.openBluetoothGatt();
     }
 
     @Override
     public void closeBluetoothGatt() {
+        BluetoothLog.v(String.format("closeBluetoothGatt"));
         mProcessor.closeBluetoothGatt();
     }
 
     @Override
     public boolean readCharacteristic(UUID service, UUID character) {
+        BluetoothLog.v(String.format("readCharacteristic service %s character %s", service, character));
         return mProcessor.readCharacteristic(service, character);
     }
 
@@ -184,11 +198,13 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     @Override
     public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
+        BluetoothLog.v(String.format("writeCharacteristic service %s character %s", service, character));
         return mProcessor.writeCharacteristic(service, character, value);
     }
 
     @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
+        BluetoothLog.v(String.format("setCharacteristicNotification service %s character %s", service, character));
         return mProcessor.setCharacteristicNotification(service, character, enable);
     }
 

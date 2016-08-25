@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.dingjikerbo.bluetooth"
+        applicationId "com.inuker.bluetooth"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -21,7 +21,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
     compile project(':library')

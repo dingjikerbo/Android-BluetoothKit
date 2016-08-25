@@ -85,6 +85,10 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
 
     @Override
     public boolean handleMessage(Message msg) {
+        ProxyBulk bulk = (ProxyBulk) msg.obj;
+        BluetoothLog.v(String.format("BleConnectMaster.%s thread = %s",
+                bulk.method.getName(), Thread.currentThread().getName()));
+
         ProxyBulk.safeInvoke(msg.obj);
         return true;
     }
