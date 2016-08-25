@@ -43,15 +43,11 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class BleConnectWorker {
+public class BleConnectWorker implements Handler.Callback {
 
     private static final int MSG_REQUEST_TIMEOUT = 0x120;
     public static final int MSG_SCHEDULE_NEXT = 0x160;
 
-    /**
-     * 这些消息是蓝牙回调中发的，要保证回调都在工作线程里处理
-     */
     private static final int MSG_CONNECT_CHANGE = 0x11;
     private static final int MSG_SERVICE_DISCOVER = 0x21;
     private static final int MSG_CHARACTER_READ = 0x41;
@@ -61,8 +57,6 @@ public class BleConnectWorker {
     private static final int MSG_READ_RSSI = 0x81;
 
     private static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
-    private static final int STATUS_DEVICE_CONNECTING = BluetoothProfile.STATE_CONNECTING;
-    private static final int STATUS_DEVICE_DISCONNECTING = BluetoothProfile.STATE_DISCONNECTING;
     private static final int STATUS_DEVICE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
     private static final int STATUS_DEVICE_SERVICE_READY = 0x13;
 
@@ -87,94 +81,12 @@ public class BleConnectWorker {
         mBleDispatcher = dispatcher;
 
         BluetoothAdapter adapter = BluetoothUtils.getBluetoothLeAdapter();
-        if (adapter != null) {
-            mBluetoothDevice = adapter.getRemoteDevice(mac);
-        } else {
-            throw new IllegalStateException(
-                    "ble adapter null");
-        }
+        mBluetoothDevice = adapter.getRemoteDevice(mac);
 
         mDeviceProfile = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
 
-        mWorkerHandler = new Handler(Looper.myLooper()) {
-
-            @Override
-            public void handleMessage(Message msg) {
-                // TODO Auto-generated method stub
-                try {
-                    processWorkerMessage(msg);
-                } catch (Throwable e) {
-                    BluetoothLog.e(e);
-
-                    /**
-                     * 如果工作线程中有异常则结束当前任务并开始下一个任务
-                     */
-                    dispatchRequestResult(false);
-                }
-            }
-
-        };
-
+        mWorkerHandler = new Handler(Looper.myLooper(), this);
         mBleDispatcher.notifyHandlerReady(mWorkerHandler);
-    }
-
-    private void processWorkerMessage(Message msg) {
-//      BluetoothLog.v("BleConnectWorker processWorkerMessage " + getMessage(msg.what));
-
-        switch (msg.what) {
-            case MSG_SCHEDULE_NEXT:
-                onScheduleNext((BleRequest) msg.obj);
-                break;
-
-            case MSG_REQUEST_TIMEOUT:
-                onRequestTimeout();
-                break;
-
-            case MSG_CONNECT_CHANGE:
-                onConnectionStateChange(msg.arg1, msg.arg2);
-                break;
-
-            case MSG_SERVICE_DISCOVER:
-                onServicesDiscovered(msg.arg1);
-                break;
-
-            case MSG_CHARACTER_READ:
-                onCharacteristicRead(msg.arg1, (BluetoothGattCharacteristic) msg.obj);
-                break;
-
-            case MSG_CHARACTER_WRITE:
-                onCharacteristicWrite(msg.arg1, (BluetoothGattCharacteristic) msg.obj);
-                break;
-
-            case MSG_CHARACTER_CHANGE:
-                Bundle data = msg.getData();
-                byte[] value = (data != null ? data.getByteArray(BluetoothConstants.EXTRA_BYTE_VALUE) : null);
-                onCharacteristicChanged((BluetoothGattCharacteristic) msg.obj, value);
-                break;
-
-            case MSG_DESCRIPTOR_WRITE:
-                onDescriptorWrite(msg.arg1, (BluetoothGattDescriptor) msg.obj);
-                break;
-
-            case MSG_READ_RSSI:
-                onReadRemoteRssi(msg.arg1, msg.arg2);
-                break;
-        }
-    }
-
-    private String getMessage(int msg) {
-        switch (msg) {
-            case MSG_SCHEDULE_NEXT: return "MSG_SCHEDULE_NEXT";
-            case MSG_REQUEST_TIMEOUT: return "MSG_REQUEST_TIMEOUT";
-            case MSG_CONNECT_CHANGE: return "MSG_CONNECT_CHANGE";
-            case MSG_SERVICE_DISCOVER: return "MSG_SERVICE_DISCOVER";
-            case MSG_CHARACTER_READ: return "MSG_CHARACTER_READ";
-            case MSG_CHARACTER_WRITE: return "MSG_CHARACTER_WRITE";
-            case MSG_CHARACTER_CHANGE: return "MSG_CHARACTER_CHANGE";
-            case MSG_DESCRIPTOR_WRITE: return "MSG_DESCRIPTOR_WRITE";
-            case MSG_READ_RSSI: return "MSG_READ_RSSI";
-            default: return "unknown message";
-        }
     }
 
     private void refreshServiceProfile() {
@@ -802,5 +714,54 @@ public class BleConnectWorker {
             default:
                 return "unknown";
         }
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        try {
+            switch (msg.what) {
+                case MSG_SCHEDULE_NEXT:
+                    onScheduleNext((BleRequest) msg.obj);
+                    break;
+
+                case MSG_REQUEST_TIMEOUT:
+                    onRequestTimeout();
+                    break;
+
+                case MSG_CONNECT_CHANGE:
+                    onConnectionStateChange(msg.arg1, msg.arg2);
+                    break;
+
+                case MSG_SERVICE_DISCOVER:
+                    onServicesDiscovered(msg.arg1);
+                    break;
+
+                case MSG_CHARACTER_READ:
+                    onCharacteristicRead(msg.arg1, (BluetoothGattCharacteristic) msg.obj);
+                    break;
+
+                case MSG_CHARACTER_WRITE:
+                    onCharacteristicWrite(msg.arg1, (BluetoothGattCharacteristic) msg.obj);
+                    break;
+
+                case MSG_CHARACTER_CHANGE:
+                    Bundle data = msg.getData();
+                    byte[] value = (data != null ? data.getByteArray(BluetoothConstants.EXTRA_BYTE_VALUE) : null);
+                    onCharacteristicChanged((BluetoothGattCharacteristic) msg.obj, value);
+                    break;
+
+                case MSG_DESCRIPTOR_WRITE:
+                    onDescriptorWrite(msg.arg1, (BluetoothGattDescriptor) msg.obj);
+                    break;
+
+                case MSG_READ_RSSI:
+                    onReadRemoteRssi(msg.arg1, msg.arg2);
+                    break;
+            }
+        } catch (Throwable e) {
+            BluetoothLog.e(e);
+            dispatchRequestResult(false);
+        }
+        return true;
     }
 }

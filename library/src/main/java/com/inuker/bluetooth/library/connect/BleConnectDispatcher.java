@@ -16,7 +16,6 @@ import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.connect.response.BleResponse;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
 
@@ -24,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BleConnectDispatcher implements IBleDispatch {
+public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Handler.Callback {
 
     public static final int MSG_REQUEST_SUCCESS = 0x100;
     public static final int MSG_REQUEST_FAILED = 0x110;
@@ -32,6 +31,7 @@ public class BleConnectDispatcher implements IBleDispatch {
     private static final int MAX_REQUEST_COUNT = 100;
 
     private Handler mWorkerHandler;
+    private Handler mResponseHandler;
 
     private List<BleRequest> mBleWorkList;
     private BleRequest mCurrentRequest;
@@ -41,36 +41,43 @@ public class BleConnectDispatcher implements IBleDispatch {
     }
 
     private BleConnectDispatcher(String mac) {
-        mBleWorkList = new ArrayList<BleRequest>();
         BleConnectWorker.attch(mac, this);
+        mBleWorkList = new ArrayList<BleRequest>();
+        mResponseHandler = new Handler(Looper.getMainLooper(), this);
     }
 
+    @Override
     public void connect(BleResponse response) {
         addNewRequest(new BleConnectRequest(response));
     }
 
+    @Override
     public void disconnect() {
         addNewRequest(new BleDisconnectRequest());
     }
 
+    @Override
     public void read(UUID service, UUID character, BleResponse response) {
         addNewRequest(new BleReadRequest(service, character, response));
     }
 
-    public void write(UUID service, UUID character, byte[] bytes,
-                      BleResponse response) {
+    @Override
+    public void write(UUID service, UUID character, byte[] bytes, BleResponse response) {
         addNewRequest(new BleWriteRequest(service, character, bytes, response));
     }
 
+    @Override
     public void notify(UUID service, UUID character, BleResponse response) {
         addNewRequest(new BleNotifyRequest(service, character, response));
     }
 
+    @Override
     public void unnotify(UUID service, UUID character) {
         addNewRequest(new BleUnnotifyRequest(service, character));
     }
 
-    public void readRemoteRssi(BleResponse response) {
+    @Override
+    public void readRssi(BleResponse response) {
         addNewRequest(new BleReadRssiRequest(response));
     }
 
@@ -134,10 +141,6 @@ public class BleConnectDispatcher implements IBleDispatch {
         addPrioRequest(request);
     }
 
-    private void sendMessageToResponseHandler(int what, Object obj) {
-        sendMessageToResponseHandler(what, obj, null);
-    }
-
     private void sendMessageToResponseHandler(int what, Object obj, Bundle data) {
         Message msg = mResponseHandler.obtainMessage(what, obj);
 
@@ -150,54 +153,44 @@ public class BleConnectDispatcher implements IBleDispatch {
 
     private void notifyRequestExceedLimit(BleRequest request) {
         request.setRequestCode(Code.REQUEST_OVERFLOW);
-        sendMessageToResponseHandler(MSG_REQUEST_FAILED, request);
+        sendMessageToResponseHandler(MSG_REQUEST_FAILED, request, null);
     }
 
-    private final Handler mResponseHandler = new Handler(Looper.getMainLooper()) {
 
-        @Override
-        public void handleMessage(Message msg) {
-            // TODO Auto-generated method stub
-            BleRequest request = null;
+    @Override
+    public boolean handleMessage(Message msg) {
+        // TODO Auto-generated method stub
+        BleRequest request = null;
 
-            if (msg != null && msg.obj instanceof BleRequest) {
-                request = (BleRequest) msg.obj;
-            }
-
-            switch (msg.what) {
-                case MSG_REQUEST_SUCCESS:
-                    request.onResponse(Code.REQUEST_SUCCESS, request.getBundle());
-
-                    break;
-
-                case MSG_REQUEST_FAILED:
-                    request.onResponse(request.getIntExtra(BluetoothConstants.EXTRA_CODE, Code.REQUEST_FAILED), request.getBundle());
-
-                    break;
-            }
+        if (msg != null && msg.obj instanceof BleRequest) {
+            request = (BleRequest) msg.obj;
         }
-    };
+
+        switch (msg.what) {
+            case MSG_REQUEST_SUCCESS:
+                request.onResponse(Code.REQUEST_SUCCESS, request.getBundle());
+                break;
+
+            case MSG_REQUEST_FAILED:
+                request.onResponse(request.getIntExtra(BluetoothConstants.EXTRA_CODE, Code.REQUEST_FAILED), request.getBundle());
+                break;
+        }
+
+        return true;
+    }
 
     @Override
     public void notifyWorkerResult(BleRequest request, boolean result) {
         if (request == null || request != mCurrentRequest) {
-            BluetoothLog.w("strange notifyWorkerResult in BleConnectDispatcher");
             return;
         }
 
         if (result == true) {
             dispatchRequestResult(result);
         } else {
-            if (mCurrentRequest != null) {
-                if (mCurrentRequest.canRetry()) {
-                    retryCurrentRequest();
-                } else {
-                    dispatchRequestResult(result);
-                }
+            if (mCurrentRequest.canRetry()) {
+                retryCurrentRequest();
             } else {
-                /**
-                 * 此处可能因为worker出现异常了，从而催促dispatcher分发下一个任务
-                 */
                 dispatchRequestResult(result);
             }
         }
@@ -210,7 +203,7 @@ public class BleConnectDispatcher implements IBleDispatch {
         if (mCurrentRequest != null) {
             int msg = (result ?
                     MSG_REQUEST_SUCCESS : MSG_REQUEST_FAILED);
-            sendMessageToResponseHandler(msg, mCurrentRequest);
+            sendMessageToResponseHandler(msg, mCurrentRequest, null);
         }
 
         mCurrentRequest = null;

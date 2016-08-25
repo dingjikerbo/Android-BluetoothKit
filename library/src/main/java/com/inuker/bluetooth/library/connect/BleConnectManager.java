@@ -1,5 +1,7 @@
 package com.inuker.bluetooth.library.connect;
 
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v4.util.ArrayMap;
 
 import com.inuker.bluetooth.library.connect.response.BleResponse;
@@ -11,14 +13,26 @@ import java.util.UUID;
  */
 public class BleConnectManager {
 
+    private static final String TAG = BleConnectManager.class.getSimpleName();
+
     private static ArrayMap<String, IBleConnectMaster> mBleConnectMasters;
+
+    private static HandlerThread mWorkerThread;
 
     static {
         mBleConnectMasters = new ArrayMap<String, IBleConnectMaster>();
     }
 
+    public static Looper getWorkerLooper() {
+        if (mWorkerThread == null) {
+            mWorkerThread = new HandlerThread(TAG);
+            mWorkerThread.start();
+        }
+        return mWorkerThread.getLooper();
+    }
+
     private static IBleConnectMaster getBleConnectMaster(String mac) {
-        IBleConnectMaster master = null;
+        IBleConnectMaster master;
 
         master = mBleConnectMasters.get(mac);
         if (master == null) {

@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library.utils;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -28,6 +29,32 @@ public class ProxyUtils {
         return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
                 new Class<?>[] { clazz },
                 new ProxyInvocationHandler(object, handler));
+    }
+
+    public static class ProxyBulk {
+        Object object;
+        Method method;
+        Object[] args;
+
+        public ProxyBulk(Object object, Method method, Object[] args) {
+            this.object = object;
+            this.method = method;
+            this.args = args;
+        }
+
+        private Object safeInvoke() {
+            Object result = null;
+            try {
+                result = method.invoke(object, args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        }
+
+        public static Object safeInvoke(Object obj) {
+            return ((ProxyBulk) obj).safeInvoke();
+        }
     }
 
     private static List<Class<?>> getAllInterfaces(final Class<?> cls) {
