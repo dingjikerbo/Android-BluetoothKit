@@ -12,7 +12,8 @@ First, you should initial BluetoothClient as below:
 BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
 
-1. connect
+### **1. connect**
+
 ```Java
 mClient.connect(MAC, new BluetoothResponse() {
     @Override
@@ -24,12 +25,12 @@ mClient.connect(MAC, new BluetoothResponse() {
 });
 ```
 
-2. disconnect
+### **2. disconnect**
 ```Java
 mClient.disconnect(MAC);
 ```
 
-3. read
+### **3. read**
 ```Java
 mClient.read(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
     @Override
@@ -41,7 +42,7 @@ mClient.read(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
 });
 ```
 
-4. write
+### **4. write**
 ```Java
 mClient.write(MAC, serviceUUID, characterUUID, bytes, new BluetoothResponse() {
     @Override
@@ -53,7 +54,7 @@ mClient.write(MAC, serviceUUID, characterUUID, bytes, new BluetoothResponse() {
 });
 ```
 
-5. notify
+### **5. notify**
 ```Java
 mClient.notify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
     @Override
@@ -65,7 +66,7 @@ mClient.notify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
 });
 ```
 
-6. unnotify
+### **6. unnotify**
 ```Java
 mClient.unnotify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
     @Override
@@ -77,7 +78,7 @@ mClient.unnotify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
 });
 ```
 
-7. read rssi
+### **7. read rssi**
 ```Java
 mClient.readRssi(MAC, new BluetoothResponse() {
     @Override
