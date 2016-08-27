@@ -5,8 +5,6 @@ package com.inuker.bluetooth.library;
  */
 public class BluetoothConstants {
 
-
-
     public static final int STATUS_CONNECTED = 0x10;
     public static final int STATUS_DISCONNECTED = 0x20;
 

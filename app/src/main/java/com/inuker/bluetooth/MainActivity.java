@@ -1,20 +1,13 @@
 package com.inuker.bluetooth;
 
 import android.app.Activity;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.View;
 import android.widget.Button;
 
 import com.inuker.bluetooth.library.BluetoothClient;
-import com.inuker.bluetooth.library.BluetoothConstants;
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.IBluetoothClient;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
-
-import java.util.UUID;
 
 public class MainActivity extends Activity {
 
