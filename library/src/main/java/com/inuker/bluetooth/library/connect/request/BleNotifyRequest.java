@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.WriteDescriptorListener;
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class BleNotifyRequest extends BleRequest implements WriteDescriptorListener {
 
-    public BleNotifyRequest(UUID service, UUID character, BleResponse response) {
+    public BleNotifyRequest(UUID service, UUID character, BluetoothResponse response) {
         super(response);
         mServiceUUID = service;
         mCharacterUUID = character;

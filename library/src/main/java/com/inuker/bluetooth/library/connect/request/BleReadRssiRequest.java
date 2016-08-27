@@ -6,14 +6,14 @@ import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ReadRssiListener;
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 /**
  * Created by liwentian on 2015/12/23.
  */
 public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
-    public BleReadRssiRequest(BleResponse response) {
+    public BleReadRssiRequest(BluetoothResponse response) {
         super(response);
     }
 

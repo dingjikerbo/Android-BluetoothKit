@@ -8,7 +8,7 @@ import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.BleConnectManager;
 import com.inuker.bluetooth.library.connect.IBluetoothApi;
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.UUID;
 
@@ -50,7 +50,7 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
         UUID service = (UUID) args.getSerializable(BluetoothConstants.EXTRA_SERVICE_UUID);
         UUID character = (UUID) args.getSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID);
         byte[] value = args.getByteArray(BluetoothConstants.EXTRA_BYTE_VALUE);
-        BleResponse response = (BleResponse) msg.obj;
+        BluetoothResponse response = (BluetoothResponse) msg.obj;
 
         switch (msg.what) {
             case CODE_CONNECT:

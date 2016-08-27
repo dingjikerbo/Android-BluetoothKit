@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 
@@ -27,7 +27,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     protected byte[] mBytes;
 
-    protected BleResponse mResponse;
+    protected BluetoothResponse mResponse;
 
     protected int mRetryLimit;
     protected int mRetryCount;
@@ -40,7 +40,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     protected IBleRequestProcessor mProcessor;
 
-    public BleRequest(BleResponse response) {
+    public BleRequest(BluetoothResponse response) {
         mExtra = new Bundle();
         mResponse = response;
         mRetryLimit = getDefaultRetryLimit();
@@ -52,7 +52,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
         return mTimeoutLimit;
     }
 
-    public void setResponse(BleResponse response) {
+    public void setResponse(BluetoothResponse response) {
         mResponse = response;
     }
 
@@ -127,7 +127,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
         return DEFAULT_RETRY_LIMIT;
     }
 
-    public BleResponse getResponse() {
+    public BluetoothResponse getResponse() {
         return mResponse;
     }
 

@@ -31,6 +31,12 @@ public class ProxyUtils {
                 new ProxyInvocationHandler(object, handler));
     }
 
+    public static <T> T newProxyInstance(Object object, Class<?>[] clazz, ProxyHandler handler) {
+        return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
+                clazz,
+                new ProxyInvocationHandler(object, handler));
+    }
+
     public static class ProxyBulk {
         public Object object;
         public Method method;

@@ -7,7 +7,7 @@ import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class BleReadRequest extends BleRequest implements ReadCharacterListener {
 
-    public BleReadRequest(UUID service, UUID character, BleResponse response) {
+    public BleReadRequest(UUID service, UUID character, BluetoothResponse response) {
         super(response);
         mServiceUUID = service;
         mCharacterUUID = character;

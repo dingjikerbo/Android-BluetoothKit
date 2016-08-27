@@ -1,13 +1,10 @@
 package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Message;
 
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
 
@@ -43,7 +40,7 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     }
 
     @Override
-    public void connect(BleResponse response) {
+    public void connect(BluetoothResponse response) {
         getConnectDispatcher().connect(response);
     }
 
@@ -53,27 +50,27 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     }
 
     @Override
-    public void read(UUID service, UUID character, BleResponse response) {
+    public void read(UUID service, UUID character, BluetoothResponse response) {
         getConnectDispatcher().read(service, character, response);
     }
 
     @Override
-    public void write(UUID service, UUID character, byte[] bytes, BleResponse response) {
+    public void write(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
         getConnectDispatcher().write(service, character, bytes, response);
     }
 
     @Override
-    public void notify(UUID service, UUID character, BleResponse response) {
+    public void notify(UUID service, UUID character, BluetoothResponse response) {
         getConnectDispatcher().notify(service, character, response);
     }
 
     @Override
-    public void unnotify(UUID service, UUID character, BleResponse response) {
+    public void unnotify(UUID service, UUID character, BluetoothResponse response) {
         getConnectDispatcher().unnotify(service, character, response);
     }
 
     @Override
-    public void readRssi(BleResponse response) {
+    public void readRssi(BluetoothResponse response) {
         getConnectDispatcher().readRssi(response);
     }
 

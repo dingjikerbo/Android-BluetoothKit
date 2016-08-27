@@ -15,7 +15,7 @@ import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
-import com.inuker.bluetooth.library.connect.response.BleResponse;
+import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
 
@@ -47,7 +47,7 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
     }
 
     @Override
-    public void connect(BleResponse response) {
+    public void connect(BluetoothResponse response) {
         addNewRequest(new BleConnectRequest(response));
     }
 
@@ -57,27 +57,27 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
     }
 
     @Override
-    public void read(UUID service, UUID character, BleResponse response) {
+    public void read(UUID service, UUID character, BluetoothResponse response) {
         addNewRequest(new BleReadRequest(service, character, response));
     }
 
     @Override
-    public void write(UUID service, UUID character, byte[] bytes, BleResponse response) {
+    public void write(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
         addNewRequest(new BleWriteRequest(service, character, bytes, response));
     }
 
     @Override
-    public void notify(UUID service, UUID character, BleResponse response) {
+    public void notify(UUID service, UUID character, BluetoothResponse response) {
         addNewRequest(new BleNotifyRequest(service, character, response));
     }
 
     @Override
-    public void unnotify(UUID service, UUID character, BleResponse response) {
+    public void unnotify(UUID service, UUID character, BluetoothResponse response) {
         addNewRequest(new BleUnnotifyRequest(service, character, response));
     }
 
     @Override
-    public void readRssi(BleResponse response) {
+    public void readRssi(BluetoothResponse response) {
         addNewRequest(new BleReadRssiRequest(response));
     }
 
