@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library.utils;
 import java.util.Random;
 
 /**
- * Created by liwentian on 2016/1/13.
+ * Created by dingjikerbo on 2016/1/13.
  */
 public class RandomUtils {
 

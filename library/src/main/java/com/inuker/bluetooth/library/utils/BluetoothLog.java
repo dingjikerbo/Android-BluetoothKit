@@ -7,7 +7,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 /**
- * Created by liwentian on 2015/12/16.
+ * Created by dingjikerbo on 2015/12/16.
  */
 public class BluetoothLog {
 

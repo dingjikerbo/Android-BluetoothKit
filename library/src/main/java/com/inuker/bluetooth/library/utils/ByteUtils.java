@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.utils;
 
 /**
- * Created by liwentian on 2015/12/31.
+ * Created by dingjikerbo on 2015/12/31.
  */
 public class ByteUtils {
 

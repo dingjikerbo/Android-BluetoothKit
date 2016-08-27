@@ -1,6 +1,5 @@
 package com.inuker.bluetooth.library.connect;
 
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothProfile;
 import android.os.Bundle;
 

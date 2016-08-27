@@ -6,7 +6,7 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/8/25.
+ * Created by dingjikerbo on 2016/8/25.
  */
 public interface IBluetoothClient extends IBluetoothApi {
 

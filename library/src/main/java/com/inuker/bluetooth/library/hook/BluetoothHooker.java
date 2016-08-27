@@ -1,26 +1,19 @@
 package com.inuker.bluetooth.library.hook;
 
-import android.app.Service;
 import android.os.IBinder;
 import android.os.IInterface;
 
 import com.inuker.bluetooth.library.hook.compat.ServiceManagerCompat;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.HookUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
- * Created by liwentian on 2016/8/27.
+ * Created by dingjikerbo on 2016/8/27.
  */
 public class BluetoothHooker {
 

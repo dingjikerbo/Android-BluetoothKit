@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library.utils;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2015/11/4.
+ * Created by dingjikerbo on 2015/11/4.
  */
 public class UUIDUtils {
     public static final String UUID_FORMAT = "0000%04x-0000-1000-8000-00805f9b34fb";

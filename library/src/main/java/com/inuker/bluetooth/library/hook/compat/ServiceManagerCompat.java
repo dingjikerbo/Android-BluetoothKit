@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
- * Created by liwentian on 2016/8/27.
+ * Created by dingjikerbo on 2016/8/27.
  */
 public class ServiceManagerCompat {
 

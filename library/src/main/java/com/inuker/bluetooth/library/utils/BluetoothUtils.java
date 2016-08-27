@@ -1,6 +1,5 @@
 package com.inuker.bluetooth.library.utils;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
@@ -12,9 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.BluetoothService;
-import com.inuker.bluetooth.library.model.BluetoothDevice;
 
 import java.util.ArrayList;
 import java.util.List;

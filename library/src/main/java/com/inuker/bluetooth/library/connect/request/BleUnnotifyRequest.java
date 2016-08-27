@@ -11,7 +11,7 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2015/11/10.
+ * Created by dingjikerbo on 2015/11/10.
  */
 public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorListener {
 

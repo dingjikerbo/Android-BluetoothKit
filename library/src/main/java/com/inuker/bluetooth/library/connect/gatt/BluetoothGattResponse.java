@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 
 /**
- * Created by liwentian on 2016/8/25.
+ * Created by dingjikerbo on 2016/8/25.
  */
 public class BluetoothGattResponse extends BluetoothGattCallback {
 

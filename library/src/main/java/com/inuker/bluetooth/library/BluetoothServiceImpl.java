@@ -13,7 +13,7 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2015/10/29.
+ * Created by dingjikerbo on 2015/10/29.
  */
 public class BluetoothServiceImpl extends IBluetoothService.Stub implements Handler.Callback, IBluetoothApi {
 

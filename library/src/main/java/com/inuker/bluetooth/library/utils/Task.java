@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 
 /**
- * Created by liwentian on 2016/8/24.
+ * Created by dingjikerbo on 2016/8/24.
  */
 public abstract class Task extends AsyncTask<Void, Void, Void> {
 

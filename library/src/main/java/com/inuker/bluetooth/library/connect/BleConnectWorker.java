@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.RequiresPermission;
 import android.util.SparseArray;
 
 import com.inuker.bluetooth.library.BluetoothConstants;

@@ -1,9 +1,6 @@
 package com.inuker.bluetooth;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCallback;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.View;
@@ -12,7 +9,6 @@ import android.widget.Button;
 import com.inuker.bluetooth.library.BluetoothClient;
 import com.inuker.bluetooth.library.IBluetoothClient;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.hook.BluetoothHooker;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.UUID;

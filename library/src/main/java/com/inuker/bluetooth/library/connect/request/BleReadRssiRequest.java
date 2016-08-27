@@ -9,7 +9,7 @@ import com.inuker.bluetooth.library.connect.gatt.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 /**
- * Created by liwentian on 2015/12/23.
+ * Created by dingjikerbo on 2015/12/23.
  */
 public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
