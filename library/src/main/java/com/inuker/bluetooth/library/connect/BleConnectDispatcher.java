@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.BluetoothConstants;
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -120,10 +119,10 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
             mCurrentRequest = mBleWorkList.remove(0);
 
             if (!BluetoothUtils.isBleSupported()) {
-                mCurrentRequest.setRequestCode(Code.BLE_NOT_SUPPORTED);
+                mCurrentRequest.setRequestCode(BLE_NOT_SUPPORTED);
                 dispatchRequestResult(false);
             } else if (!BluetoothUtils.isBluetoothEnabled()) {
-                mCurrentRequest.setRequestCode(Code.BLUETOOTH_DISABLED);
+                mCurrentRequest.setRequestCode(BLUETOOTH_DISABLED);
                 dispatchRequestResult(false);
             } else {
                 callWorkerForNewRequest(mCurrentRequest);
@@ -152,7 +151,7 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
     }
 
     private void notifyRequestExceedLimit(BleRequest request) {
-        request.setRequestCode(Code.REQUEST_OVERFLOW);
+        request.setRequestCode(REQUEST_OVERFLOW);
         sendMessageToResponseHandler(MSG_REQUEST_FAILED, request, null);
     }
 
@@ -168,11 +167,11 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
 
         switch (msg.what) {
             case MSG_REQUEST_SUCCESS:
-                request.onResponse(Code.REQUEST_SUCCESS, request.getBundle());
+                request.onResponse(REQUEST_SUCCESS, request.getBundle());
                 break;
 
             case MSG_REQUEST_FAILED:
-                request.onResponse(request.getIntExtra(BluetoothConstants.EXTRA_CODE, Code.REQUEST_FAILED), request.getBundle());
+                request.onResponse(request.getIntExtra(EXTRA_CODE, REQUEST_FAILED), request.getBundle());
                 break;
         }
 

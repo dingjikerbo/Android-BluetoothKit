@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library;
 /**
  * Created by liwentian on 2016/8/27.
  */
-public interface IResponseConstant {
+public interface IBluetoothConstant {
 
     String EXTRA_MAC = "extra.mac";
     String EXTRA_SERVICE_UUID = "extra.service.uuid";

@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.inuker.bluetooth.library.BluetoothConstants;
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -30,12 +29,12 @@ public class BleReadRequest extends BleRequest implements ReadCharacterListener 
                 if (readCharacteristic(mServiceUUID, mCharacterUUID)) {
                     registerGattResponseListener(this);
                 } else {
-                    notifyRequestResult(Code.REQUEST_FAILED, null);
+                    notifyRequestResult(REQUEST_FAILED, null);
                 }
                 break;
 
             default:
-                notifyRequestResult(Code.REQUEST_FAILED, null);
+                notifyRequestResult(REQUEST_FAILED, null);
                 break;
         }
     }
@@ -50,10 +49,10 @@ public class BleReadRequest extends BleRequest implements ReadCharacterListener 
         byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            putByteArrayExtra(BluetoothConstants.EXTRA_BYTE_VALUE, value);
-            notifyRequestResult(Code.REQUEST_SUCCESS, null);
+            putByteArrayExtra(EXTRA_BYTE_VALUE, value);
+            notifyRequestResult(REQUEST_SUCCESS, null);
         } else {
-            notifyRequestResult(Code.REQUEST_FAILED, null);
+            notifyRequestResult(REQUEST_FAILED, null);
         }
     }
 }

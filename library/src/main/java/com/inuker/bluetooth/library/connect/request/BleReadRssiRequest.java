@@ -2,8 +2,6 @@ package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
 
-import com.inuker.bluetooth.library.BluetoothConstants;
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -31,12 +29,12 @@ public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
                 if (readRemoteRssi()) {
                     registerGattResponseListener(this);
                 } else {
-                    notifyRequestResult(Code.REQUEST_FAILED, null);
+                    notifyRequestResult(REQUEST_FAILED, null);
                 }
                 break;
 
             default:
-                notifyRequestResult(Code.REQUEST_FAILED, null);
+                notifyRequestResult(REQUEST_FAILED, null);
                 break;
         }
     }
@@ -44,10 +42,10 @@ public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
     @Override
     public void onReadRemoteRssi(int rssi, int status) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            putIntExtra(BluetoothConstants.EXTRA_RSSI, rssi);
-            notifyRequestResult(Code.REQUEST_SUCCESS, null);
+            putIntExtra(EXTRA_RSSI, rssi);
+            notifyRequestResult(REQUEST_SUCCESS, null);
         } else {
-            notifyRequestResult(Code.REQUEST_FAILED, null);
+            notifyRequestResult(REQUEST_FAILED, null);
         }
     }
 }

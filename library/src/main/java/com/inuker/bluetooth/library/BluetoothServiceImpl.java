@@ -46,10 +46,10 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
     @Override
     public boolean handleMessage(Message msg) {
         Bundle args = msg.getData();
-        String mac = args.getString(BluetoothConstants.EXTRA_MAC);
-        UUID service = (UUID) args.getSerializable(BluetoothConstants.EXTRA_SERVICE_UUID);
-        UUID character = (UUID) args.getSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID);
-        byte[] value = args.getByteArray(BluetoothConstants.EXTRA_BYTE_VALUE);
+        String mac = args.getString(EXTRA_MAC);
+        UUID service = (UUID) args.getSerializable(EXTRA_SERVICE_UUID);
+        UUID character = (UUID) args.getSerializable(EXTRA_CHARACTER_UUID);
+        byte[] value = args.getByteArray(EXTRA_BYTE_VALUE);
         BluetoothResponse response = (BluetoothResponse) msg.obj;
 
         switch (msg.what) {

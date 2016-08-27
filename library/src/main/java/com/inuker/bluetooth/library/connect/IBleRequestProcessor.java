@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library.connect;
 import android.bluetooth.BluetoothProfile;
 import android.os.Bundle;
 
+import com.inuker.bluetooth.library.IBluetoothConstant;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 
 import java.util.UUID;
@@ -10,7 +11,7 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 16/8/25.
  */
-public interface IBleRequestProcessor {
+public interface IBleRequestProcessor extends IBluetoothConstant {
 
     UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 

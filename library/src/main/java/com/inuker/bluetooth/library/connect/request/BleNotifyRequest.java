@@ -3,7 +3,6 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattDescriptor;
 
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.WriteDescriptorListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -30,12 +29,12 @@ public class BleNotifyRequest extends BleRequest implements WriteDescriptorListe
                 if (setCharacteristicNotification(mServiceUUID, mCharacterUUID, true)) {
                     registerGattResponseListener(this);
                 } else {
-                    notifyRequestResult(Code.REQUEST_FAILED, null);
+                    notifyRequestResult(REQUEST_FAILED, null);
                 }
                 break;
 
             default:
-                notifyRequestResult(Code.REQUEST_FAILED, null);
+                notifyRequestResult(REQUEST_FAILED, null);
                 break;
         }
     }
@@ -48,9 +47,9 @@ public class BleNotifyRequest extends BleRequest implements WriteDescriptorListe
     @Override
     public void onDescriptorWrite(int status, BluetoothGattDescriptor descriptor) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            notifyRequestResult(Code.REQUEST_SUCCESS, null);
+            notifyRequestResult(REQUEST_SUCCESS, null);
         } else {
-            notifyRequestResult(Code.REQUEST_FAILED, null);
+            notifyRequestResult(REQUEST_FAILED, null);
         }
     }
 }

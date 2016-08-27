@@ -2,7 +2,6 @@ package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
 
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -33,14 +32,14 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
                 throw new IllegalStateException("status impossible");
 
             case STATUS_DEVICE_SERVICE_READY:
-                notifyRequestResult(Code.REQUEST_SUCCESS, null);
+                notifyRequestResult(REQUEST_SUCCESS, null);
                 break;
 
             default:
                 if (openBluetoothGatt()) {
                     registerGattResponseListener(this);
                 } else {
-                    notifyRequestResult(Code.REQUEST_FAILED, null);
+                    notifyRequestResult(REQUEST_FAILED, null);
                 }
                 break;
         }
@@ -54,9 +53,9 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
     @Override
     public void onServicesDiscovered(int status) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            notifyRequestResult(Code.REQUEST_SUCCESS, null);
+            notifyRequestResult(REQUEST_SUCCESS, null);
         } else {
-            notifyRequestResult(Code.REQUEST_FAILED, null);
+            notifyRequestResult(REQUEST_FAILED, null);
         }
     }
 }

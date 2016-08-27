@@ -1,9 +1,11 @@
 package com.inuker.bluetooth.library.connect;
 
+import com.inuker.bluetooth.library.IBluetoothConstant;
+
 /**
  * Created by dingjikerbo on 2016/8/23.
  */
-public interface IBluetoothApi {
+public interface IBluetoothApi extends IBluetoothConstant {
 
     int CODE_CONNECT = 1;
     int CODE_DISCONNECT = 2;

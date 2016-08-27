@@ -7,7 +7,6 @@ import android.os.Message;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.BluetoothConstants;
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -116,7 +115,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
     }
 
     public void setRequestCode(int code) {
-        putIntExtra(BluetoothConstants.EXTRA_CODE, code);
+        putIntExtra(EXTRA_CODE, code);
     }
 
     public void retry() {
@@ -217,7 +216,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_REQUEST_TIMEOUT:
-                notifyRequestResult(Code.REQUEST_TIMEDOUT, null);
+                notifyRequestResult(REQUEST_TIMEDOUT, null);
                 break;
         }
         return true;

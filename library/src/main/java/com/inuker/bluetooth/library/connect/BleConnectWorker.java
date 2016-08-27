@@ -17,7 +17,6 @@ import android.util.SparseArray;
 
 import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.BluetoothService;
-import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.connect.gatt.BluetoothGattResponse;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.gatt.IBluetoothGattResponse;
@@ -243,7 +242,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void notifyRequestResult(int code, Bundle data) {
-        dispatchRequestResult(code == Code.REQUEST_SUCCESS);
+        dispatchRequestResult(code == REQUEST_SUCCESS);
     }
 
     @Override
@@ -336,10 +335,10 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         BluetoothLog.v(String.format("onCharacteristicChanged"));
 
         Intent intent = new Intent(BluetoothConstants.ACTION_CHARACTER_CHANGED);
-        intent.putExtra(BluetoothConstants.EXTRA_MAC, mBluetoothDevice.getAddress());
-        intent.putExtra(BluetoothConstants.EXTRA_SERVICE_UUID, characteristic.getService().getUuid());
-        intent.putExtra(BluetoothConstants.EXTRA_CHARACTER_UUID, characteristic.getUuid());
-        intent.putExtra(BluetoothConstants.EXTRA_BYTE_VALUE, value);
+        intent.putExtra(EXTRA_MAC, mBluetoothDevice.getAddress());
+        intent.putExtra(EXTRA_SERVICE_UUID, characteristic.getService().getUuid());
+        intent.putExtra(EXTRA_CHARACTER_UUID, characteristic.getUuid());
+        intent.putExtra(EXTRA_BYTE_VALUE, value);
         BluetoothUtils.sendBroadcast(intent);
     }
 

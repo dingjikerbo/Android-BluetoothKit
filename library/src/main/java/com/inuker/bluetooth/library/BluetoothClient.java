@@ -95,58 +95,58 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
     @Override
     public void connect(String mac, BluetoothResponse response) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
+        args.putString(EXTRA_MAC, mac);
         safeCallBluetoothApi(CODE_CONNECT, args, response);
     }
 
     @Override
     public void disconnect(String mac) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
+        args.putString(EXTRA_MAC, mac);
         safeCallBluetoothApi(CODE_DISCONNECT, args, null);
     }
 
     @Override
     public void read(String mac, UUID service, UUID character, BluetoothResponse response) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
-        args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
         safeCallBluetoothApi(CODE_READ, args, response);
     }
 
     @Override
     public void write(String mac, UUID service, UUID character, byte[] value, BluetoothResponse response) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
-        args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
-        args.putByteArray(BluetoothConstants.EXTRA_BYTE_VALUE, value);
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
+        args.putByteArray(EXTRA_BYTE_VALUE, value);
         safeCallBluetoothApi(CODE_WRITE, args, response);
     }
 
     @Override
     public void notify(String mac, UUID service, UUID character, BluetoothResponse response) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
-        args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
         safeCallBluetoothApi(CODE_NOTIFY, args, response);
     }
 
     @Override
     public void unnotify(String mac, UUID service, UUID character, BluetoothResponse response) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
-        args.putSerializable(BluetoothConstants.EXTRA_SERVICE_UUID, service);
-        args.putSerializable(BluetoothConstants.EXTRA_CHARACTER_UUID, character);
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
         safeCallBluetoothApi(CODE_UNNOTIFY, args, response);
     }
 
     @Override
     public void readRssi(String mac, BluetoothResponse response) {
         Bundle args = new Bundle();
-        args.putString(BluetoothConstants.EXTRA_MAC, mac);
+        args.putString(EXTRA_MAC, mac);
         safeCallBluetoothApi(CODE_READ_RSSI, args, response);
     }
 
@@ -158,7 +158,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             if (service != null) {
                 service.callBluetoothApi(code, args, response);
             } else {
-                response.onResponse(Code.SERVICE_EXCEPTION, null);
+                response.onResponse(SERVICE_EXCEPTION, null);
             }
         } catch (Exception e) {
             e.printStackTrace();
