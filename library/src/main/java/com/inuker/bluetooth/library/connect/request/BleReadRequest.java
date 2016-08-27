@@ -3,7 +3,6 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 
-import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;

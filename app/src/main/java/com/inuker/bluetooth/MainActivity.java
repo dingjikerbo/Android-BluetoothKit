@@ -2,12 +2,15 @@ package com.inuker.bluetooth;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.view.View;
 import android.widget.Button;
 
 import com.inuker.bluetooth.library.BluetoothClient;
 import com.inuker.bluetooth.library.IBluetoothClient;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.security.BleRegisterConnector;
 
 public class MainActivity extends Activity {
 
@@ -18,10 +21,14 @@ public class MainActivity extends Activity {
 
     private IBluetoothClient mClient;
 
+    private BleRegisterConnector mConnector;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mConnector = new BleRegisterConnector(MAC, 149);
 
         mClient = BluetoothClient.getInstance(this);
 
@@ -46,12 +53,10 @@ public class MainActivity extends Activity {
     }
 
     private void connect() {
-        mClient.connect(MAC, new BluetoothResponse() {
+        mConnector.connect(new BluetoothResponse() {
             @Override
-            public void onResponse(int code, Bundle data) {
-                if (code == REQUEST_SUCCESS) {
-
-                }
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
             }
         });
     }

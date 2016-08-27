@@ -44,7 +44,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         mWorkerThread.start();
         mWorkerHandler = new Handler(mWorkerThread.getLooper());
 
-        BluetoothHooker.hook();
+//        BluetoothHooker.hook();
     }
 
     public static IBluetoothClient getInstance(Context context) {
@@ -67,8 +67,6 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
     }
 
     private void bindServiceSync() {
-        BluetoothLog.v(String.format("bindServiceSync"));
-
         mCountDownLatch = new CountDownLatch(1);
 
         Intent intent = new Intent();
@@ -80,14 +78,12 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            BluetoothLog.v(String.format("onServiceConnected"));
             mBluetoothService = IBluetoothService.Stub.asInterface(service);
             notifyBluetoothManagerReady();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            BluetoothLog.v(String.format("onServiceDisconnected"));
             mBluetoothService = null;
         }
     };
@@ -152,7 +148,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
 
     private void safeCallBluetoothApi(int code, Bundle args, BluetoothResponse response) {
         try {
-            BluetoothLog.v(String.format("safeCallBluetoothApi code = %d", code));
+            BluetoothLog.v(String.format("BluetoothClient %s", getBluetoothCallName(code)));
 
             IBluetoothService service = getBluetoothService();
             if (service != null) {
@@ -172,7 +168,6 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             @Override
             public void run() {
                 try {
-                    Log.i("bush", "onPreCalled " + method.getName());
                     method.invoke(object, args);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -194,6 +189,19 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             mCountDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private String getBluetoothCallName(int code) {
+        switch (code) {
+            case CODE_CONNECT: return "connect";
+            case CODE_DISCONNECT: return "disconnect";
+            case CODE_READ: return "read";
+            case CODE_WRITE: return "write";
+            case CODE_NOTIFY: return "notify";
+            case CODE_UNNOTIFY: return "unnotify";
+            case CODE_READ_RSSI: return "readRssi";
+            default: return String.format("unknown %d", code);
         }
     }
 }

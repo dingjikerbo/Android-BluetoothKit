@@ -6,11 +6,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.BluetoothConstants;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
 
@@ -134,16 +134,25 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
     public void process(IBleRequestProcessor processor) {
         mProcessor = processor;
 
-        BluetoothLog.v(String.format("process %s, connectStatus = %d",
-                getClass().getSimpleName(), getConnectStatus()));
+        BluetoothLog.v(String.format("%s.process, connectStatus = %s",
+                getClass().getSimpleName(), getConnectStatusText(getConnectStatus())));
 
         Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
         mHandler.sendMessageDelayed(msg, getTimeoutLimit());
     }
 
+    private String getConnectStatusText(int status) {
+        switch (status) {
+            case STATUS_DEVICE_CONNECTED: return "connected";
+            case STATUS_DEVICE_DISCONNECTED: return "disconnected";
+            case STATUS_DEVICE_SERVICE_READY: return "service ready";
+            default: return String.format("unknown %d", status);
+        }
+    }
+
     @Override
     public void registerGattResponseListener(int responseId, GattResponseListener listener) {
-        BluetoothLog.v(String.format("registerGattResponseListener responseId = %d", responseId));
+//        BluetoothLog.v(String.format("registerGattResponseListener responseId = %d", responseId));
         mProcessor.registerGattResponseListener(responseId, listener);
     }
 
@@ -153,7 +162,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     @Override
     public void unregisterGattResponseListener(int responseId) {
-        BluetoothLog.v(String.format("unregisterGattResponseListener %d", responseId));
+//        BluetoothLog.v(String.format("unregisterGattResponseListener %d", responseId));
         mProcessor.unregisterGattResponseListener(responseId);
     }
 
@@ -197,7 +206,8 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     @Override
     public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
-        BluetoothLog.v(String.format("writeCharacteristic service %s character %s", service, character));
+        BluetoothLog.v(String.format("writeCharacteristic service %s character %s, value = %s",
+                service, character, ByteUtils.byteToString(value)));
         return mProcessor.writeCharacteristic(service, character, value);
     }
 

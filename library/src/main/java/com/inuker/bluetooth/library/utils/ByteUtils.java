@@ -1,5 +1,7 @@
 package com.inuker.bluetooth.library.utils;
 
+import java.util.Arrays;
+
 /**
  * Created by dingjikerbo on 2015/12/31.
  */
@@ -71,5 +73,33 @@ public class ByteUtils {
         }
 
         return true;
+    }
+
+    public static byte[] cutBeforeBytes(byte[] bytes, byte cut) {
+        if (ByteUtils.isEmpty(bytes)) {
+            return bytes;
+        }
+
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] != cut) {
+                return Arrays.copyOfRange(bytes, i, bytes.length);
+            }
+        }
+
+        return EMPTY_BYTES;
+    }
+
+    public static byte[] cutAfterBytes(byte[] bytes, byte cut) {
+        if (ByteUtils.isEmpty(bytes)) {
+            return bytes;
+        }
+
+        for (int i = bytes.length - 1; i >= 0; i--) {
+            if (bytes[i] != cut) {
+                return Arrays.copyOfRange(bytes, 0, i + 1);
+            }
+        }
+
+        return EMPTY_BYTES;
     }
 }

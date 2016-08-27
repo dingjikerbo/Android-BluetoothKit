@@ -34,6 +34,14 @@ public class BluetoothUtils {
         getContext().registerReceiver(receiver, filter);
     }
 
+    public static void unregisterReceiver(BroadcastReceiver receiver) {
+        unregisterGlobalReceiver(receiver);
+    }
+
+    private static void unregisterGlobalReceiver(BroadcastReceiver receiver) {
+        getContext().unregisterReceiver(receiver);
+    }
+
     public static void sendBroadcast(Intent intent) {
         sendGlobalBroadcast(intent);
     }
