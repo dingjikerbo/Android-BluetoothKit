@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library.utils;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
@@ -9,12 +10,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.BluetoothService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class BluetoothUtils {
 
@@ -22,8 +26,21 @@ public class BluetoothUtils {
     private static BluetoothAdapter mBluetoothLeAdapter;
     private static BluetoothAdapter mBluetoothClassicAdapter;
 
+    private static Handler mHandler;
+
     private static Context getContext() {
         return BluetoothService.getContext();
+    }
+
+    private static Handler getHandler() {
+        if (mHandler == null) {
+            mHandler = new Handler(Looper.getMainLooper());
+        }
+        return mHandler;
+    }
+
+    public static void post(Runnable runnable) {
+        getHandler().post(runnable);
     }
 
     public static void registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
@@ -112,6 +129,18 @@ public class BluetoothUtils {
             devices.addAll(manager.getConnectedDevices(BluetoothProfile.GATT));
         }
 
+        return devices;
+    }
+
+    public static List<BluetoothDevice> getBondedBluetoothClassicDevices() {
+        BluetoothAdapter adapter = getBluetoothClassicAdapter();
+        List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
+        if (adapter != null) {
+            Set<BluetoothDevice> sets = adapter.getBondedDevices();
+            if (sets != null) {
+                devices.addAll(sets);
+            }
+        }
         return devices;
     }
 

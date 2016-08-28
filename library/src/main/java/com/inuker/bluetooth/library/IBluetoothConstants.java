@@ -18,7 +18,12 @@ public interface IBluetoothConstants {
     String EXTRA_STATE = "extra.state";
     String EXTRA_RSSI = "extra.rssi";
     String EXTRA_VERSION = "extra.version";
+    String EXTRA_REQUEST = "extra.request";
+    String EXTRA_SEARCH_RESULT = "extra.search.result";
 
+    /**
+     * CallBluetoothApi response code
+     */
     int REQUEST_SUCCESS = 0;
     int REQUEST_FAILED = -1;
     int REQUEST_CANCELED = -2;
@@ -31,6 +36,14 @@ public interface IBluetoothConstants {
     int REQUEST_EXCEPTION = -9;
     int SERVICE_UNREADY = -10;
 
+    /**
+     * Scan Response code
+     */
+    int SEARCH_START = 1;
+    int SEARCH_STOP = 2;
+    int SEARCH_CANCEL = 3;
+    int DEVICE_FOUND = 4;
+
     int STATUS_CONNECTED = 0x10;
     int STATUS_DISCONNECTED = 0x20;
 
@@ -42,6 +55,9 @@ public interface IBluetoothConstants {
     int STATUS_DEVICE_SERVICE_READY = 0x13;
 
     int GATT_ERROR = 133;
+
+    public static final int SEARCH_TYPE_CLASSIC = 1;
+    public static final int SEARCH_TYPE_BLE = 2;
 
     UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 }

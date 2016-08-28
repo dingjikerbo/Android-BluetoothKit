@@ -9,6 +9,8 @@ import android.os.RemoteException;
 import com.inuker.bluetooth.library.connect.BleConnectManager;
 import com.inuker.bluetooth.library.connect.IBluetoothApi;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.search.BluetoothSearchManager;
+import com.inuker.bluetooth.library.search.SearchRequest;
 
 import java.util.UUID;
 
@@ -79,6 +81,15 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
             case CODE_READ_RSSI:
                 BleConnectManager.readRssi(mac, response);
+                break;
+
+            case CODE_SEARCH:
+                SearchRequest request = args.getParcelable(EXTRA_REQUEST);
+                BluetoothSearchManager.search(request, response);
+                break;
+
+            case CODE_STOP_SESARCH:
+                BluetoothSearchManager.stopSearch();
                 break;
         }
         return true;

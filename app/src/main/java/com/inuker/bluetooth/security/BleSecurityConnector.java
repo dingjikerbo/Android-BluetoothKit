@@ -170,14 +170,6 @@ public abstract class BleSecurityConnector {
         return checkBindAbility();
     }
 
-    /**
-     * 老固件在token不匹配时是不会notify的，只会超时
-     * @return
-     */
-    protected boolean willNotifyTokenNotMatch() {
-        return checkBindAbility();
-    }
-
     private class ConnectReceiver extends BroadcastReceiver {
 
         @Override

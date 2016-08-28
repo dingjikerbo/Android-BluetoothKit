@@ -8,10 +8,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.search.SearchResponse;
+import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
+import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -20,7 +27,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandler {
+public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandler, Handler.Callback {
 
     private static final String TAG = BluetoothClient.class.getSimpleName();
 
@@ -40,7 +47,8 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
 
         mWorkerThread = new HandlerThread(TAG);
         mWorkerThread.start();
-        mWorkerHandler = new Handler(mWorkerThread.getLooper());
+
+        mWorkerHandler = new Handler(mWorkerThread.getLooper(), this);
 
 //        BluetoothHooker.hook();
     }
@@ -144,13 +152,50 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         safeCallBluetoothApi(CODE_READ_RSSI, args, response);
     }
 
-    private void safeCallBluetoothApi(int code, Bundle args, BluetoothResponse response) {
+    @Override
+    public void search(SearchRequest request, final SearchResponse response) {
+        Bundle args = new Bundle();
+        args.putParcelable(EXTRA_REQUEST, request);
+        safeCallBluetoothApi(CODE_SEARCH, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                switch (code) {
+                    case SEARCH_START:
+                        response.onSearchStarted();
+                        break;
+
+                    case SEARCH_CANCEL:
+                        response.onSearchCanceled();
+                        break;
+
+                    case SEARCH_STOP:
+                        response.onSearchStopped();
+                        break;
+
+                    case DEVICE_FOUND:
+                        SearchResult device = data.getParcelable(EXTRA_SEARCH_RESULT);
+                        response.onDeviceFounded(device);
+                        break;
+
+                    default:
+                        throw new IllegalStateException("unknown code");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void stopSearch() {
+        safeCallBluetoothApi(CODE_STOP_SESARCH, null, null);
+    }
+
+    private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
         try {
             BluetoothLog.v(String.format("BluetoothClient %s", getBluetoothCallName(code)));
 
             IBluetoothService service = getBluetoothService();
             if (service != null) {
-                service.callBluetoothApi(code, args, response);
+                service.callBluetoothApi(code, args, new BluetoothResponseWrapper(response));
             } else {
                 response.onResponse(SERVICE_UNREADY, null);
             }
@@ -159,19 +204,23 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         }
     }
 
+    private class BluetoothResponseWrapper extends BluetoothResponse {
+
+        BluetoothResponse response;
+
+        BluetoothResponseWrapper(BluetoothResponse response) {
+            this.response = response;
+        }
+
+        @Override
+        public void onResponse(final int code, final Bundle data) {
+            response.onMainResponse(code, data);
+        }
+    }
+
     @Override
     public boolean onPreCalled(final Object object, final Method method, final Object[] args) {
-        mWorkerHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    method.invoke(object, args);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        mWorkerHandler.obtainMessage(0, new ProxyBulk(object, method, args)).sendToTarget();
         return false;
     }
 
@@ -201,5 +250,11 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             case CODE_READ_RSSI: return "readRssi";
             default: return String.format("unknown %d", code);
         }
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        ProxyBulk.safeInvoke(msg.obj);
+        return true;
     }
 }
