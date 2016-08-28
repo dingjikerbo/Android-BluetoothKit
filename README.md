@@ -12,6 +12,8 @@ First, you should initial BluetoothClient as below:
 BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
 
+# Bluetooth LE 
+
 ## **1. Connect**
 
 ```Java
