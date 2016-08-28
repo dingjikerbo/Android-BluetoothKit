@@ -1,7 +1,7 @@
 BluetoothKit---Android Bluetooth Framework
 ===========================
 
-This library allows for easy access to a Bluetooth LE device's connection, solved many android bluetooth inherent compatibility and stability problems refer to [Android 4.3 Bluetooth Low Energy unstable](http://stackoverflow.com/questions/17870189/android-4-3-bluetooth-low-energy-unstable)
+This library allows for easy access to Bluetooth device scan and connection, support customizing scan policy and solved many android bluetooth inherent compatibility and stability problems refer to [Android 4.3 Bluetooth Low Energy unstable](http://stackoverflow.com/questions/17870189/android-4-3-bluetooth-low-energy-unstable)
 
 Usage
 -----------------------
