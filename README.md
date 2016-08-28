@@ -11,8 +11,7 @@ First, you should initial BluetoothClient as below:
 ```Java
 BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
-
-<br/><br/>
+<br/>
 # **Scan Device** 
 
 This library support both Bluetooth LE device scan and Classic device scan, you could customize the scan policy as below:
@@ -49,8 +48,7 @@ mClient.search(request, new SearchResponse() {
 
 mClient.stopSearch();
 ```
-
-<br/><br/>
+<br/>
 # **Bluetooth LE Connection** 
 
 ## **1. Connect**
