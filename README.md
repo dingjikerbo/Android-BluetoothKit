@@ -13,7 +13,6 @@ BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
 <br/><br/>
 # **Bluetooth LE** 
----------
 
 ## **1. Connect**
 
