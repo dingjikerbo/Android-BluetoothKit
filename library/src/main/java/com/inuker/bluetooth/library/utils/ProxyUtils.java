@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library.utils;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -15,6 +16,12 @@ public class ProxyUtils {
 
     public static <T> T newProxyInstance(Object object) {
         return newProxyInstance(object, null);
+    }
+
+    public static <T> T newWeakProxyInstance(T object) {
+        return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
+                object.getClass().getInterfaces(),
+                new WeakProxyInvocationHandler(object));
     }
 
     public static <T> T newProxyInstance(Object object, ProxyHandler handler) {
@@ -136,6 +143,31 @@ public class ProxyUtils {
                 }
             }
             return true;
+        }
+    }
+
+    private static class WeakProxyInvocationHandler implements InvocationHandler {
+
+        private WeakReference<Object> refSubject;
+
+        public WeakProxyInvocationHandler(Object subject) {
+            this.refSubject = new WeakReference<Object>(subject);
+        }
+
+        @Override
+        public Object invoke(Object object, Method method, Object[] args) {
+            // TODO Auto-generated method stub
+            try {
+                Object subject = refSubject.get();
+                if (subject != null) {
+                    return method.invoke(subject, args);
+                }
+            } catch (Throwable e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return null;
         }
     }
 }

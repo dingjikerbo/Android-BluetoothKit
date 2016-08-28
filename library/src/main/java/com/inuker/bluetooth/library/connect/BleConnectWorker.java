@@ -251,11 +251,19 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
             mDeviceProfile.clear();
 
             setConnectStatus(STATUS_DEVICE_DISCONNECTED);
+            broadcastConnectStatus(STATUS_DISCONNECTED);
         }
     }
 
+    private void broadcastConnectStatus(int status) {
+        Intent intent = new Intent(ACTION_CONNECT_STATUS_CHANGED);
+        intent.putExtra(EXTRA_MAC, mBluetoothDevice.getAddress());
+        intent.putExtra(EXTRA_STATUS, status);
+        BluetoothUtils.sendBroadcast(intent);
+    }
+
     @Override
-    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+    public void onConnectionStateChange(int status, int newState) {
         BluetoothLog.v(String.format("onConnectionStateChange status = %d, newState = %d",
                 status, newState));
 
@@ -272,31 +280,39 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+    public void onServicesDiscovered(int status) {
         BluetoothLog.v(String.format("onServicesDiscovered status = %d in %s",
                 status, Thread.currentThread().getName()));
 
-        setConnectStatus(STATUS_DEVICE_SERVICE_READY);
-        refreshServiceProfile();
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            setConnectStatus(STATUS_DEVICE_SERVICE_READY);
+            broadcastConnectStatus(STATUS_CONNECTED);
+
+            refreshServiceProfile();
+        } else {
+            closeBluetoothGatt();
+        }
 
         ServiceDiscoverListener listener = getGattResponseListener(GATT_RESP_SERVICE_DISCOVER);
+
         if (listener != null) {
             listener.onServicesDiscovered(status);
         }
     }
 
     @Override
-    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-        BluetoothLog.v(String.format("onCharacteristicRead status = %d", status));
+    public void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
+        BluetoothLog.v(String.format("onCharacteristicRead status = %d, value = %s",
+                status, ByteUtils.byteToString(value)));
 
         ReadCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_READ);
         if (listener != null) {
-            listener.onCharacteristicRead(characteristic, status);
+            listener.onCharacteristicRead(characteristic, status, value);
         }
     }
 
     @Override
-    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+    public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status) {
         BluetoothLog.v(String.format("onCharacteristicWrite status = %d", status));
 
         WriteCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_WRITE);
@@ -306,7 +322,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
+    public void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value) {
         BluetoothLog.v(String.format("onCharacteristicChanged service %s, character %s, value = %s",
                 characteristic.getService().getUuid(), characteristic.getUuid(), ByteUtils.byteToString(value)));
 
@@ -319,7 +335,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+    public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
         WriteDescriptorListener listener = getGattResponseListener(GATT_RESP_DESCRIPTOR_WRITE);
         if (listener != null) {
             listener.onDescriptorWrite(status, descriptor);
@@ -327,7 +343,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+    public void onReadRemoteRssi(int rssi, int status) {
         ReadRssiListener listener = getGattResponseListener(GATT_RESP_READ_RSSI);
         if (listener != null) {
             listener.onReadRemoteRssi(rssi, status);

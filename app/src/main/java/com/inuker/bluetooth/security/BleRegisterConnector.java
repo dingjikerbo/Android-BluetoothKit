@@ -8,6 +8,8 @@ import com.inuker.bluetooth.BluetoothConstants;
 import com.inuker.bluetooth.ClientManager;
 import com.inuker.bluetooth.MD5;
 import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -42,11 +44,11 @@ public class BleRegisterConnector extends BleSecurityConnector {
         BluetoothLog.d("process step 1 ...");
 
         ClientManager.getClient().write(mMac, BluetoothConstants.MISERVICE,
-                BluetoothConstants.CHARACTER_EVENT, ByteUtils.fromInt(SESSION_START), new BluetoothResponse() {
+                BluetoothConstants.CHARACTER_EVENT, ByteUtils.fromInt(SESSION_START), new BleWriteResponse() {
 
                     @Override
-                    public void onResponse(int code, Bundle data) throws RemoteException {
-                        BluetoothLog.d("step 1 onResponse: " + code);
+                    public void onResponse(int code) {
+                        BluetoothLog.v(String.format("step 1 onResponse: code = %d", code));
 
                         if (code == REQUEST_SUCCESS) {
                             processStep2();
@@ -65,9 +67,15 @@ public class BleRegisterConnector extends BleSecurityConnector {
         openTokenNotify(mBleNotifyResponse);
     }
 
-    private final BluetoothResponse mBleNotifyResponse = new BluetoothResponse() {
+    private final BleNotifyResponse mBleNotifyResponse = new BleNotifyResponse() {
         @Override
-        public void onResponse(int code, Bundle data) throws RemoteException {
+        public void onNotify(UUID service, UUID character, byte[] value) {
+            BluetoothLog.v(String.format("onNotify service = %s, character = %s, value = %s",
+                    service, character, ByteUtils.byteToString(value)));
+        }
+
+        @Override
+        public void onResponse(int code) {
             BluetoothLog.d("step 2 onResponse: " + code);
 
             if (code == REQUEST_SUCCESS) {
@@ -133,10 +141,10 @@ public class BleRegisterConnector extends BleSecurityConnector {
 
         ClientManager.getClient().write(mMac, BluetoothConstants.MISERVICE,
                 BluetoothConstants.CHARACTER_TOKEN, bytes,
-                new BluetoothResponse() {
+                new BleWriteResponse() {
 
                     @Override
-                    public void onResponse(int code, Bundle data) throws RemoteException {
+                    public void onResponse(int code) {
                         BluetoothLog.d("step 4 onResponse: " + code);
 
                         if (code == REQUEST_SUCCESS) {

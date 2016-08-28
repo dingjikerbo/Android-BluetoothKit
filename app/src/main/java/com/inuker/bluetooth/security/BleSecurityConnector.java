@@ -12,6 +12,9 @@ import android.os.Message;
 import com.inuker.bluetooth.BluetoothConstants;
 import com.inuker.bluetooth.ClientManager;
 import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -48,9 +51,11 @@ public abstract class BleSecurityConnector {
         ClientManager.getClient().connect(mMac, mBleConnectResponse);
     }
 
-    private final BluetoothResponse mBleConnectResponse = new BluetoothResponse() {
+    private final BleConnectResponse mBleConnectResponse = new BleConnectResponse() {
         @Override
         public void onResponse(int code, Bundle data) {
+            BluetoothLog.v(String.format("code onResponse: code = %d", code));
+
             if (code == REQUEST_SUCCESS) {
                 if (data != null) {
                     mBundle.putAll(data);
@@ -75,7 +80,7 @@ public abstract class BleSecurityConnector {
         return true;
     }
 
-    protected void openTokenNotify(BluetoothResponse response) {
+    protected void openTokenNotify(BleNotifyResponse response) {
         ClientManager.getClient().notify(mMac, BluetoothConstants.MISERVICE, BluetoothConstants.CHARACTER_TOKEN, response);
         registerBleNotifyReceiver();
     }
@@ -110,12 +115,10 @@ public abstract class BleSecurityConnector {
         BluetoothLog.d("readFirmwareVersionFromDevice: ");
 
         ClientManager.getClient().read(mMac, BluetoothConstants.MISERVICE,
-                BluetoothConstants.CHARACTER_FIRMWARE_VERSION, new BluetoothResponse() {
+                BluetoothConstants.CHARACTER_FIRMWARE_VERSION, new BleReadResponse() {
                     @Override
-                    public void onResponse(int code, Bundle bundle) {
-                        if (code == REQUEST_SUCCESS && bundle != null) {
-                            byte[] data = bundle.getByteArray(EXTRA_BYTE_VALUE);
-
+                    public void onResponse(int code, byte[] data) {
+                        if (code == REQUEST_SUCCESS && data != null) {
                             data = BLECipher.encrypt(token, data);
                             data = ByteUtils.cutAfterBytes(data, (byte) 0);
 

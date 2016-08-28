@@ -17,8 +17,6 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
         return 1;
     }
 
-
-
     @Override
     public int getTimeoutLimit() {
         return 30000;

@@ -9,17 +9,17 @@ import android.bluetooth.BluetoothGattDescriptor;
  */
 public interface IBluetoothGattResponse {
 
-    void onConnectionStateChange(BluetoothGatt gatt, int status, int newState);
+    void onConnectionStateChange(int status, int newState);
 
-    void onServicesDiscovered(BluetoothGatt gatt, int status);
+    void onServicesDiscovered(int status);
 
-    void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status);
+    void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status, byte[] value);
 
-    void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status);
+    void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status);
 
-    void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value);
+    void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value);
 
-    void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status);
+    void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status);
 
-    void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status);
+    void onReadRemoteRssi(int rssi, int status);
 }

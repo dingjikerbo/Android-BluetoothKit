@@ -1,8 +1,10 @@
 package com.inuker.bluetooth.library;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,16 +13,28 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.text.TextUtils;
+import android.util.SparseArray;
 
+import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
+import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
@@ -42,6 +56,10 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
     private HandlerThread mWorkerThread;
     private Handler mWorkerHandler;
 
+    private BluetoothReceiver mBluetoothReceiver;
+
+    private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
+
     private BluetoothClient(Context context) {
         mContext = context.getApplicationContext();
 
@@ -49,6 +67,10 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         mWorkerThread.start();
 
         mWorkerHandler = new Handler(mWorkerThread.getLooper(), this);
+
+        mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
+
+        registerBluetoothReceiver();
 
 //        BluetoothHooker.hook();
     }
@@ -95,10 +117,17 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
     };
 
     @Override
-    public void connect(String mac, BluetoothResponse response) {
+    public void connect(String mac, final BleConnectResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
-        safeCallBluetoothApi(CODE_CONNECT, args, response);
+        safeCallBluetoothApi(CODE_CONNECT, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code, data);
+                }
+            }
+        });
     }
 
     @Override
@@ -106,50 +135,126 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
         safeCallBluetoothApi(CODE_DISCONNECT, args, null);
+        clearNotifyListener(mac);
     }
 
     @Override
-    public void read(String mac, UUID service, UUID character, BluetoothResponse response) {
+    public void read(String mac, UUID service, UUID character, final BleReadResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(CODE_READ, args, response);
+        safeCallBluetoothApi(CODE_READ, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code, data.getByteArray(EXTRA_BYTE_VALUE));
+                }
+            }
+        });
     }
 
     @Override
-    public void write(String mac, UUID service, UUID character, byte[] value, BluetoothResponse response) {
+    public void write(String mac, UUID service, UUID character, byte[] value, final BleWriteResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
         args.putByteArray(EXTRA_BYTE_VALUE, value);
-        safeCallBluetoothApi(CODE_WRITE, args, response);
+        safeCallBluetoothApi(CODE_WRITE, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code);
+                }
+            }
+        });
+    }
+
+    private void saveNotifyListener(String mac, UUID service, UUID character, BleNotifyResponse response) {
+        HashMap<String, List<BleNotifyResponse>> listenerMap = mNotifyResponses.get(mac);
+        if (listenerMap == null) {
+            listenerMap = new HashMap<String, List<BleNotifyResponse>>();
+            mNotifyResponses.put(mac, listenerMap);
+        }
+
+        String key = generateCharacterKey(service, character);
+        List<BleNotifyResponse> responses = listenerMap.get(key);
+        if (responses == null) {
+            responses = new ArrayList<BleNotifyResponse>();
+            listenerMap.put(key, responses);
+        }
+
+        responses.add(ProxyUtils.newWeakProxyInstance(response));
+    }
+
+    private void removeNotifyListener(String mac, UUID service, UUID character) {
+        HashMap<String, List<BleNotifyResponse>> listenerMap = mNotifyResponses.get(mac);
+        if (listenerMap != null) {
+            String key = generateCharacterKey(service, character);
+            listenerMap.remove(key);
+        }
+    }
+
+    private void clearNotifyListener(String mac) {
+        mNotifyResponses.remove(mac);
+    }
+
+    private String generateCharacterKey(UUID service, UUID character) {
+        return String.format("%s_%s", service, character);
     }
 
     @Override
-    public void notify(String mac, UUID service, UUID character, BluetoothResponse response) {
+    public void notify(final String mac, final UUID service, final UUID character, final BleNotifyResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(CODE_NOTIFY, args, response);
+        safeCallBluetoothApi(CODE_NOTIFY, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    if (code == REQUEST_SUCCESS) {
+                        saveNotifyListener(mac, service, character, response);
+                    }
+                    response.onResponse(code);
+                }
+            }
+        });
     }
 
     @Override
-    public void unnotify(String mac, UUID service, UUID character, BluetoothResponse response) {
+    public void unnotify(final String mac, final UUID service, final UUID character, final BleUnnotifyResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
-        safeCallBluetoothApi(CODE_UNNOTIFY, args, response);
+        safeCallBluetoothApi(CODE_UNNOTIFY, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code);
+                }
+
+                if (code == REQUEST_SUCCESS) {
+                    removeNotifyListener(mac, service, character);
+                }
+            }
+        });
     }
 
     @Override
-    public void readRssi(String mac, BluetoothResponse response) {
+    public void readRssi(String mac, final BleReadRssiResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
-        safeCallBluetoothApi(CODE_READ_RSSI, args, response);
+        safeCallBluetoothApi(CODE_READ_RSSI, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code, data.getInt(EXTRA_RSSI, 0));
+                }
+            }
+        });
     }
 
     @Override
@@ -159,6 +264,10 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         safeCallBluetoothApi(CODE_SEARCH, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    return;
+                }
+
                 switch (code) {
                     case SEARCH_START:
                         response.onSearchStarted();
@@ -258,5 +367,63 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
     public boolean handleMessage(Message msg) {
         ProxyBulk.safeInvoke(msg.obj);
         return true;
+    }
+
+    private void dispatchCharacterNotify(String mac, UUID service, UUID character, byte[] value) {
+        HashMap<String, List<BleNotifyResponse>> notifyMap = mNotifyResponses.get(mac);
+        if (notifyMap != null) {
+            String key = generateCharacterKey(service, character);
+            List<BleNotifyResponse> responses = notifyMap.get(key);
+            if (responses != null) {
+                for (BleNotifyResponse response : responses) {
+                    response.onNotify(service, character, value);
+                }
+            }
+        }
+    }
+
+    private void registerBluetoothReceiver() {
+        if (mBluetoothReceiver == null) {
+            mBluetoothReceiver = new BluetoothReceiver();
+            IntentFilter filter = new IntentFilter(ACTION_CHARACTER_CHANGED);
+            filter.addAction(ACTION_CONNECT_STATUS_CHANGED);
+            mContext.registerReceiver(mBluetoothReceiver, filter);
+        }
+    }
+
+    private class BluetoothReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                return;
+            }
+
+            String mac = intent.getStringExtra(EXTRA_MAC);
+
+            if (TextUtils.isEmpty(mac)) {
+                return;
+            }
+
+            String action = intent.getAction();
+
+            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = %s, action = %s", mac, action));
+
+            if (ACTION_CHARACTER_CHANGED.equalsIgnoreCase(action)) {
+                UUID service = (UUID) intent.getSerializableExtra(EXTRA_SERVICE_UUID);
+                UUID character = (UUID) intent.getSerializableExtra(EXTRA_CHARACTER_UUID);
+                byte[] value = intent.getByteArrayExtra(EXTRA_BYTE_VALUE);
+
+                if (service != null && character != null) {
+                    dispatchCharacterNotify(mac, service, character, value);
+                }
+            } else if (ACTION_CONNECT_STATUS_CHANGED.equalsIgnoreCase(action)) {
+                int status = intent.getIntExtra(IBluetoothConstants.EXTRA_STATUS, 0);
+
+                if (status == STATUS_DISCONNECTED) {
+                    clearNotifyListener(mac);
+                }
+            }
+        }
     }
 }

@@ -41,13 +41,12 @@ public class BleReadRequest extends BleRequest implements ReadCharacterListener 
     }
 
     @Override
-    public void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status) {
+    public void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
         if (!checkCharacteristic(characteristic)) {
             return;
         }
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
             putByteArrayExtra(EXTRA_BYTE_VALUE, value);
             onRequestFinished(REQUEST_SUCCESS);
         } else {
