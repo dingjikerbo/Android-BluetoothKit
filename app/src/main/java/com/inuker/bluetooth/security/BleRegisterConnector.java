@@ -18,7 +18,7 @@ import com.xiaomi.smarthome.device.bluetooth.security.BLECipher;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/2/22.
+ * Created by dingjikerbo on 2016/2/22.
  * 一、APP和设备建立连接
  * 二、APP向设备的0010写入DE85CA90
  * 三、APP打开0001的notify

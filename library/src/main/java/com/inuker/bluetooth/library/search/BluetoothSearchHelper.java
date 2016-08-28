@@ -12,7 +12,7 @@ import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyHandler;
 import java.lang.reflect.Method;
 
 /**
- * Created by liwentian on 2016/8/28.
+ * Created by dingjikerbo on 2016/8/28.
  */
 public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyHandler, Handler.Callback {
 

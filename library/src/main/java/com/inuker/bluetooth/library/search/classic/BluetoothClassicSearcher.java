@@ -12,7 +12,7 @@ import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
 /**
- * @author liwentian
+ * @author dingjikerbo
  */
 public class BluetoothClassicSearcher extends BluetoothSearcher {
 

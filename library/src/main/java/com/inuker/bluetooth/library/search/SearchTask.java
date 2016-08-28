@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by liwentian on 2016/8/28.
+ * Created by dingjikerbo on 2016/8/28.
  */
 public class SearchTask implements Parcelable {
 

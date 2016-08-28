@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by liwentian on 2016/8/28.
+ * Created by dingjikerbo on 2016/8/28.
  */
 public class SearchRequest implements Parcelable, IBluetoothConstants {
 

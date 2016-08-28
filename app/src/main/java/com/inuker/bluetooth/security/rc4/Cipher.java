@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.security.rc4;
 
 /**
- * Created by liwentian on 2015/11/17.
+ * Created by dingjikerbo on 2015/11/17.
  */
 public abstract class Cipher extends CryptoUtils {
 

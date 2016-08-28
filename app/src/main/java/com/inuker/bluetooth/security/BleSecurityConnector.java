@@ -24,7 +24,7 @@ import com.xiaomi.smarthome.device.bluetooth.security.BLECipher;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/2/22.
+ * Created by dingjikerbo on 2016/2/22.
  */
 public abstract class BleSecurityConnector {
 

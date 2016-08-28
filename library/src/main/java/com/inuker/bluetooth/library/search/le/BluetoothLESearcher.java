@@ -12,7 +12,7 @@ import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
 /**
- * @author liwentian
+ * @author dingjikerbo
  */
 public class BluetoothLESearcher extends BluetoothSearcher {
 

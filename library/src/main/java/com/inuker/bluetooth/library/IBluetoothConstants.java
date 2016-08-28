@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothProfile;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/8/27.
+ * Created by dingjikerbo on 2016/8/27.
  */
 public interface IBluetoothConstants {
 
