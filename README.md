@@ -43,8 +43,11 @@ mClient.search(request, new SearchResponse() {
 
     }
 });
+```
 
+You could stop the whole scan by just one line
 
+```Java
 mClient.stopSearch();
 ```
 <br/>
