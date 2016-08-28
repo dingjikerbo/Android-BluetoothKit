@@ -3,7 +3,7 @@ BluetoothKit---Android Bluetooth Framework
 
 This library allows for easy access to Bluetooth device scan and connection, support customizing scan policy and solved many android bluetooth inherent compatibility and stability problems refer to [Android 4.3 Bluetooth Low Energy unstable](http://stackoverflow.com/questions/17870189/android-4-3-bluetooth-low-energy-unstable)
 
-Usage
+# **Usage**
 -----------------------
 
 First, you should initial BluetoothClient as below:
@@ -12,7 +12,7 @@ First, you should initial BluetoothClient as below:
 BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
 <br/>
-# **Scan Device** 
+## **Scan Device** 
 
 This library support both Bluetooth LE device scan and Classic device scan, you could customize the scan policy as below:
 
@@ -49,9 +49,9 @@ mClient.search(request, new SearchResponse() {
 mClient.stopSearch();
 ```
 <br/>
-# **Bluetooth LE Connection** 
+## **Bluetooth LE Connection** 
 
-## **1. Connect**
+### **1. Connect**
 
 ```Java
 mClient.connect(MAC, new BluetoothResponse() {
@@ -64,12 +64,12 @@ mClient.connect(MAC, new BluetoothResponse() {
 });
 ```
 
-## **2. Disconnect**
+### **2. Disconnect**
 ```Java
 mClient.disconnect(MAC);
 ```
 
-## **3. Read Characteristic**
+### **3. Read Characteristic**
 ```Java
 mClient.read(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
     @Override
