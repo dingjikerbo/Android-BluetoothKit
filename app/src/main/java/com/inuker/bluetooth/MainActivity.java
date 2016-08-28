@@ -69,26 +69,21 @@ public class MainActivity extends Activity {
                 .searchBluetoothLeDevice(2000)
                 .build();
 
-        ClientManager.getClient().search(request, new SearchResponse() {
+        mClient.search(request, new SearchResponse() {
             @Override
             public void onSearchStarted() throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
             }
 
             @Override
             public void onDeviceFounded(SearchResult device) throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onDeviceFounded in %s, mac = %s, rssi = %d",
-                        Thread.currentThread().getName(), device.device.getAddress(), device.rssi));
             }
 
             @Override
             public void onSearchStopped() throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onSearchStopped in %s", Thread.currentThread().getName()));
             }
 
             @Override
             public void onSearchCanceled() throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onSearchCanceled in %s", Thread.currentThread().getName()));
             }
         });
     }
@@ -96,6 +91,6 @@ public class MainActivity extends Activity {
     private void disconnect() {
 //        mClient.disconnect(MAC);
 
-        ClientManager.getClient().stopSearch();
+        mClient.stopSearch();
     }
 }

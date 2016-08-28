@@ -11,8 +11,45 @@ First, you should initial BluetoothClient as below:
 ```Java
 BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
+
 <br/><br/>
-# **Bluetooth LE** 
+# **Scan Device** 
+
+This library support custom scan policy
+
+```Java
+SearchRequest request = new SearchRequest.Builder()
+        .searchBluetoothLeDevice(3000, 3)   // scan Bluetooth LE device for 3000ms, 3 times
+        .searchBluetoothClassicDevice(5000) // then scan Bluetooth Classic device for 5000ms, 1 time
+        .searchBluetoothLeDevice(2000)      // at last scan Bluetooth LE device for 2000ms
+        .build();
+
+mClient.search(request, new SearchResponse() {
+    @Override
+    public void onSearchStarted() throws RemoteException {
+    }
+
+    @Override
+    public void onDeviceFounded(SearchResult device) throws RemoteException {
+    }
+
+    @Override
+    public void onSearchStopped() throws RemoteException {
+    }
+
+    @Override
+    public void onSearchCanceled() throws RemoteException {
+    }
+});
+
+
+mClient.stopSearch();
+```
+
+
+
+<br/><br/>
+# **Bluetooth LE Connection** 
 
 ## **1. Connect**
 
