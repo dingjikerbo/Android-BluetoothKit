@@ -15,7 +15,7 @@ BluetoothClient mClient = BluetoothClient.getInstance(context);
 <br/><br/>
 # **Scan Device** 
 
-This library support custom scan policy
+This library support both Bluetooth LE device scan and Classic device scan, you could customize the scan policy as below:
 
 ```Java
 SearchRequest request = new SearchRequest.Builder()
@@ -26,27 +26,29 @@ SearchRequest request = new SearchRequest.Builder()
 
 mClient.search(request, new SearchResponse() {
     @Override
-    public void onSearchStarted() throws RemoteException {
+    public void onSearchStarted() {
+
     }
 
     @Override
-    public void onDeviceFounded(SearchResult device) throws RemoteException {
+    public void onDeviceFounded(SearchResult device) {
+
     }
 
     @Override
-    public void onSearchStopped() throws RemoteException {
+    public void onSearchStopped() {
+
     }
 
     @Override
-    public void onSearchCanceled() throws RemoteException {
+    public void onSearchCanceled() {
+
     }
 });
 
 
 mClient.stopSearch();
 ```
-
-
 
 <br/><br/>
 # **Bluetooth LE Connection** 
