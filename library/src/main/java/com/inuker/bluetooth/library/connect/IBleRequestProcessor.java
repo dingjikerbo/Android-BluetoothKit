@@ -1,8 +1,5 @@
 package com.inuker.bluetooth.library.connect;
 
-import android.bluetooth.BluetoothProfile;
-import android.os.Bundle;
-
 import com.inuker.bluetooth.library.IBluetoothConstants;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 
@@ -17,7 +14,7 @@ public interface IBleRequestProcessor extends IBluetoothConstants {
 
     void unregisterGattResponseListener(int responseId);
 
-    void notifyRequestResult(int code, Bundle data);
+    void notifyRequestResult();
 
     int getConnectStatus();
 
@@ -32,4 +29,6 @@ public interface IBleRequestProcessor extends IBluetoothConstants {
     boolean setCharacteristicNotification(UUID service, UUID character, boolean enable);
 
     boolean readRemoteRssi();
+
+    void refreshCache();
 }

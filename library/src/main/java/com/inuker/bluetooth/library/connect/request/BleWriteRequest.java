@@ -3,7 +3,6 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 
-import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.WriteCharacterListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
@@ -20,20 +19,18 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
     }
 
     @Override
-    public void process(IBleRequestProcessor processor) {
-        super.process(processor);
-
+    void processRequest() {
         switch (getConnectStatus()) {
             case STATUS_DEVICE_SERVICE_READY:
                 if (writeCharacteristic(mServiceUUID, mCharacterUUID, mBytes)) {
                     registerGattResponseListener(this);
                 } else {
-                    notifyRequestResult(REQUEST_FAILED, null);
+                    onRequestFinished(REQUEST_FAILED);
                 }
                 break;
 
             default:
-                notifyRequestResult(REQUEST_FAILED, null);
+                onRequestFinished(REQUEST_FAILED);
                 break;
         }
     }
@@ -46,9 +43,9 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
     @Override
     public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            notifyRequestResult(REQUEST_SUCCESS, null);
+            onRequestFinished(REQUEST_SUCCESS);
         } else {
-            notifyRequestResult(REQUEST_FAILED, null);
+            onRequestFinished(REQUEST_FAILED);
         }
     }
 }

@@ -28,7 +28,8 @@ public interface IBluetoothConstants {
     int CONNECTION_NOT_READY = -6;
     int REQUEST_TIMEDOUT = -7;
     int REQUEST_OVERFLOW = -8;
-    int SERVICE_EXCEPTION = -9;
+    int REQUEST_EXCEPTION = -9;
+    int SERVICE_UNREADY = -10;
 
     int STATUS_CONNECTED = 0x10;
     int STATUS_DISCONNECTED = 0x20;

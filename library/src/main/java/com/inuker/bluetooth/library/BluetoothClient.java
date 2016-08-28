@@ -8,10 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.hook.BluetoothHooker;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 
@@ -154,7 +152,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             if (service != null) {
                 service.callBluetoothApi(code, args, response);
             } else {
-                response.onResponse(SERVICE_EXCEPTION, null);
+                response.onResponse(SERVICE_UNREADY, null);
             }
         } catch (Exception e) {
             e.printStackTrace();

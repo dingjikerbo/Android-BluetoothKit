@@ -1,8 +1,6 @@
 package com.inuker.bluetooth.library.connect.request;
 
 
-import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
-
 public class BleDisconnectRequest extends BleRequest {
 
     public BleDisconnectRequest() {
@@ -10,9 +8,8 @@ public class BleDisconnectRequest extends BleRequest {
     }
 
     @Override
-    public void process(IBleRequestProcessor processor) {
-        super.process(processor);
+    void processRequest() {
         closeBluetoothGatt();
-        notifyRequestResult(REQUEST_SUCCESS, null);
+        onRequestFinished(REQUEST_SUCCESS);
     }
 }

@@ -3,7 +3,6 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 
-import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -20,20 +19,18 @@ public class BleReadRequest extends BleRequest implements ReadCharacterListener 
     }
 
     @Override
-    public void process(IBleRequestProcessor processor) {
-        super.process(processor);
-
+    void processRequest() {
         switch (getConnectStatus()) {
             case STATUS_DEVICE_SERVICE_READY:
                 if (readCharacteristic(mServiceUUID, mCharacterUUID)) {
                     registerGattResponseListener(this);
                 } else {
-                    notifyRequestResult(REQUEST_FAILED, null);
+                    onRequestFinished(REQUEST_FAILED);
                 }
                 break;
 
             default:
-                notifyRequestResult(REQUEST_FAILED, null);
+                onRequestFinished(REQUEST_FAILED);
                 break;
         }
     }
@@ -45,13 +42,21 @@ public class BleReadRequest extends BleRequest implements ReadCharacterListener 
 
     @Override
     public void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status) {
-        byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
+        if (!checkCharacteristic(characteristic)) {
+            return;
+        }
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
+            byte[] value = ByteUtils.getNonEmptyByte(characteristic.getValue());
             putByteArrayExtra(EXTRA_BYTE_VALUE, value);
-            notifyRequestResult(REQUEST_SUCCESS, null);
+            onRequestFinished(REQUEST_SUCCESS);
         } else {
-            notifyRequestResult(REQUEST_FAILED, null);
+            onRequestFinished(REQUEST_FAILED);
         }
+    }
+
+    private boolean checkCharacteristic(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && mCharacterUUID.equals(characteristic.getUuid())
+                && characteristic.getService() != null && mServiceUUID.equals(characteristic.getService().getUuid());
     }
 }

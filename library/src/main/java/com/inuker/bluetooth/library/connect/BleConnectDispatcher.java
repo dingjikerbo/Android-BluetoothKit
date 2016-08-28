@@ -1,6 +1,5 @@
 package com.inuker.bluetooth.library.connect;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -119,10 +118,10 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
 
             if (!BluetoothUtils.isBleSupported()) {
                 mCurrentRequest.setRequestCode(BLE_NOT_SUPPORTED);
-                dispatchRequestResult(false);
+                dispatchRequestResult();
             } else if (!BluetoothUtils.isBluetoothEnabled()) {
                 mCurrentRequest.setRequestCode(BLUETOOTH_DISABLED);
-                dispatchRequestResult(false);
+                dispatchRequestResult();
             } else {
                 callWorkerForNewRequest(mCurrentRequest);
             }
@@ -139,21 +138,23 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
         addPrioRequest(request);
     }
 
-    private void sendMessageToResponseHandler(int what, Object obj, Bundle data) {
-        Message msg = mResponseHandler.obtainMessage(what, obj);
-
-        if (data != null) {
-            msg.setData(data);
-        }
-
-        msg.sendToTarget();
-    }
-
     private void notifyRequestExceedLimit(BleRequest request) {
         request.setRequestCode(REQUEST_OVERFLOW);
-        sendMessageToResponseHandler(MSG_REQUEST_FAILED, request, null);
+        mResponseHandler.obtainMessage(0, request).sendToTarget();
     }
 
+    @Override
+    public void notifyWorkerResult(BleRequest request) {
+        if (request == null || request != mCurrentRequest) {
+            return;
+        }
+
+        if (request.isSuccess() || !mCurrentRequest.canRetry()) {
+            dispatchRequestResult();
+        } else {
+            retryCurrentRequest();
+        }
+    }
 
     @Override
     public boolean handleMessage(Message msg) {
@@ -164,44 +165,14 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
             request = (BleRequest) msg.obj;
         }
 
-        switch (msg.what) {
-            case MSG_REQUEST_SUCCESS:
-                request.onResponse(REQUEST_SUCCESS, request.getBundle());
-                break;
-
-            case MSG_REQUEST_FAILED:
-                request.onResponse(request.getIntExtra(EXTRA_CODE, REQUEST_FAILED), request.getBundle());
-                break;
-        }
+        request.onResponse();
 
         return true;
     }
 
-    @Override
-    public void notifyWorkerResult(BleRequest request, boolean result) {
-        if (request == null || request != mCurrentRequest) {
-            return;
-        }
-
-        if (result == true) {
-            dispatchRequestResult(result);
-        } else {
-            if (mCurrentRequest.canRetry()) {
-                retryCurrentRequest();
-            } else {
-                dispatchRequestResult(result);
-            }
-        }
-    }
-
-    /**
-     * 让当前request收场回调，然后启动下一个任务
-     */
-    private void dispatchRequestResult(boolean result) {
+    private void dispatchRequestResult() {
         if (mCurrentRequest != null) {
-            int msg = (result ?
-                    MSG_REQUEST_SUCCESS : MSG_REQUEST_FAILED);
-            sendMessageToResponseHandler(msg, mCurrentRequest, null);
+            mResponseHandler.obtainMessage(0, mCurrentRequest).sendToTarget();
         }
 
         mCurrentRequest = null;

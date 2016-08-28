@@ -51,8 +51,8 @@ public class ProxyUtils {
             Object result = null;
             try {
                 result = method.invoke(object, args);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                BluetoothLog.e(e);
             }
             return result;
         }

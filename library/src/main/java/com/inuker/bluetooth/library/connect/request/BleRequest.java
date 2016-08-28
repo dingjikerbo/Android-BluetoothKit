@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
+import com.inuker.bluetooth.library.connect.BleConnectManager;
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -14,7 +15,7 @@ import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
 
-public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Callback {
+public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Callback {
 
     private static final int MSG_REQUEST_TIMEOUT = 0x22;
 
@@ -47,69 +48,44 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
         mHandler = new Handler(Looper.myLooper(), this);
     }
 
-    public int getTimeoutLimit() {
+    int getTimeoutLimit() {
         return mTimeoutLimit;
     }
 
-    public void setResponse(BluetoothResponse response) {
+    void setResponse(BluetoothResponse response) {
         mResponse = response;
     }
 
-    public void onResponse(int code, Bundle data) {
+    public void onResponse() {
         // TODO Auto-generated method stub
         if (mResponse != null) {
             try {
-                mResponse.onResponse(code, data);
+                mResponse.onResponse(getRequestCode(), mExtra);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
     }
 
-    @Override
-    public String toString() {
-        // TODO Auto-generated method stub
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        return sb.toString();
-    }
-
     public boolean canRetry() {
         return mRetryCount < mRetryLimit;
     }
 
-    public Bundle getBundle() {
-        return mExtra;
-    }
-
-    public void putExtra(Bundle bundle) {
-        if (bundle != null) {
-            mExtra.putAll(bundle);
+    void putByteArrayExtra(String key, byte[] bytes) {
+        if (!TextUtils.isEmpty(key)) {
+            mExtra.putByteArray(key, bytes);
         }
     }
 
-    public void putByteArrayExtra(String key, byte[] bytes) {
+    void putIntExtra(String key, int value) {
         if (!TextUtils.isEmpty(key)) {
-            Bundle bundle = new Bundle();
-            bundle.putByteArray(key, bytes);
-            putExtra(bundle);
+            mExtra.putInt(key, value);
         }
     }
 
-    public void putIntExtra(String key, int value) {
+    int getIntExtra(String key, int defaultValue) {
         if (!TextUtils.isEmpty(key)) {
-            Bundle bundle = new Bundle();
-            bundle.putInt(key, value);
-            putExtra(bundle);
-        }
-    }
-
-    public int getIntExtra(String key, int defaultValue) {
-        if (!TextUtils.isEmpty(key)) {
-            Bundle bundle = getBundle();
-            if (bundle != null) {
-                return bundle.getInt(key, defaultValue);
-            }
+            return mExtra.getInt(key, defaultValue);
         }
         return defaultValue;
     }
@@ -118,20 +94,33 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
         putIntExtra(EXTRA_CODE, code);
     }
 
+    int getRequestCode() {
+        return getIntExtra(EXTRA_CODE, REQUEST_FAILED);
+    }
+
     public void retry() {
         mRetryCount++;
     }
 
-    protected int getDefaultRetryLimit() {
+    int getDefaultRetryLimit() {
         return DEFAULT_RETRY_LIMIT;
     }
 
-    public BluetoothResponse getResponse() {
+    BluetoothResponse getResponse() {
         return mResponse;
     }
 
+    final private void checkRequestContext() {
+        if (Looper.myLooper() != BleConnectManager.getWorkerLooper()) {
+            throw new IllegalStateException(String.format("%s.process run-out-of worker thread -> %s",
+                    getClass().getSimpleName(), Thread.currentThread().getName()));
+        }
+    }
+
     @Override
-    public void process(IBleRequestProcessor processor) {
+    final public void process(IBleRequestProcessor processor) {
+        checkRequestContext();
+
         mProcessor = processor;
 
         BluetoothLog.v(String.format("%s.process, connectStatus = %s",
@@ -139,7 +128,16 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
         Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
         mHandler.sendMessageDelayed(msg, getTimeoutLimit());
+
+        try {
+            processRequest();
+        } catch (Throwable e) {
+            BluetoothLog.e(e);
+            onRequestFinished(REQUEST_EXCEPTION);
+        }
     }
+
+    abstract void processRequest();
 
     private String getConnectStatusText(int status) {
         switch (status) {
@@ -171,15 +169,16 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
         return mProcessor.getConnectStatus();
     }
 
-    @Override
-    public void notifyRequestResult(int code, Bundle data) {
+    void onRequestFinished(int code) {
         BluetoothLog.v(String.format("%s.notifyRequestResult code = %d",
                 getClass().getSimpleName(), code));
+
+        setRequestCode(code);
 
         mHandler.removeMessages(MSG_REQUEST_TIMEOUT);
 
         unregisterGattResponseListener(getGattResponseListenerId());
-        mProcessor.notifyRequestResult(code, data);
+        mProcessor.notifyRequestResult();
     }
 
     @Override
@@ -213,7 +212,7 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
 
     @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
-        BluetoothLog.v(String.format("setCharacteristicNotification service %s character %s", service, character));
+        BluetoothLog.v(String.format("setCharacteristicNotification service %s character %s %b", service, character, enable));
         return mProcessor.setCharacteristicNotification(service, character, enable);
     }
 
@@ -223,13 +222,35 @@ public class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Ca
     }
 
     @Override
+    public void refreshCache() {
+        mProcessor.refreshCache();
+    }
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_REQUEST_TIMEOUT:
-                notifyRequestResult(REQUEST_TIMEDOUT, null);
+                onRequestFinished(REQUEST_TIMEDOUT);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName());
+        return sb.toString();
+    }
+
+    public boolean isSuccess() {
+        return getRequestCode() == REQUEST_SUCCESS;
+    }
+
+    @Override
+    final public void notifyRequestResult() {
+        throw new IllegalStateException("should not call this method in request");
     }
 }
 

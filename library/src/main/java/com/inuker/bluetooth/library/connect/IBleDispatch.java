@@ -6,6 +6,6 @@ import com.inuker.bluetooth.library.connect.request.BleRequest;
 
 public interface IBleDispatch {
 
-    void notifyWorkerResult(BleRequest request, boolean success);
+    void notifyWorkerResult(BleRequest request);
     void notifyHandlerReady(Handler handler);
 }

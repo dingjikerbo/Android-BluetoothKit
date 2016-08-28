@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -132,21 +131,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     private void processRequest(BleRequest request) {
         mCurrentRequest = request;
-
-        try {
-            mCurrentRequest.process(this);
-        } catch (Exception e) {
-            BluetoothLog.w(e);
-            dispatchRequestResult(false);
-        }
-    }
-
-    private void dispatchRequestResult(boolean result) {
-        BleRequest request = mCurrentRequest;
-
-        mCurrentRequest = null;
-
-        mBleDispatcher.notifyWorkerResult(request, result);
+        mCurrentRequest.process(this);
     }
 
     @Override
@@ -185,19 +170,19 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         return mBluetoothGatt.readRemoteRssi();
     }
 
-    private boolean refreshDeviceCache(BluetoothGatt gatt) {
+    @Override
+    public void refreshCache() {
         try {
-            if (gatt != null) {
+            if (mBluetoothGatt != null) {
                 Method refresh = BluetoothGatt.class.getMethod("refresh");
                 if (refresh != null) {
                     refresh.setAccessible(true);
-                    return (boolean) refresh.invoke(gatt, new Object[0]);
+                    refresh.invoke(mBluetoothGatt, new Object[0]);
                 }
             }
         } catch (Exception e) {
             BluetoothLog.e(e);
         }
-        return false;
     }
 
     private void setConnectStatus(int status) {
@@ -211,18 +196,6 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
             throw new NullPointerException("new request null");
         } else {
             processRequest(newRequest);
-        }
-    }
-
-    private void processMessage(Message msg) {
-        switch (msg.what) {
-            case MSG_SCHEDULE_NEXT:
-                onScheduleNext((BleRequest) msg.obj);
-                break;
-
-            case MSG_GATT_RESPONSE:
-                ProxyBulk.safeInvoke(msg.obj);
-                break;
         }
     }
 
@@ -241,8 +214,12 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public void notifyRequestResult(int code, Bundle data) {
-        dispatchRequestResult(code == REQUEST_SUCCESS);
+    public void notifyRequestResult() {
+        BleRequest request = mCurrentRequest;
+
+        mCurrentRequest = null;
+
+        mBleDispatcher.notifyWorkerResult(request);
     }
 
     @Override
@@ -260,7 +237,6 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         if (mBluetoothGatt == null) {
             mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false,
                     new BluetoothGattResponse(mBluetoothGattResponse));
-            refreshDeviceCache(mBluetoothGatt);
         }
 
         return mBluetoothGatt != null;
@@ -278,13 +254,11 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         }
     }
 
-    private Context getContext() {
-        return BluetoothService.getContext();
-    }
-
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-        BluetoothLog.v(String.format("onConnectionStateChange status = %d, newState = %d", status, newState));
+        BluetoothLog.v(String.format("onConnectionStateChange status = %d, newState = %d",
+                status, newState));
+
         if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
             setConnectStatus(STATUS_DEVICE_CONNECTED);
             mBluetoothGatt.discoverServices();
@@ -299,7 +273,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-        BluetoothLog.v(String.format("onServicesDiscovered status = %d", status));
+        BluetoothLog.v(String.format("onServicesDiscovered status = %d in %s",
+                status, Thread.currentThread().getName()));
 
         setConnectStatus(STATUS_DEVICE_SERVICE_READY);
         refreshServiceProfile();
@@ -368,12 +343,20 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public boolean handleMessage(Message msg) {
-        try {
-            processMessage(msg);
-        } catch (Throwable e) {
-            BluetoothLog.e(e);
-            dispatchRequestResult(false);
+        switch (msg.what) {
+            case MSG_SCHEDULE_NEXT:
+                onScheduleNext((BleRequest) msg.obj);
+                break;
+
+            case MSG_GATT_RESPONSE:
+                ProxyBulk.safeInvoke(msg.obj);
+                break;
         }
+
         return true;
+    }
+
+    private Context getContext() {
+        return BluetoothService.getContext();
     }
 }
