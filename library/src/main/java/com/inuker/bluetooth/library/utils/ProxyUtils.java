@@ -19,8 +19,20 @@ public class ProxyUtils {
     }
 
     public static <T> T newWeakProxyInstance(T object) {
+        if (object == null) {
+            return null;
+        }
         return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
                 object.getClass().getInterfaces(),
+                new WeakProxyInvocationHandler(object));
+    }
+
+    public static <T> T newWeakProxyInstance(T object, Class<?> clazz) {
+        if (object == null) {
+            return null;
+        }
+        return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
+                new Class<?>[] { clazz },
                 new WeakProxyInvocationHandler(object));
     }
 

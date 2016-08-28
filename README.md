@@ -96,6 +96,7 @@ mClient.write(MAC, serviceUUID, characterUUID, bytes, new BluetoothResponse() {
 ```
 
 ### **5. Open Notify**
+
 ```Java
 mClient.notify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
     @Override
@@ -103,6 +104,12 @@ mClient.notify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
         if (code == REQUEST_SUCCESS) {
 
         }
+    }
+
+    @Override
+    public void onNotify(UUID service, UUID character, byte[] value) {
+        BluetoothLog.v(String.format("onNotify service = %s, character = %s, value = %s",
+                service, character, ByteUtils.byteToString(value)));
     }
 });
 ```

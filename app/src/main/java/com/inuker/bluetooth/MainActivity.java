@@ -56,41 +56,43 @@ public class MainActivity extends Activity {
     }
 
     private void connect() {
-        mConnector.connect(new BluetoothResponse() {
-            @Override
-            public void onResponse(int code, Bundle data) throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
-            }
-        });
-
-//        SearchRequest request = new SearchRequest.Builder()
-//                .searchBluetoothLeDevice(3000, 3)
-//                .searchBluetoothClassicDevice(5000)
-//                .searchBluetoothLeDevice(2000)
-//                .build();
-//
-//        mClient.search(request, new SearchResponse() {
+//        mConnector.connect(new BluetoothResponse() {
 //            @Override
-//            public void onSearchStarted() throws RemoteException {
-//            }
-//
-//            @Override
-//            public void onDeviceFounded(SearchResult device) throws RemoteException {
-//            }
-//
-//            @Override
-//            public void onSearchStopped() throws RemoteException {
-//            }
-//
-//            @Override
-//            public void onSearchCanceled() throws RemoteException {
+//            public void onResponse(int code, Bundle data) throws RemoteException {
+//                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
 //            }
 //        });
+
+        SearchRequest request = new SearchRequest.Builder()
+                .searchBluetoothLeDevice(2000, 1)
+                .build();
+
+        mClient.search(request, new SearchResponse() {
+            @Override
+            public void onSearchStarted() {
+                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
+            }
+
+            @Override
+            public void onDeviceFounded(SearchResult device) {
+                BluetoothLog.v(String.format("MainActivity.onDeviceFound %s", device.device.getAddress()));
+            }
+
+            @Override
+            public void onSearchStopped() {
+                BluetoothLog.v(String.format("MainActivity.onSearchStopped"));
+            }
+
+            @Override
+            public void onSearchCanceled() {
+                BluetoothLog.v(String.format("MainActivity.onSearchCanceled"));
+            }
+        });
     }
 
     private void disconnect() {
-        mClient.disconnect(MAC);
+//        mClient.disconnect(MAC);
 
-//        mClient.stopSearch();
+        mClient.stopSearch();
     }
 }
