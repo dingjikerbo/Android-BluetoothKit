@@ -9,6 +9,9 @@ import android.widget.Button;
 import com.inuker.bluetooth.library.BluetoothClient;
 import com.inuker.bluetooth.library.IBluetoothClient;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.search.SearchResponse;
+import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.security.BleRegisterConnector;
 
@@ -53,15 +56,46 @@ public class MainActivity extends Activity {
     }
 
     private void connect() {
-        mConnector.connect(new BluetoothResponse() {
+//        mConnector.connect(new BluetoothResponse() {
+//            @Override
+//            public void onResponse(int code, Bundle data) throws RemoteException {
+//                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
+//            }
+//        });
+
+        SearchRequest request = new SearchRequest.Builder()
+                .searchBluetoothLeDevice(3000, 3)
+                .searchBluetoothClassicDevice(5000)
+                .searchBluetoothLeDevice(2000)
+                .build();
+
+        ClientManager.getClient().search(request, new SearchResponse() {
             @Override
-            public void onResponse(int code, Bundle data) throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
+            public void onSearchStarted() throws RemoteException {
+                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
+            }
+
+            @Override
+            public void onDeviceFounded(SearchResult device) throws RemoteException {
+                BluetoothLog.v(String.format("MainActivity.onDeviceFounded in %s, mac = %s, rssi = %d",
+                        Thread.currentThread().getName(), device.device.getAddress(), device.rssi));
+            }
+
+            @Override
+            public void onSearchStopped() throws RemoteException {
+                BluetoothLog.v(String.format("MainActivity.onSearchStopped in %s", Thread.currentThread().getName()));
+            }
+
+            @Override
+            public void onSearchCanceled() throws RemoteException {
+                BluetoothLog.v(String.format("MainActivity.onSearchCanceled in %s", Thread.currentThread().getName()));
             }
         });
     }
 
     private void disconnect() {
-        mClient.disconnect(MAC);
+//        mClient.disconnect(MAC);
+
+        ClientManager.getClient().stopSearch();
     }
 }

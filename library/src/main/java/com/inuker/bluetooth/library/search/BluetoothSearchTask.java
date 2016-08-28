@@ -5,8 +5,9 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
-public class BluetoothSearchTask implements IBluetoothConstants {
+public class BluetoothSearchTask implements IBluetoothConstants, Handler.Callback {
 
 	private static final int MSG_SEARCH_TIMEOUT = 0x22;
 
@@ -21,6 +22,7 @@ public class BluetoothSearchTask implements IBluetoothConstants {
 	public BluetoothSearchTask(SearchTask task) {
 		setSearchType(task.getSearchType());
 		setSearchDuration(task.getSearchDuration());
+		mHandler = new Handler(Looper.myLooper(), this);
 	}
 
 	public void setSearchType(int searchType) {
@@ -48,29 +50,7 @@ public class BluetoothSearchTask implements IBluetoothConstants {
 
 	public void start(BluetoothSearchResponse response) {
 		getBluetoothSearcher().startScanBluetooth(response);
-		sendMessageDelayed(MSG_SEARCH_TIMEOUT, searchDuration);
-	}
-
-	private void sendMessageDelayed(int what, int delayMillis) {
-		if (mHandler == null) {
-			mHandler = new Handler(Looper.myLooper()) {
-
-				@Override
-				public void handleMessage(Message msg) {
-					// TODO Auto-generated method stub
-					switch (msg.what) {
-						case MSG_SEARCH_TIMEOUT:
-							getBluetoothSearcher().stopScanBluetooth();
-							break;
-					}
-
-				}
-
-			};
-		}
-
-		Message msg = mHandler.obtainMessage(what);
-		mHandler.sendMessageDelayed(msg, delayMillis);
+		mHandler.sendEmptyMessageDelayed(MSG_SEARCH_TIMEOUT, searchDuration);
 	}
 
 	public void cancel() {
@@ -97,4 +77,13 @@ public class BluetoothSearchTask implements IBluetoothConstants {
 		}
 	}
 
+	@Override
+	public boolean handleMessage(Message msg) {
+		switch (msg.what) {
+			case MSG_SEARCH_TIMEOUT:
+				getBluetoothSearcher().stopScanBluetooth();
+				break;
+		}
+		return true;
+	}
 }

@@ -248,6 +248,8 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             case CODE_NOTIFY: return "notify";
             case CODE_UNNOTIFY: return "unnotify";
             case CODE_READ_RSSI: return "readRssi";
+            case CODE_SEARCH: return "search";
+            case CODE_STOP_SESARCH: return "stop search";
             default: return String.format("unknown %d", code);
         }
     }

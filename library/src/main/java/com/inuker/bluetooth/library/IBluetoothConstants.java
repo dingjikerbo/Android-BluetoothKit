@@ -56,8 +56,8 @@ public interface IBluetoothConstants {
 
     int GATT_ERROR = 133;
 
-    public static final int SEARCH_TYPE_CLASSIC = 1;
-    public static final int SEARCH_TYPE_BLE = 2;
+    int SEARCH_TYPE_CLASSIC = 1;
+    int SEARCH_TYPE_BLE = 2;
 
     UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 }

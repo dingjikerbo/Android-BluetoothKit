@@ -27,7 +27,7 @@ public class BluetoothSearchManager implements IBluetoothConstants {
             public void onDeviceFounded(SearchResult device) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(EXTRA_SEARCH_RESULT, device);
-                response.onSafeResponse(DEVICE_FOUND, null);
+                response.onSafeResponse(DEVICE_FOUND, bundle);
             }
 
             @Override

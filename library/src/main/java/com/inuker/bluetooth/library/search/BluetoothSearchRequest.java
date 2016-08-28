@@ -142,19 +142,20 @@ public class BluetoothSearchRequest implements Handler.Callback {
 		@Override
 		public void onSearchStarted() {
 			// TODO Auto-generated method stub
-			BluetoothLog.d(String.format("%s onSearchStarted", task.toString()));
+			BluetoothLog.v(String.format("%s onSearchStarted", task));
 		}
 
 		@Override
 		public void onDeviceFounded(SearchResult device) {
 			// TODO Auto-generated method stub
+			BluetoothLog.v(String.format("onDeviceFounded %s", device));
 			notifyDeviceFounded(device);
 		}
 
 		@Override
 		public void onSearchStopped() {
 			// TODO Auto-generated method stub
-			BluetoothLog.d(String.format("%s onSearchStopped", task.toString()));
+			BluetoothLog.v(String.format("%s onSearchStopped", task));
 			mHandler.sendEmptyMessageDelayed(MSG_START_SEARCH, SCAN_INTERVAL);
 		}
 
@@ -164,10 +165,10 @@ public class BluetoothSearchRequest implements Handler.Callback {
 			/**
 			 * 这里什么都不用做
 			 */
-			BluetoothLog.d(String.format("%s onSearchCanceled", task.toString()));
+			BluetoothLog.v(String.format("%s onSearchCanceled", task));
 		}
 
-	};
+	}
 
 	@Override
 	public String toString() {

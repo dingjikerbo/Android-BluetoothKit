@@ -8,6 +8,7 @@ import android.os.Build;
 import com.inuker.bluetooth.library.search.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearcher;
 import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
 /**
@@ -45,7 +46,7 @@ public class BluetoothLESearcher extends BluetoothSearcher {
 		try {
 			mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		} catch (Exception e) {
-
+			BluetoothLog.e(e);
 		}
 
 		super.stopScanBluetooth();
