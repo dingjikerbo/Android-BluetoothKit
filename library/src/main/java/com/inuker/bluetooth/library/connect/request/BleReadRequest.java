@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
 
