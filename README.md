@@ -56,11 +56,11 @@ mClient.stopSearch();
 ### **1. Connect**
 
 ```Java
-mClient.connect(MAC, new BluetoothResponse() {
+mClient.connect(MAC, new BleConnectResponse() {
     @Override
     public void onResponse(int code, Bundle data) {
         if (code == REQUEST_SUCCESS) {
-
+            
         }
     }
 });
@@ -73,11 +73,11 @@ mClient.disconnect(MAC);
 
 ### **3. Read Characteristic**
 ```Java
-mClient.read(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
+mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
     @Override
-    public void onResponse(int code, Bundle data) {
+    public void onResponse(int code, byte[] data) {
         if (code == REQUEST_SUCCESS) {
-            byte[] value = data.getByteArray(EXTRA_BYTE_VALUE);
+
         }
     }
 });
@@ -85,9 +85,9 @@ mClient.read(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
 
 ### **4. Write Characteristic**
 ```Java
-mClient.write(MAC, serviceUUID, characterUUID, bytes, new BluetoothResponse() {
+mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
     @Override
-    public void onResponse(int code, Bundle data)  {
+    public void onResponse(int code) {
         if (code == REQUEST_SUCCESS) {
 
         }
@@ -98,27 +98,26 @@ mClient.write(MAC, serviceUUID, characterUUID, bytes, new BluetoothResponse() {
 ### **5. Open Notify**
 
 ```Java
-mClient.notify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
+mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
     @Override
-    public void onResponse(int code, Bundle data) {
-        if (code == REQUEST_SUCCESS) {
-
-        }
+    public void onNotify(UUID service, UUID character, byte[] value) {
+        
     }
 
     @Override
-    public void onNotify(UUID service, UUID character, byte[] value) {
-        BluetoothLog.v(String.format("onNotify service = %s, character = %s, value = %s",
-                service, character, ByteUtils.byteToString(value)));
+    public void onResponse(int code) {
+        if (code == REQUEST_SUCCESS) {
+
+        }
     }
 });
 ```
 
 ### **6. Close Notify**
 ```Java
-mClient.unnotify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
+mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
     @Override
-    public void onResponse(int code, Bundle data) {
+    public void onResponse(int code) {
         if (code == REQUEST_SUCCESS) {
 
         }
@@ -128,11 +127,11 @@ mClient.unnotify(MAC, serviceUUID, characterUUID, new BluetoothResponse() {
 
 ### **7. Read Rssi**
 ```Java
-mClient.readRssi(MAC, new BluetoothResponse() {
+mClient.readRssi(MAC, new BleReadRssiResponse() {
     @Override
-    public void onResponse(int code, Bundle data) {
+    public void onResponse(int code, Integer rssi) {
         if (code == REQUEST_SUCCESS) {
-            int rssi = data.getInt(EXTRA_RSSI);
+
         }
     }
 });
