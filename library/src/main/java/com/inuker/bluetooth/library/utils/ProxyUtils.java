@@ -18,7 +18,7 @@ public class ProxyUtils {
         return newProxyInstance(object, null);
     }
 
-    public static <T> T newWeakProxyInstance(T object) {
+    public static <T> T getWeakProxy(T object) {
         if (object == null) {
             return null;
         }
@@ -27,7 +27,7 @@ public class ProxyUtils {
                 new WeakProxyInvocationHandler(object));
     }
 
-    public static <T> T newWeakProxyInstance(T object, Class<?> clazz) {
+    public static <T> T getWeakProxy(T object, Class<?> clazz) {
         if (object == null) {
             return null;
         }

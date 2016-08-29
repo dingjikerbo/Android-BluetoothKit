@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
+import com.inuker.bluetooth.library.connect.handle.BleConnectHandle;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -123,7 +125,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
 
-        final BleConnectResponse response0 = ProxyUtils.newWeakProxyInstance(response);
+        final BleConnectResponse response0 = ProxyUtils.getWeakProxy(response);
         safeCallBluetoothApi(CODE_CONNECT, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -149,7 +151,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
 
-        final BleReadResponse response0 = ProxyUtils.newWeakProxyInstance(response);
+        final BleReadResponse response0 = ProxyUtils.getWeakProxy(response);
         safeCallBluetoothApi(CODE_READ, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -168,7 +170,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
         args.putByteArray(EXTRA_BYTE_VALUE, value);
 
-        final BleWriteResponse response0 = ProxyUtils.newWeakProxyInstance(response);
+        final BleWriteResponse response0 = ProxyUtils.getWeakProxy(response);
         safeCallBluetoothApi(CODE_WRITE, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -219,7 +221,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
 
-        final BleNotifyResponse response0 = ProxyUtils.newWeakProxyInstance(response);
+        final BleNotifyResponse response0 = ProxyUtils.getWeakProxy(response);
         safeCallBluetoothApi(CODE_NOTIFY, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -240,7 +242,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         args.putSerializable(EXTRA_SERVICE_UUID, service);
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
 
-        final BleUnnotifyResponse response0 = ProxyUtils.newWeakProxyInstance(response);
+        final BleUnnotifyResponse response0 = ProxyUtils.getWeakProxy(response);
         safeCallBluetoothApi(CODE_UNNOTIFY, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -260,7 +262,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
 
-        final BleReadRssiResponse response0 = ProxyUtils.newWeakProxyInstance(response);
+        final BleReadRssiResponse response0 = ProxyUtils.getWeakProxy(response);
         safeCallBluetoothApi(CODE_READ_RSSI, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -276,7 +278,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
         Bundle args = new Bundle();
         args.putParcelable(EXTRA_REQUEST, request);
 
-        final ISearchResponse response0 = ProxyUtils.newWeakProxyInstance(response, ISearchResponse.class);
+        final ISearchResponse response0 = ProxyUtils.getWeakProxy(response, ISearchResponse.class);
         safeCallBluetoothApi(CODE_SEARCH, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -406,6 +408,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
             mBluetoothReceiver = new BluetoothReceiver();
             IntentFilter filter = new IntentFilter(ACTION_CHARACTER_CHANGED);
             filter.addAction(ACTION_CONNECT_STATUS_CHANGED);
+            filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
             mContext.registerReceiver(mBluetoothReceiver, filter);
         }
     }
@@ -420,15 +423,18 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
 
             String mac = intent.getStringExtra(EXTRA_MAC);
 
-            if (TextUtils.isEmpty(mac)) {
-                return;
-            }
-
             String action = intent.getAction();
 
-            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = %s, action = %s", mac, action));
+            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
 
-            if (ACTION_CHARACTER_CHANGED.equalsIgnoreCase(action)) {
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+                int previousState = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_STATE, 0);
+
+                if (state == BluetoothAdapter.STATE_OFF && previousState != BluetoothAdapter.STATE_OFF) {
+                    stopSearch();
+                }
+            } else if (ACTION_CHARACTER_CHANGED.equals(action)) {
                 UUID service = (UUID) intent.getSerializableExtra(EXTRA_SERVICE_UUID);
                 UUID character = (UUID) intent.getSerializableExtra(EXTRA_CHARACTER_UUID);
                 byte[] value = intent.getByteArrayExtra(EXTRA_BYTE_VALUE);
@@ -436,7 +442,7 @@ public class BluetoothClient implements IBluetoothClient, ProxyUtils.ProxyHandle
                 if (service != null && character != null) {
                     dispatchCharacterNotify(mac, service, character, value);
                 }
-            } else if (ACTION_CONNECT_STATUS_CHANGED.equalsIgnoreCase(action)) {
+            } else if (ACTION_CONNECT_STATUS_CHANGED.equals(action)) {
                 int status = intent.getIntExtra(IBluetoothConstants.EXTRA_STATUS, 0);
 
                 if (status == STATUS_DISCONNECTED) {
