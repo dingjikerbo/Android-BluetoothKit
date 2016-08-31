@@ -5,7 +5,11 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 
 # **Usage**
 
-1、Import [bluetooth.jar](https://github.com/dingjikerbo/BluetoothKit/blob/master/bluetooth.jar) to your project
+1、If you are building with Gradle, simply add the following line to the `dependencies` section of your `build.gradle` file:
+
+```groovy
+compile 'com.inuker.bluetooth:library:1.0.0'
+```
 
 2、Add following permission to AndroidManifest.xml 
 
