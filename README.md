@@ -5,7 +5,7 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 
 # **Usage**
 
-1、Import bluetoothkit.jar to your project
+1、Import bluetooth.jar to your project
 
 2、Add following permission to AndroidManifest.xml 
 
