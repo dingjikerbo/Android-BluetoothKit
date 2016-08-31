@@ -96,18 +96,10 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
         scheduleNextRequest();
     }
 
-    /**
-     * 向worker发送一个新任务
-     *
-     * @param request
-     */
     private void callWorkerForNewRequest(BleRequest request) {
         mWorkerHandler.obtainMessage(BleConnectWorker.MSG_SCHEDULE_NEXT, request).sendToTarget();
     }
 
-    /**
-     * 准备处理下一个请求
-     */
     private void scheduleNextRequest() {
         if (mCurrentRequest != null) {
             return;
@@ -128,9 +120,6 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
         }
     }
 
-    /**
-     * 重试当前任务，直接插入任务头即可
-     */
     private void retryCurrentRequest() {
         BleRequest request = mCurrentRequest;
         mCurrentRequest.retry();

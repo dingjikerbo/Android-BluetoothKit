@@ -13,45 +13,22 @@ public class BluetoothLog {
 
     private static final String LOG_TAG = "miio-bluetooth";
 
-    /**
-     * 这个是模块级别或类级别的记录
-     */
     public static void i(String msg) {
         Log.i(LOG_TAG, msg);
     }
 
-    /**
-     * 错误日志
-     *
-     * @param msg
-     */
     public static void e(String msg) {
         Log.e(LOG_TAG, msg);
     }
 
-    /**
-     * 这个是能看到函数内部的运行状况
-     *
-     * @param msg
-     */
     public static void v(String msg) {
         Log.v(LOG_TAG, msg);
     }
 
-    /**
-     * 这个是能看到函数的执行路径
-     *
-     * @param msg
-     */
     public static void d(String msg) {
         Log.d(LOG_TAG, msg);
     }
 
-    /**
-     * 重要日志，为了醒目所以标注warning
-     *
-     * @param msg
-     */
     public static void w(String msg) {
         Log.w(LOG_TAG, msg);
     }

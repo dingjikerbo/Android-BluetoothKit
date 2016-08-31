@@ -162,9 +162,6 @@ public class BluetoothSearchRequest implements Handler.Callback {
 		@Override
 		public void onSearchCanceled() {
 			// TODO Auto-generated method stub
-			/**
-			 * 这里什么都不用做
-			 */
 			BluetoothLog.v(String.format("%s onSearchCanceled", task));
 		}
 
