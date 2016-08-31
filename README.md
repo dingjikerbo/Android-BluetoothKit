@@ -20,20 +20,21 @@ This library allows for easy access to Bluetooth device scan and connection, sup
     android:required="true" />
 ```
 
-3、android:minSdkVersion should be not less than 18
-
-4、Declare BluetoothService in AndroidManifest, you can set the process in which service runs in.
+3、Declare BluetoothService in AndroidManifest, you can set the process in which service runs in.
 
 ```
 <service android:name="com.inuker.bluetooth.library.BluetoothService"
     android:process=":bluetoothkit"/>
 ```
 
-5、Initial BluetoothClient as below:
+4、Initial BluetoothClient as below:
 
 ```Java
 BluetoothClient mClient = BluetoothClient.getInstance(context);
 ```
+
+Note, android:minSdkVersion should be not less than 18
+
 <br/>
 ## **Scan Device** 
 
