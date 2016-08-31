@@ -23,7 +23,7 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 
 4. Declare BluetoothService in AndroidManifest, you can set the process in which service runs in.
 
-```Java
+```
 <service android:name="com.inuker.bluetooth.library.BluetoothService"
     android:process=":bluetoothkit"/>
 ```
