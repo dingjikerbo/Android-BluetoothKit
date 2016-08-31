@@ -35,7 +35,6 @@ BluetoothClient mClient = BluetoothClient.getInstance(context);
 
 Note, android:minSdkVersion should be not less than 18
 
-<br/>
 ## **Scan Device** 
 
 This library support both Bluetooth LE device scan and Classic device scan, you could customize the scan policy as below:
