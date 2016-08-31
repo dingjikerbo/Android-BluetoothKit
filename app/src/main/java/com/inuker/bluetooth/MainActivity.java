@@ -153,7 +153,6 @@ public class MainActivity extends Activity {
             @Override
             public void onResponse(int code) {
                 if (code == REQUEST_SUCCESS) {
-                    BluetoothGatt.GATT_FAILURE
                 }
             }
         });
