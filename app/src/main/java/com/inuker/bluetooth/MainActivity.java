@@ -1,6 +1,7 @@
 package com.inuker.bluetooth;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothGatt;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.View;
@@ -76,8 +77,32 @@ public class MainActivity extends Activity {
 //        });
 
         SearchRequest request = new SearchRequest.Builder()
-                .searchBluetoothLeDevice(2000, 1)
+                .searchBluetoothLeDevice(2000, 4)
+                .searchBluetoothClassicDevice(3000)
+                .searchBluetoothLeDevice(5000)
                 .build();
+
+        mClient.search(request, new SearchResponse() {
+            @Override
+            public void onSearchStarted() {
+                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
+            }
+
+            @Override
+            public void onDeviceFounded(SearchResult device) {
+                BluetoothLog.v(String.format("MainActivity.onDeviceFound %s", device.device.getAddress()));
+            }
+
+            @Override
+            public void onSearchStopped() {
+                BluetoothLog.v(String.format("MainActivity.onSearchStopped"));
+            }
+
+            @Override
+            public void onSearchCanceled() {
+                BluetoothLog.v(String.format("MainActivity.onSearchCanceled"));
+            }
+        });
 
         mClient.connect(MAC, new BleConnectResponse() {
             @Override
@@ -87,6 +112,10 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        mClient.disconnect(MAC);
+
+        mClient.stopSearch();
 
         mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
             @Override
@@ -124,7 +153,7 @@ public class MainActivity extends Activity {
             @Override
             public void onResponse(int code) {
                 if (code == REQUEST_SUCCESS) {
-
+                    BluetoothGatt.GATT_FAILURE
                 }
             }
         });
@@ -135,28 +164,6 @@ public class MainActivity extends Activity {
                 if (code == REQUEST_SUCCESS) {
 
                 }
-            }
-        });
-
-        mClient.search(request, new SearchResponse() {
-            @Override
-            public void onSearchStarted() {
-                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
-            }
-
-            @Override
-            public void onDeviceFounded(SearchResult device) {
-                BluetoothLog.v(String.format("MainActivity.onDeviceFound %s", device.device.getAddress()));
-            }
-
-            @Override
-            public void onSearchStopped() {
-                BluetoothLog.v(String.format("MainActivity.onSearchStopped"));
-            }
-
-            @Override
-            public void onSearchCanceled() {
-                BluetoothLog.v(String.format("MainActivity.onSearchCanceled"));
             }
         });
     }

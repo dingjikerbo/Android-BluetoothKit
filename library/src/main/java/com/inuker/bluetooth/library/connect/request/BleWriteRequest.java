@@ -42,10 +42,19 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
 
     @Override
     public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status) {
+        if (!checkCharacteristic(characteristic)) {
+            return;
+        }
+
         if (status == BluetoothGatt.GATT_SUCCESS) {
             onRequestFinished(REQUEST_SUCCESS);
         } else {
             onRequestFinished(REQUEST_FAILED);
         }
+    }
+
+    private boolean checkCharacteristic(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && mCharacterUUID.equals(characteristic.getUuid())
+                && characteristic.getService() != null && mServiceUUID.equals(characteristic.getService().getUuid());
     }
 }
