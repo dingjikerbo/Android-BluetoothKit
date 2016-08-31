@@ -5,7 +5,30 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 
 # **Usage**
 
-First, you should initial BluetoothClient as below:
+1. Import bluetoothkit.jar to your project
+2. Add following permission to AndroidManifest.xml 
+
+```
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+<uses-feature
+    android:name="android.hardware.bluetooth_le"
+    android:required="true" />
+```
+
+3. android:minSdkVersion should be not less than 18
+
+4. Declare BluetoothService in AndroidManifest, you can set the process in which service runs in.
+
+```Java
+<service android:name="com.inuker.bluetooth.library.BluetoothService"
+    android:process=":bluetoothkit"/>
+```
+
+5. Initial BluetoothClient as below:
 
 ```Java
 BluetoothClient mClient = BluetoothClient.getInstance(context);
