@@ -33,6 +33,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
-    //    compile files('libs/bluetooth.jar')
     compile project(':library')
+//    compile 'com.inuker.bluetooth:library:1.0.1'
 }

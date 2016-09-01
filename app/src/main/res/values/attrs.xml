@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PullToRefreshFrameLayout">
+        <attr name="has_header" format="boolean" />
+        <attr name="has_footer" format="boolean" />
+        <attr name="has_shadow" format="boolean" />
+        <attr name="has_divider" format="boolean" />
+    </declare-styleable>
+    
+</resources>

@@ -21,15 +21,12 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.search.ISearchResponse;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
-
-import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

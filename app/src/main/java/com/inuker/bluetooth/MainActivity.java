@@ -1,175 +1,101 @@
 package com.inuker.bluetooth;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothGatt;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.inuker.bluetooth.library.BluetoothClient;
-import com.inuker.bluetooth.library.IBluetoothClient;
-import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
-import com.inuker.bluetooth.library.connect.response.BleReadResponse;
-import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
-import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
-import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.security.BleRegisterConnector;
+import com.inuker.bluetooth.view.PullRefreshListView;
+import com.inuker.bluetooth.view.PullToRefreshFrameLayout;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
     private static final String MAC = "B0:D5:9D:6F:E7:A5";
 
-    private Button mBtnConnect;
-    private Button mBtnDisconnect;
+    private PullToRefreshFrameLayout mRefreshLayout;
+    private PullRefreshListView mListView;
+    private DeviceListAdapter mAdapter;
+    private TextView mTvTitle;
 
-    private BluetoothClient mClient;
-
-    private BleRegisterConnector mConnector;
-
-    private UUID serviceUUID, characterUUID;
-
-    private byte[] bytes;
+    private List<SearchResult> mDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mClient = ClientManager.getClient();
+        mDevices = new ArrayList<SearchResult>();
 
-        mConnector = new BleRegisterConnector(MAC, 149);
+        mTvTitle = (TextView) findViewById(R.id.title);
 
-        mBtnConnect = (Button) findViewById(R.id.connect);
-        mBtnConnect.setOnClickListener(new View.OnClickListener() {
+        mRefreshLayout = (PullToRefreshFrameLayout) findViewById(R.id.pulllayout);
 
-            @Override
-            public void onClick(View v) {
-                connect();
-            }
-        });
+        mListView = mRefreshLayout.getPullToRefreshListView();
+        mAdapter = new DeviceListAdapter(this);
+        mListView.setAdapter(mAdapter);
 
-        mBtnDisconnect = (Button) findViewById(R.id.disconnect);
-        mBtnDisconnect.setOnClickListener(new View.OnClickListener() {
+        mListView.setOnRefreshListener(new PullRefreshListView.OnRefreshListener() {
 
             @Override
-            public void onClick(View v) {
-                disconnect();
+            public void onRefresh() {
+                // TODO Auto-generated method stub
+                searchDevice();
             }
+
         });
 
+        searchDevice();
     }
 
-    private void connect() {
-        mConnector.connect(new BluetoothResponse() {
-            @Override
-            public void onResponse(int code, Bundle data) throws RemoteException {
-                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
+    private void searchDevice() {
+        SearchRequest request = new SearchRequest.Builder()
+                .searchBluetoothLeDevice(6000).build();
+
+        ClientManager.getClient().search(request, mSearchResponse);
+    }
+
+    private final SearchResponse mSearchResponse = new SearchResponse() {
+        @Override
+        public void onSearchStarted() {
+            BluetoothLog.w("MainActivity.onSearchStarted");
+            mRefreshLayout.showState(Constants.LOADING);
+            mTvTitle.setText(R.string.string_refreshing);
+            mDevices.clear();
+        }
+
+        @Override
+        public void onDeviceFounded(SearchResult device) {
+//            BluetoothLog.w("MainActivity.onDeviceFounded " + device.device.getAddress());
+            if (!mDevices.contains(device)) {
+                mDevices.add(device);
+                mAdapter.setDataList(mDevices);
             }
-        });
 
-//        SearchRequest request = new SearchRequest.Builder()
-//                .searchBluetoothLeDevice(2000, 4)
-//                .searchBluetoothClassicDevice(3000)
-//                .searchBluetoothLeDevice(5000)
-//                .build();
-//
-//        mClient.search(request, new SearchResponse() {
-//            @Override
-//            public void onSearchStarted() {
-//                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
-//            }
-//
-//            @Override
-//            public void onDeviceFounded(SearchResult device) {
-//                BluetoothLog.v(String.format("MainActivity.onDeviceFound %s", device.device.getAddress()));
-//            }
-//
-//            @Override
-//            public void onSearchStopped() {
-//                BluetoothLog.v(String.format("MainActivity.onSearchStopped"));
-//            }
-//
-//            @Override
-//            public void onSearchCanceled() {
-//                BluetoothLog.v(String.format("MainActivity.onSearchCanceled"));
-//            }
-//        });
-//
-//        mClient.connect(MAC, new BleConnectResponse() {
-//            @Override
-//            public void onResponse(int code, Bundle data) {
-//                if (code == REQUEST_SUCCESS) {
-//
-//                }
-//            }
-//        });
-//
-//        mClient.disconnect(MAC);
-//
-//        mClient.stopSearch();
-//
-//        mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
-//            @Override
-//            public void onResponse(int code, byte[] data) {
-//                if (code == REQUEST_SUCCESS) {
-//
-//                }
-//            }
-//        });
-//
-//        mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
-//            @Override
-//            public void onResponse(int code) {
-//                if (code == REQUEST_SUCCESS) {
-//
-//                }
-//            }
-//        });
-//
-//        mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
-//            @Override
-//            public void onNotify(UUID service, UUID character, byte[] value) {
-//
-//            }
-//
-//            @Override
-//            public void onResponse(int code) {
-//                if (code == REQUEST_SUCCESS) {
-//
-//                }
-//            }
-//        });
-//
-//        mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
-//            @Override
-//            public void onResponse(int code) {
-//                if (code == REQUEST_SUCCESS) {
-//                }
-//            }
-//        });
-//
-//        mClient.readRssi(MAC, new BleReadRssiResponse() {
-//            @Override
-//            public void onResponse(int code, Integer rssi) {
-//                if (code == REQUEST_SUCCESS) {
-//
-//                }
-//            }
-//        });
-    }
+            if (mDevices.size() > 0) {
+                mRefreshLayout.showState(Constants.LIST);
+            }
+        }
 
-    private void disconnect() {
-        mClient.disconnect(MAC);
+        @Override
+        public void onSearchStopped() {
+            BluetoothLog.w("MainActivity.onSearchStopped");
+            mListView.onRefreshComplete(true);
+            mTvTitle.setText(R.string.devices);
+        }
 
-//        mClient.stopSearch();
-    }
+        @Override
+        public void onSearchCanceled() {
+            BluetoothLog.w("MainActivity.onSearchCanceled");
+            mListView.onRefreshComplete(true);
+            mTvTitle.setText(R.string.devices);
+        }
+    };
 }

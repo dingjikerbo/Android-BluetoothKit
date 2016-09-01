@@ -61,4 +61,20 @@ public class SearchResult implements Parcelable {
             return new SearchResult[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SearchResult that = (SearchResult) o;
+
+        return device.equals(that.device);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return device.hashCode();
+    }
 }

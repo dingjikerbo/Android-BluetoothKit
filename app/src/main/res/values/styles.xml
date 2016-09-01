@@ -17,4 +17,18 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="ListView" parent="android:style/Widget.ListView">
+        <item name="android:background">@color/timeline_home_bg_color</item>
+        <item name="android:scrollingCache">true</item>
+        <item name="android:cacheColorHint">#00000000</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:longClickable">false</item>
+        <item name="android:drawSelectorOnTop">false</item>
+        <item name="android:listSelector">@drawable/list_selector</item>
+        <item name="android:fadingEdgeLength">0dip</item>
+        <item name="android:fastScrollEnabled">false</item>
+        <item name="android:divider">@drawable/list_divider_line</item>
+        <item name="android:dividerHeight">1.5dp</item>
+    </style>
 </resources>

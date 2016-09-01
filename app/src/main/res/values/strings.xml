@@ -1,4 +1,19 @@
 <resources>
     <string name="app_name">BluetoothCommon</string>
     <string name="action_settings">Settings</string>
+
+    <!-- 下拉刷新listView -->
+    <string name="pull_to_refresh_pull_label">向下拖动刷新</string>
+    <string name="string_update_time">最后更新：%s</string>
+    <string name="string_refreshing">扫描蓝牙中…</string>
+    <string name="release_to_refresh_pull_label">松开立即刷新</string>
+    <string name="loading_error">点击加载</string>
+    <string name="loading_wait">正在获取更多…</string>
+    <string name="click_for_loading_more">点击加载更多</string>
+    <string name="all_has_show">已显示全部内容</string>
+
+    <string name="list_click">点击屏幕,重新加载</string>
+    <string name="list_empty">暂无数据</string>
+
+    <string name="devices">设备列表</string>
 </resources>

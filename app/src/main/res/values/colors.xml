@@ -3,4 +3,26 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="pull_to_refresh_bg_color">#f6f6f6</color>
+    <color name="timeline_home_bg_color">#f6f6f6</color>
+    <color name="pull_to_refresh_tips_color">#101010</color>
+    <color name="pull_to_refresh_time_color">#706F6F</color>
+    <color name="loading_bar_text_color">#737373</color>
+
+    <color name="list_title_color">#141414</color>
+
+    <color name="title_bar_bg">#22292c</color>
+    <color name="title_bar_text">#ffffff</color>
+
+    <color name="dialog_title_text_color">#13b791</color>
+
+    <color name="list_state_offline">#ff0000</color>
+    <color name="list_state_online">#6ccdb3</color>
+
+    <color name="list_state_text_color">#999999</color>
+    <color name="article_edit_title_bg">#888888</color>
+    <color name="article_edit_title_text">#000000</color>
+
+    <color name="edit_border_color">#cccccc</color>
 </resources>

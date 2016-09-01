@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pull_to_refresh_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:drawingCacheQuality="auto" >
+
+        <com.inuker.bluetooth.view.PullRefreshListView
+            android:id="@+id/timeline_list"
+            style="@style/ListView"
+            android:smoothScrollbar="true"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/list_top_shadow"
+        android:layout_width="fill_parent"
+        android:layout_height="12dp"
+        android:layout_gravity="top"
+        android:background="@drawable/top_shadow_bg"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/list_bottom_shadow"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_shadow_bg"
+        android:contentDescription="@null" />
+
+    <RelativeLayout
+        android:id="@+id/loading_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <ImageView
+            android:id="@+id/loading_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:scaleType="center"
+            android:contentDescription="@null" />
+
+        <ProgressBar
+            android:id="@+id/pb_refresh"
+            style="@android:style/Widget.ProgressBar.Inverse"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_above="@id/loading_img"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/error_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/load_list_error_icon"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txt_list_click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/list_click"
+                android:textColor="#98a5ac"
+                android:textSize="17sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/empty_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/empty_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="@null"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/empty_text_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/list_empty"
+                android:textColor="#737373"
+                android:textSize="17sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>
