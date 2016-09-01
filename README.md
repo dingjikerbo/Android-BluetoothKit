@@ -5,9 +5,9 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 
 # **Requirements**
 
-android:minSdkVersion should be not less than 18
+ - android:minSdkVersion should be not less than 18
 
-Permission
+ - Permission
 ```
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
