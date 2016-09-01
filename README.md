@@ -25,7 +25,7 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 compile 'com.inuker.bluetooth:library:1.0.0'
 ```
 
-2、New a BluetoothClient as below: 
+2、Create a BluetoothClient as below: 
 
 ```Java
 BluetoothClient mClient = new BluetoothClient(context);
