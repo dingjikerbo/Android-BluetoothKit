@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library.search;
 import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 /**
  * Created by dingjikerbo on 2016/8/28.
@@ -25,6 +26,14 @@ public class SearchResult implements Parcelable {
         this.scanRecord = scanRecord;
     }
 
+    public String getName() {
+        String name = device.getName();
+        return TextUtils.isEmpty(name) ? "NULL" : name;
+    }
+
+    public String getAddress() {
+        return device.getAddress();
+    }
 
     @Override
     public String toString() {

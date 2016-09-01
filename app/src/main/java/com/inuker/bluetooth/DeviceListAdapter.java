@@ -3,6 +3,7 @@ package com.inuker.bluetooth;
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,9 @@ public class DeviceListAdapter extends BaseAdapter implements Comparator<SearchR
     }
 
     private static class ViewHolder {
+        TextView name;
         TextView mac;
+        TextView rssi;
     }
 
     @Override
@@ -70,14 +73,19 @@ public class DeviceListAdapter extends BaseAdapter implements Comparator<SearchR
                     R.layout.device_list_item, null, false);
 
             holder = new ViewHolder();
+            holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.mac = (TextView) convertView.findViewById(R.id.mac);
+            holder.rssi = (TextView) convertView.findViewById(R.id.rssi);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
         SearchResult result = (SearchResult) getItem(position);
-        holder.mac.setText(result.device.getAddress());
+
+        holder.name.setText(result.getName());
+        holder.mac.setText(result.getAddress());
+        holder.rssi.setText(String.format("Rssi: %d", result.rssi));
 
         return convertView;
     }

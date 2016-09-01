@@ -69,6 +69,8 @@ public class MainActivity extends Activity {
             mRefreshLayout.showState(Constants.LOADING);
             mTvTitle.setText(R.string.string_refreshing);
             mDevices.clear();
+
+            Toast.makeText(MainActivity.this, R.string.string_refreshing, Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -89,6 +91,7 @@ public class MainActivity extends Activity {
             BluetoothLog.w("MainActivity.onSearchStopped");
             mListView.onRefreshComplete(true);
             mTvTitle.setText(R.string.devices);
+            Toast.makeText(MainActivity.this, R.string.scan_over, Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -96,6 +99,7 @@ public class MainActivity extends Activity {
             BluetoothLog.w("MainActivity.onSearchCanceled");
             mListView.onRefreshComplete(true);
             mTvTitle.setText(R.string.devices);
+            Toast.makeText(MainActivity.this, R.string.scan_over, Toast.LENGTH_SHORT).show();
         }
     };
 }
