@@ -11,7 +11,7 @@ import android.os.Message;
 
 import com.inuker.bluetooth.BluetoothConstants;
 import com.inuker.bluetooth.ClientManager;
-import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -93,8 +93,8 @@ public abstract class BleSecurityConnector {
     private void registerBleNotifyReceiver() {
         if (mReceiver == null) {
             mReceiver = new ConnectReceiver();
-            IntentFilter filter = new IntentFilter(IBluetoothConstants.ACTION_CHARACTER_CHANGED);
-            filter.addAction(IBluetoothConstants.ACTION_CONNECT_STATUS_CHANGED);
+            IntentFilter filter = new IntentFilter(IBluetoothBase.ACTION_CHARACTER_CHANGED);
+            filter.addAction(IBluetoothBase.ACTION_CONNECT_STATUS_CHANGED);
             BluetoothUtils.registerReceiver(mReceiver, filter);
         }
     }
@@ -134,7 +134,7 @@ public abstract class BleSecurityConnector {
     }
 
     protected void dispatchResultInMainThread(int code) {
-        boolean success = (code == IBluetoothConstants.REQUEST_SUCCESS);
+        boolean success = (code == IBluetoothBase.REQUEST_SUCCESS);
 
         closeTokenNotify();
 
@@ -185,26 +185,26 @@ public abstract class BleSecurityConnector {
 
 //            BluetoothLog.d("onReceive: " + action);
 
-            if (IBluetoothConstants.ACTION_CHARACTER_CHANGED.equalsIgnoreCase(action)) {
-                String mac = intent.getStringExtra(IBluetoothConstants.EXTRA_MAC);
+            if (IBluetoothBase.ACTION_CHARACTER_CHANGED.equalsIgnoreCase(action)) {
+                String mac = intent.getStringExtra(IBluetoothBase.EXTRA_MAC);
 
                 if (mMac.equalsIgnoreCase(mac)) {
-                    UUID service = (UUID) intent.getSerializableExtra(IBluetoothConstants.EXTRA_SERVICE_UUID);
-                    UUID character = (UUID) intent.getSerializableExtra(IBluetoothConstants.EXTRA_CHARACTER_UUID);
-                    byte[] value = intent.getByteArrayExtra(IBluetoothConstants.EXTRA_BYTE_VALUE);
+                    UUID service = (UUID) intent.getSerializableExtra(IBluetoothBase.EXTRA_SERVICE_UUID);
+                    UUID character = (UUID) intent.getSerializableExtra(IBluetoothBase.EXTRA_CHARACTER_UUID);
+                    byte[] value = intent.getByteArrayExtra(IBluetoothBase.EXTRA_BYTE_VALUE);
 
                     if (service != null && character != null) {
                         processNotify(service, character, value);
                     }
                 }
-            } else if (IBluetoothConstants.ACTION_CONNECT_STATUS_CHANGED.equalsIgnoreCase(action)) {
-                String mac = intent.getStringExtra(IBluetoothConstants.EXTRA_MAC);
+            } else if (IBluetoothBase.ACTION_CONNECT_STATUS_CHANGED.equalsIgnoreCase(action)) {
+                String mac = intent.getStringExtra(IBluetoothBase.EXTRA_MAC);
 
                 if (mMac.equalsIgnoreCase(mac)) {
-                    int status = intent.getIntExtra(IBluetoothConstants.EXTRA_STATUS, 0);
+                    int status = intent.getIntExtra(IBluetoothBase.EXTRA_STATUS, 0);
 
-                    if (status == IBluetoothConstants.STATUS_DISCONNECTED) {
-                        dispatchResult(IBluetoothConstants.REQUEST_FAILED);
+                    if (status == IBluetoothBase.STATUS_DISCONNECTED) {
+                        dispatchResult(IBluetoothBase.REQUEST_FAILED);
                     }
                 }
             }

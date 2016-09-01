@@ -7,7 +7,7 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 2016/8/27.
  */
-public interface IBluetoothConstants {
+public interface IBluetoothBase {
 
     String EXTRA_MAC = "extra.mac";
     String EXTRA_SERVICE_UUID = "extra.service.uuid";

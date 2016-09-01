@@ -1,16 +1,13 @@
 package com.inuker.bluetooth.security;
 
-import android.os.Bundle;
 import android.os.Message;
-import android.os.RemoteException;
 
 import com.inuker.bluetooth.BluetoothConstants;
 import com.inuker.bluetooth.ClientManager;
 import com.inuker.bluetooth.MD5;
-import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.xiaomi.smarthome.device.bluetooth.security.BLECipher;
@@ -102,7 +99,7 @@ public class BleRegisterConnector extends BleSecurityConnector {
                     processStep4();
                 } else {
                     BluetoothLog.w("token not match");
-                    dispatchResult(IBluetoothConstants.REQUEST_FAILED);
+                    dispatchResult(IBluetoothBase.REQUEST_FAILED);
                 }
             }
         }
@@ -162,7 +159,7 @@ public class BleRegisterConnector extends BleSecurityConnector {
         switch (msg.what) {
             case MSG_NOTIFY_TIMEOUT:
                 BluetoothLog.w("notify timeout");
-                dispatchResult(IBluetoothConstants.REQUEST_FAILED);
+                dispatchResult(IBluetoothBase.REQUEST_FAILED);
                 break;
         }
     }

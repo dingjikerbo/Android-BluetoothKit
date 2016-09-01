@@ -35,7 +35,7 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
 
     static IBleConnectMaster newInstance(String mac) {
         BleConnectMaster master = new BleConnectMaster(mac);
-        return ProxyUtils.newProxyInstance(master, master);
+        return ProxyUtils.getProxy(master, master);
     }
 
     @Override

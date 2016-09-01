@@ -8,13 +8,13 @@ import com.inuker.bluetooth.library.IBluetoothClient;
  */
 public class ClientManager {
 
-    private static IBluetoothClient mClient;
+    private static BluetoothClient mClient;
 
-    public static IBluetoothClient getClient() {
+    public static BluetoothClient getClient() {
         if (mClient == null) {
             synchronized (ClientManager.class) {
                 if (mClient == null) {
-                    mClient = BluetoothClient.getInstance(MyApplication.getInstance());
+                    mClient = new BluetoothClient(MyApplication.getInstance());
                 }
             }
         }

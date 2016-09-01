@@ -4,9 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.IBluetoothBase;
 
-public class BluetoothSearchTask implements IBluetoothConstants, Handler.Callback {
+public class BluetoothSearchTask implements IBluetoothBase, Handler.Callback {
 
 	private static final int MSG_SEARCH_TIMEOUT = 0x22;
 

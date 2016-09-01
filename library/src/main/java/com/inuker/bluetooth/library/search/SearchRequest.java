@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library.search;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.IBluetoothBase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by dingjikerbo on 2016/8/28.
  */
-public class SearchRequest implements Parcelable, IBluetoothConstants {
+public class SearchRequest implements Parcelable, IBluetoothBase {
 
     private List<SearchTask> tasks;
 

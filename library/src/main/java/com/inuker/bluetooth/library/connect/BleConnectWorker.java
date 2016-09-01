@@ -76,7 +76,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         mBleDispatcher.notifyHandlerReady(mWorkerHandler);
 
         mGattResponseListeners = new SparseArray<GattResponseListener>();
-        mBluetoothGattResponse = ProxyUtils.newProxyInstance(this, IBluetoothGattResponse.class, this);
+        mBluetoothGattResponse = ProxyUtils.getProxy(this, IBluetoothGattResponse.class, this);
 
         mDeviceProfile = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
     }

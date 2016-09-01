@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class ProxyUtils {
 
-    public static <T> T newProxyInstance(Object object) {
-        return newProxyInstance(object, null);
+    public static <T> T getProxy(Object object) {
+        return getProxy(object, null);
     }
 
     public static <T> T getWeakProxy(T object) {
@@ -36,20 +36,20 @@ public class ProxyUtils {
                 new WeakProxyInvocationHandler(object));
     }
 
-    public static <T> T newProxyInstance(Object object, ProxyHandler handler) {
+    public static <T> T getProxy(Object object, ProxyHandler handler) {
         List<Class<?>> clazzes = getAllInterfaces(object.getClass());
         return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
                 clazzes.toArray(new Class<?>[clazzes.size()]),
                 new ProxyInvocationHandler(object, handler));
     }
 
-    public static <T> T newProxyInstance(Object object, Class<?> clazz, ProxyHandler handler) {
+    public static <T> T getProxy(Object object, Class<?> clazz, ProxyHandler handler) {
         return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
                 new Class<?>[] { clazz },
                 new ProxyInvocationHandler(object, handler));
     }
 
-    public static <T> T newProxyInstance(Object object, Class<?>[] clazz, ProxyHandler handler) {
+    public static <T> T getProxy(Object object, Class<?>[] clazz, ProxyHandler handler) {
         return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(),
                 clazz,
                 new ProxyInvocationHandler(object, handler));

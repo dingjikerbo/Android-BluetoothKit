@@ -1,6 +1,6 @@
 package com.inuker.bluetooth.library.connect;
 
-import com.inuker.bluetooth.library.IBluetoothConstants;
+import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 
 import java.util.UUID;
@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 16/8/25.
  */
-public interface IBleRequestProcessor extends IBluetoothConstants {
+public interface IBleRequestProcessor extends IBluetoothBase {
 
     void registerGattResponseListener(int responseId, GattResponseListener listener);
 

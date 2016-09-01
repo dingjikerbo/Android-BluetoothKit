@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
     private Button mBtnConnect;
     private Button mBtnDisconnect;
 
-    private IBluetoothClient mClient;
+    private BluetoothClient mClient;
 
     private BleRegisterConnector mConnector;
 
@@ -44,9 +44,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mConnector = new BleRegisterConnector(MAC, 149);
+        mClient = ClientManager.getClient();
 
-        mClient = BluetoothClient.getInstance(this);
+        mConnector = new BleRegisterConnector(MAC, 149);
 
         mBtnConnect = (Button) findViewById(R.id.connect);
         mBtnConnect.setOnClickListener(new View.OnClickListener() {
@@ -69,107 +69,107 @@ public class MainActivity extends Activity {
     }
 
     private void connect() {
-//        mConnector.connect(new BluetoothResponse() {
+        mConnector.connect(new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
+            }
+        });
+
+//        SearchRequest request = new SearchRequest.Builder()
+//                .searchBluetoothLeDevice(2000, 4)
+//                .searchBluetoothClassicDevice(3000)
+//                .searchBluetoothLeDevice(5000)
+//                .build();
+//
+//        mClient.search(request, new SearchResponse() {
 //            @Override
-//            public void onResponse(int code, Bundle data) throws RemoteException {
-//                BluetoothLog.v(String.format("MainActivity.onResponse code = %d", code));
+//            public void onSearchStarted() {
+//                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
+//            }
+//
+//            @Override
+//            public void onDeviceFounded(SearchResult device) {
+//                BluetoothLog.v(String.format("MainActivity.onDeviceFound %s", device.device.getAddress()));
+//            }
+//
+//            @Override
+//            public void onSearchStopped() {
+//                BluetoothLog.v(String.format("MainActivity.onSearchStopped"));
+//            }
+//
+//            @Override
+//            public void onSearchCanceled() {
+//                BluetoothLog.v(String.format("MainActivity.onSearchCanceled"));
 //            }
 //        });
-
-        SearchRequest request = new SearchRequest.Builder()
-                .searchBluetoothLeDevice(2000, 4)
-                .searchBluetoothClassicDevice(3000)
-                .searchBluetoothLeDevice(5000)
-                .build();
-
-        mClient.search(request, new SearchResponse() {
-            @Override
-            public void onSearchStarted() {
-                BluetoothLog.v(String.format("MainActivity.onSearchStarted in %s", Thread.currentThread().getName()));
-            }
-
-            @Override
-            public void onDeviceFounded(SearchResult device) {
-                BluetoothLog.v(String.format("MainActivity.onDeviceFound %s", device.device.getAddress()));
-            }
-
-            @Override
-            public void onSearchStopped() {
-                BluetoothLog.v(String.format("MainActivity.onSearchStopped"));
-            }
-
-            @Override
-            public void onSearchCanceled() {
-                BluetoothLog.v(String.format("MainActivity.onSearchCanceled"));
-            }
-        });
-
-        mClient.connect(MAC, new BleConnectResponse() {
-            @Override
-            public void onResponse(int code, Bundle data) {
-                if (code == REQUEST_SUCCESS) {
-
-                }
-            }
-        });
-
-        mClient.disconnect(MAC);
-
-        mClient.stopSearch();
-
-        mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
-            @Override
-            public void onResponse(int code, byte[] data) {
-                if (code == REQUEST_SUCCESS) {
-
-                }
-            }
-        });
-
-        mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
-            @Override
-            public void onResponse(int code) {
-                if (code == REQUEST_SUCCESS) {
-
-                }
-            }
-        });
-
-        mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
-            @Override
-            public void onNotify(UUID service, UUID character, byte[] value) {
-
-            }
-
-            @Override
-            public void onResponse(int code) {
-                if (code == REQUEST_SUCCESS) {
-
-                }
-            }
-        });
-
-        mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
-            @Override
-            public void onResponse(int code) {
-                if (code == REQUEST_SUCCESS) {
-                }
-            }
-        });
-
-        mClient.readRssi(MAC, new BleReadRssiResponse() {
-            @Override
-            public void onResponse(int code, Integer rssi) {
-                if (code == REQUEST_SUCCESS) {
-
-                }
-            }
-        });
+//
+//        mClient.connect(MAC, new BleConnectResponse() {
+//            @Override
+//            public void onResponse(int code, Bundle data) {
+//                if (code == REQUEST_SUCCESS) {
+//
+//                }
+//            }
+//        });
+//
+//        mClient.disconnect(MAC);
+//
+//        mClient.stopSearch();
+//
+//        mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
+//            @Override
+//            public void onResponse(int code, byte[] data) {
+//                if (code == REQUEST_SUCCESS) {
+//
+//                }
+//            }
+//        });
+//
+//        mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
+//            @Override
+//            public void onResponse(int code) {
+//                if (code == REQUEST_SUCCESS) {
+//
+//                }
+//            }
+//        });
+//
+//        mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
+//            @Override
+//            public void onNotify(UUID service, UUID character, byte[] value) {
+//
+//            }
+//
+//            @Override
+//            public void onResponse(int code) {
+//                if (code == REQUEST_SUCCESS) {
+//
+//                }
+//            }
+//        });
+//
+//        mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
+//            @Override
+//            public void onResponse(int code) {
+//                if (code == REQUEST_SUCCESS) {
+//                }
+//            }
+//        });
+//
+//        mClient.readRssi(MAC, new BleReadRssiResponse() {
+//            @Override
+//            public void onResponse(int code, Integer rssi) {
+//                if (code == REQUEST_SUCCESS) {
+//
+//                }
+//            }
+//        });
     }
 
     private void disconnect() {
-//        mClient.disconnect(MAC);
+        mClient.disconnect(MAC);
 
-        mClient.stopSearch();
+//        mClient.stopSearch();
     }
 }

@@ -31,7 +31,7 @@ public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyHandl
             synchronized (BluetoothSearchHelper.class) {
                 if (sInstance == null) {
                     BluetoothSearchHelper helper = new BluetoothSearchHelper();
-                    sInstance = ProxyUtils.newProxyInstance(helper, helper);
+                    sInstance = ProxyUtils.getProxy(helper, helper);
                 }
             }
         }
