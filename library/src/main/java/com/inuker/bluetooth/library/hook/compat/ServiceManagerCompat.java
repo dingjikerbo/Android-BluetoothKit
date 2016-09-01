@@ -30,7 +30,7 @@ public class ServiceManagerCompat {
         return serviceManager;
     }
 
-    public static Field getsCache() {
+    public static Field getCacheField() {
         return sCache;
     }
 

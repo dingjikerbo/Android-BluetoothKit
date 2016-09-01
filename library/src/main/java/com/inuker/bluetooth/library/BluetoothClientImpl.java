@@ -21,6 +21,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.hook.BluetoothHooker;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -69,7 +70,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
         registerBluetoothReceiver();
 
-//        BluetoothHooker.hook();
+        BluetoothHooker.hook();
     }
 
     public static IBluetoothClient getInstance(Context context) {
