@@ -110,17 +110,8 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
         return mResponse;
     }
 
-    final private void checkRequestContext() {
-        if (Looper.myLooper() != BleConnectManager.getWorkerLooper()) {
-            throw new IllegalStateException(String.format("%s.process run-out-of worker thread -> %s",
-                    getClass().getSimpleName(), Thread.currentThread().getName()));
-        }
-    }
-
     @Override
     final public void process(IBleRequestProcessor processor) {
-        checkRequestContext();
-
         mProcessor = processor;
 
         BluetoothLog.v(String.format("%s.process, connectStatus = %s",

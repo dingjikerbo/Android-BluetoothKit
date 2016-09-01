@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
@@ -20,9 +21,9 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     private String mAddress;
     private BleConnectDispatcher mBleConnectDispatcher;
 
-    private BleConnectMaster(String mac) {
+    private BleConnectMaster(String mac, Looper looper) {
         mAddress = mac;
-        mHandler = new Handler(BleConnectManager.getWorkerLooper(), this);
+        mHandler = new Handler(looper, this);
     }
 
     // Runs in worker thread
@@ -33,8 +34,8 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
         return mBleConnectDispatcher;
     }
 
-    static IBleConnectMaster newInstance(String mac) {
-        BleConnectMaster master = new BleConnectMaster(mac);
+    static IBleConnectMaster newInstance(String mac, Looper looper) {
+        BleConnectMaster master = new BleConnectMaster(mac, looper);
         return ProxyUtils.getProxy(master, master);
     }
 
@@ -81,10 +82,6 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
 
     @Override
     public boolean handleMessage(Message msg) {
-        ProxyBulk bulk = (ProxyBulk) msg.obj;
-//        BluetoothLog.v(String.format("BleConnectMaster.%s thread = %s",
-//                bulk.method.getName(), Thread.currentThread().getName()));
-
         ProxyBulk.safeInvoke(msg.obj);
         return true;
     }

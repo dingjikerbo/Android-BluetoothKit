@@ -23,7 +23,7 @@ public class BleConnectManager {
         mBleConnectMasters = new ArrayMap<String, IBleConnectMaster>();
     }
 
-    public static Looper getWorkerLooper() {
+    private static Looper getWorkerLooper() {
         if (mWorkerThread == null) {
             mWorkerThread = new HandlerThread(TAG);
             mWorkerThread.start();
@@ -36,7 +36,7 @@ public class BleConnectManager {
 
         master = mBleConnectMasters.get(mac);
         if (master == null) {
-            master = BleConnectMaster.newInstance(mac);
+            master = BleConnectMaster.newInstance(mac, getWorkerLooper());
             mBleConnectMasters.put(mac, master);
         }
 

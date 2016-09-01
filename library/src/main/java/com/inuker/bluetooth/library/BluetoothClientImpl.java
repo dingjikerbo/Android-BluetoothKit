@@ -309,15 +309,13 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
             IBluetoothService service = getBluetoothService();
             if (service != null) {
-                if (args == null) {
-                    args = new Bundle();
-                }
+                args = (args != null ? args : new Bundle());
                 service.callBluetoothApi(code, args, new BluetoothResponseWrapper(response));
             } else {
                 response.onResponse(SERVICE_UNREADY, null);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            BluetoothLog.e(e);
         }
     }
 
