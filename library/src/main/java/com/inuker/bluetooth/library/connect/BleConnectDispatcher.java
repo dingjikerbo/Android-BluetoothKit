@@ -20,15 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Handler.Callback {
-
-    public static final int MSG_REQUEST_SUCCESS = 0x100;
-    public static final int MSG_REQUEST_FAILED = 0x110;
+public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster {
 
     private static final int MAX_REQUEST_COUNT = 100;
 
     private Handler mWorkerHandler;
-    private Handler mResponseHandler;
 
     private List<BleRequest> mBleWorkList;
     private BleRequest mCurrentRequest;
@@ -40,7 +36,6 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
     private BleConnectDispatcher(String mac) {
         BleConnectWorker.attch(mac, this);
         mBleWorkList = new ArrayList<BleRequest>();
-        mResponseHandler = new Handler(Looper.getMainLooper(), this);
     }
 
     @Override
@@ -129,7 +124,7 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
 
     private void notifyRequestExceedLimit(BleRequest request) {
         request.setRequestCode(REQUEST_OVERFLOW);
-        mResponseHandler.obtainMessage(0, request).sendToTarget();
+        mWorkerHandler.obtainMessage(0, request).sendToTarget();
     }
 
     @Override
@@ -145,23 +140,9 @@ public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster, Ha
         }
     }
 
-    @Override
-    public boolean handleMessage(Message msg) {
-        // TODO Auto-generated method stub
-        BleRequest request = null;
-
-        if (msg != null && msg.obj instanceof BleRequest) {
-            request = (BleRequest) msg.obj;
-        }
-
-        request.onResponse();
-
-        return true;
-    }
-
     private void dispatchRequestResult() {
         if (mCurrentRequest != null) {
-            mResponseHandler.obtainMessage(0, mCurrentRequest).sendToTarget();
+            mCurrentRequest.onResponse();
         }
 
         mCurrentRequest = null;

@@ -3,6 +3,20 @@ BluetoothKit---Android Bluetooth Framework
 
 This library allows for easy access to Bluetooth device scan and connection, support customizing scan policy and solved many android bluetooth inherent compatibility and stability problems refer to [Android 4.3 Bluetooth Low Energy unstable](http://stackoverflow.com/questions/17870189/android-4-3-bluetooth-low-energy-unstable)
 
+# **Requirements**
+
+android:minSdkVersion should be not less than 18
+
+Permission
+```
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+<uses-feature
+    android:name="android.hardware.bluetooth_le"
+    android:required="true" />
+```
+
 # **Usage**
 
 1、If you are building with Gradle, simply add the following line to the `dependencies` section of your `build.gradle` file:
@@ -11,33 +25,11 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 compile 'com.inuker.bluetooth:library:1.0.0'
 ```
 
-2、Add following permission to AndroidManifest.xml 
-
-```
-<uses-permission android:name="android.permission.BLUETOOTH" />
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
-<uses-feature
-    android:name="android.hardware.bluetooth_le"
-    android:required="true" />
-```
-
-3、Declare BluetoothService in AndroidManifest, you can set the process in which service runs in.
-
-```
-<service android:name="com.inuker.bluetooth.library.BluetoothService"
-    android:process=":bluetoothkit"/>
-```
-
-4、Initial BluetoothClient as below:
+2、New a BluetoothClient as below: 
 
 ```Java
-BluetoothClient mClient = BluetoothClient.getInstance(context);
+BluetoothClient mClient = new BluetoothClient(context);
 ```
-
-Note, android:minSdkVersion should be not less than 18
 
 ## **Scan Device** 
 
