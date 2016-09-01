@@ -1,8 +1,6 @@
 package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
@@ -20,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BleConnectDispatcher implements IBleDispatch, IBleConnectMaster {
+public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectMaster {
 
     private static final int MAX_REQUEST_COUNT = 100;
 

@@ -48,7 +48,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     private BluetoothGatt mBluetoothGatt;
     private BluetoothDevice mBluetoothDevice;
 
-    private IBleDispatch mBleDispatcher;
+    private IBleConnectDispatcher mBleConnectDispatcher;
 
     private BleRequest mCurrentRequest;
 
@@ -62,18 +62,18 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
 
-    public static BleConnectWorker attch(String mac, IBleDispatch dispatcher) {
+    public static BleConnectWorker attch(String mac, IBleConnectDispatcher dispatcher) {
         return new BleConnectWorker(mac, dispatcher);
     }
 
-    private BleConnectWorker(String mac, IBleDispatch dispatcher) {
-        mBleDispatcher = dispatcher;
+    private BleConnectWorker(String mac, IBleConnectDispatcher dispatcher) {
+        mBleConnectDispatcher = dispatcher;
 
         BluetoothAdapter adapter = BluetoothUtils.getBluetoothLeAdapter();
         mBluetoothDevice = adapter.getRemoteDevice(mac);
 
         mWorkerHandler = new Handler(Looper.myLooper(), this);
-        mBleDispatcher.notifyHandlerReady(mWorkerHandler);
+        mBleConnectDispatcher.notifyHandlerReady(mWorkerHandler);
 
         mGattResponseListeners = new SparseArray<GattResponseListener>();
         mBluetoothGattResponse = ProxyUtils.getProxy(this, IBluetoothGattResponse.class, this);
@@ -219,7 +219,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
         mCurrentRequest = null;
 
-        mBleDispatcher.notifyWorkerResult(request);
+        mBleConnectDispatcher.notifyWorkerResult(request);
     }
 
     @Override
