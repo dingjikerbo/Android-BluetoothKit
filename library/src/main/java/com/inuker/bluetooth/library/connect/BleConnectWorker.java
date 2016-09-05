@@ -24,6 +24,8 @@ import com.inuker.bluetooth.library.connect.gatt.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.gatt.WriteCharacterListener;
 import com.inuker.bluetooth.library.connect.gatt.WriteDescriptorListener;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
+import com.inuker.bluetooth.library.model.BleGattProfile;
+import com.inuker.bluetooth.library.model.BleGattService;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -31,7 +33,9 @@ import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -225,6 +229,31 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     @Override
     public int getConnectStatus() {
         return mConnectStatus;
+    }
+
+    @Override
+    public BleGattProfile getGattProfile() {
+        BleGattProfile profile = new BleGattProfile();
+
+        Iterator itor = mDeviceProfile.entrySet().iterator();
+
+        List<BleGattService> services = new ArrayList<BleGattService>();
+
+        while (itor.hasNext()) {
+            Map.Entry entry = (Map.Entry) itor.next();
+
+            UUID serviceUUID = (UUID) entry.getKey();
+
+            BleGattService service = new BleGattService(serviceUUID);
+            services.add(service);
+
+            Map map = (Map) entry.getValue();
+            service.addCharacters(map.keySet());
+        }
+
+        profile.addServices(services);
+
+        return profile;
     }
 
     @Override

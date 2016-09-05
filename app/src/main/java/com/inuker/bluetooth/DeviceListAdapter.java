@@ -2,6 +2,7 @@ package com.inuker.bluetooth;
 
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.inuker.bluetooth.library.beacon.Beacon;
 import com.inuker.bluetooth.library.search.SearchResult;
 
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ public class DeviceListAdapter extends BaseAdapter implements Comparator<SearchR
         TextView name;
         TextView mac;
         TextView rssi;
+        TextView adv;
     }
 
     @Override
@@ -76,16 +79,31 @@ public class DeviceListAdapter extends BaseAdapter implements Comparator<SearchR
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.mac = (TextView) convertView.findViewById(R.id.mac);
             holder.rssi = (TextView) convertView.findViewById(R.id.rssi);
+            holder.adv = (TextView) convertView.findViewById(R.id.adv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        SearchResult result = (SearchResult) getItem(position);
+        final SearchResult result = (SearchResult) getItem(position);
 
         holder.name.setText(result.getName());
         holder.mac.setText(result.getAddress());
         holder.rssi.setText(String.format("Rssi: %d", result.rssi));
+
+        Beacon beacon = new Beacon(result.scanRecord);
+        holder.adv.setText(beacon.toString());
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(mContext, DeviceDetailActivity.class);
+                intent.putExtra("mac", result.getAddress());
+                mContext.startActivity(intent);
+            }
+        });
 
         return convertView;
     }

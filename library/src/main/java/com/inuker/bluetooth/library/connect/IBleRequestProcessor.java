@@ -2,6 +2,7 @@ package com.inuker.bluetooth.library.connect;
 
 import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
+import com.inuker.bluetooth.library.model.BleGattProfile;
 
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ public interface IBleRequestProcessor extends IBluetoothBase {
     void notifyRequestResult();
 
     int getConnectStatus();
+
+    BleGattProfile getGattProfile();
 
     boolean openBluetoothGatt();
 

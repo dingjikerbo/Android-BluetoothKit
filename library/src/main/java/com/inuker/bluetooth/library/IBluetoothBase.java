@@ -20,6 +20,7 @@ public interface IBluetoothBase {
     String EXTRA_VERSION = "extra.version";
     String EXTRA_REQUEST = "extra.request";
     String EXTRA_SEARCH_RESULT = "extra.search.result";
+    String EXTRA_GATT_PROFILE = "extra.gatt.profile";
 
     /**
      * CallBluetoothApi response code

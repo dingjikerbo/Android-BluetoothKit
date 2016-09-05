@@ -12,10 +12,6 @@ import com.inuker.bluetooth.library.utils.BluetoothUtils;
 public class BluetoothSearchManager implements IBluetoothBase {
 
     public static void search(SearchRequest request, final BluetoothResponse response) {
-        if (!BluetoothUtils.isBluetoothEnabled()) {
-            return;
-        }
-
         BluetoothSearchRequest requestWrapper = new BluetoothSearchRequest(request);
         BluetoothSearchHelper.getInstance().startSearch(requestWrapper, new BluetoothSearchResponse() {
             @Override

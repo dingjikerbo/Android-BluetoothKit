@@ -1,9 +1,11 @@
 package com.inuker.bluetooth.library.connect.gatt;
 
+import com.inuker.bluetooth.library.IBluetoothBase;
+
 /**
  * Created by dingjikerbo on 16/8/25.
  */
-public interface GattResponseListener {
+public interface GattResponseListener extends IBluetoothBase {
 
     int GATT_RESP_SERVICE_DISCOVER = 1;
 

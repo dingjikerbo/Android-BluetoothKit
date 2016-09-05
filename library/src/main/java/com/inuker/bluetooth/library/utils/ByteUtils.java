@@ -102,4 +102,30 @@ public class ByteUtils {
 
         return EMPTY_BYTES;
     }
+
+    public static byte[] getBytes(byte[] bytes, int start, int end) {
+        if (bytes == null) {
+            return null;
+        }
+
+        if (start < 0 || start >= bytes.length) {
+            return null;
+        }
+
+        if (end < 0 || end >= bytes.length) {
+            return null;
+        }
+
+        if (start > end) {
+            return null;
+        }
+
+        byte[] newBytes = new byte[end - start + 1];
+
+        for (int i = start; i <= end; i++) {
+            newBytes[i - start] = bytes[i];
+        }
+
+        return newBytes;
+    }
 }

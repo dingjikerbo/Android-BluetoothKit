@@ -10,6 +10,7 @@ import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.ListUtils;
 import com.inuker.bluetooth.view.PullRefreshListView;
 import com.inuker.bluetooth.view.PullToRefreshFrameLayout;
 
@@ -90,6 +91,8 @@ public class MainActivity extends Activity {
         public void onSearchStopped() {
             BluetoothLog.w("MainActivity.onSearchStopped");
             mListView.onRefreshComplete(true);
+            mRefreshLayout.showState(Constants.LIST);
+
             mTvTitle.setText(R.string.devices);
             Toast.makeText(MainActivity.this, R.string.scan_over, Toast.LENGTH_SHORT).show();
         }
@@ -97,9 +100,18 @@ public class MainActivity extends Activity {
         @Override
         public void onSearchCanceled() {
             BluetoothLog.w("MainActivity.onSearchCanceled");
+
             mListView.onRefreshComplete(true);
+            mRefreshLayout.showState(Constants.LIST);
+
             mTvTitle.setText(R.string.devices);
             Toast.makeText(MainActivity.this, R.string.scan_over, Toast.LENGTH_SHORT).show();
         }
     };
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ClientManager.getClient().stopSearch();
+    }
 }

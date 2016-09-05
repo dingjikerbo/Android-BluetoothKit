@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothGatt;
 
 import com.inuker.bluetooth.library.connect.gatt.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.model.BleGattProfile;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 public class BleConnectRequest extends BleRequest implements ServiceDiscoverListener {
 
@@ -54,5 +56,13 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
         } else {
             onRequestFinished(REQUEST_FAILED);
         }
+    }
+
+    @Override
+    void onRequestFinished(int code) {
+        if (code == REQUEST_SUCCESS) {
+            mExtra.putParcelable(EXTRA_GATT_PROFILE, getGattProfile());
+        }
+        super.onRequestFinished(code);
     }
 }
