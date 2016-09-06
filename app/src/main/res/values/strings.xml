@@ -17,4 +17,6 @@
     <string name="list_empty">暂无数据</string>
 
     <string name="devices">设备列表</string>
+
+    <string name="connecting">正在连接</string>
 </resources>

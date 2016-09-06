@@ -16,6 +16,7 @@ public class BluetoothSearchRequest implements Handler.Callback {
 	private static final int SCAN_INTERVAL = 100;
 	
 	private static final int MSG_START_SEARCH = 0x11;
+	private static final int MSG_DEVICE_FOUND = 0x12;
 
 	private List<BluetoothSearchTask> mSearchTaskList;
 	private BluetoothSearchResponse mSearchResponse;
@@ -53,6 +54,13 @@ public class BluetoothSearchRequest implements Handler.Callback {
 		switch (msg.what) {
 			case MSG_START_SEARCH:
 				scheduleNewSearchTask();
+				break;
+
+			case MSG_DEVICE_FOUND:
+				SearchResult device = (SearchResult) msg.obj;
+				if (mSearchResponse != null) {
+					mSearchResponse.onDeviceFounded(device);
+				}
 				break;
 		}
 		return true;
@@ -126,9 +134,7 @@ public class BluetoothSearchRequest implements Handler.Callback {
 	}
 
 	private void notifyDeviceFounded(SearchResult device) {
-		if (mSearchResponse != null) {
-			mSearchResponse.onDeviceFounded(device);
-		}
+		mHandler.obtainMessage(MSG_DEVICE_FOUND, device).sendToTarget();
 	}
 
 	private class BluetoothSearchTaskResponse implements BluetoothSearchResponse {

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
@@ -40,14 +41,48 @@ public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyHandl
 
     @Override
     public void startSearch(BluetoothSearchRequest request, BluetoothSearchResponse response) {
-        request.setSearchResponse(response);
+        request.setSearchResponse(new BluetoothSearchResponseImpl(response));
 
         if (!BluetoothUtils.isBluetoothEnabled()) {
             request.cancel();
         } else {
             stopSearch();
-            mCurrentRequest = request;
-            mCurrentRequest.start();
+
+            if (mCurrentRequest == null) {
+                mCurrentRequest = request;
+                mCurrentRequest.start();
+            }
+        }
+    }
+
+    private class BluetoothSearchResponseImpl implements BluetoothSearchResponse {
+
+        BluetoothSearchResponse response;
+
+        BluetoothSearchResponseImpl(BluetoothSearchResponse response) {
+            this.response = response;
+        }
+
+        @Override
+        public void onSearchStarted() {
+            response.onSearchStarted();
+        }
+
+        @Override
+        public void onDeviceFounded(SearchResult device) {
+            response.onDeviceFounded(device);
+        }
+
+        @Override
+        public void onSearchStopped() {
+            response.onSearchStopped();
+            mCurrentRequest = null;
+        }
+
+        @Override
+        public void onSearchCanceled() {
+            response.onSearchCanceled();
+            mCurrentRequest = null;
         }
     }
 

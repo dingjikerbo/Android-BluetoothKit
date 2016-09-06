@@ -8,6 +8,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
+import com.inuker.bluetooth.library.connect.response.ConnectStatusListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
@@ -33,6 +34,16 @@ public class BluetoothClient implements IBluetoothClient {
     @Override
     public void disconnect(String mac) {
         mClient.disconnect(mac);
+    }
+
+    @Override
+    public void registerConnectStatusListener(String mac, ConnectStatusListener listener) {
+        mClient.registerConnectStatusListener(mac, listener);
+    }
+
+    @Override
+    public void unregisterConnectStatusListener(String mac, ConnectStatusListener listener) {
+        mClient.unregisterConnectStatusListener(mac, listener);
     }
 
     @Override

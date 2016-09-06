@@ -25,4 +25,7 @@
     <color name="article_edit_title_text">#000000</color>
 
     <color name="edit_border_color">#cccccc</color>
+
+    <color name="device_detail_service">#cccccc</color>
+    <color name="device_detail_character">#ffffff</color>
 </resources>

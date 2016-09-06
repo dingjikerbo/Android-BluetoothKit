@@ -31,6 +31,8 @@
 
         <activity android:name=".DeviceDetailActivity" />
 
+        <activity android:name=".CharacterActivity" />
+
     </application>
 
 </manifest>

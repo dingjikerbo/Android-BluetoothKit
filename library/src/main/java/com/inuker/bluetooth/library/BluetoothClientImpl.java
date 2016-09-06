@@ -21,11 +21,13 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.connect.response.ConnectStatusListener;
 import com.inuker.bluetooth.library.hook.BluetoothHooker;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.ListUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
 
@@ -57,6 +59,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
     private BluetoothReceiver mBluetoothReceiver;
 
     private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
+    private HashMap<String, List<ConnectStatusListener>> mConnectStatusListeners;
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
@@ -67,10 +70,11 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         mWorkerHandler = new Handler(mWorkerThread.getLooper(), this);
 
         mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
+        mConnectStatusListeners = new HashMap<String, List<ConnectStatusListener>>();
 
         registerBluetoothReceiver();
 
-        BluetoothHooker.hook();
+//        BluetoothHooker.hook();
     }
 
     public static IBluetoothClient getInstance(Context context) {
@@ -139,6 +143,25 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         args.putString(EXTRA_MAC, mac);
         safeCallBluetoothApi(CODE_DISCONNECT, args, null);
         clearNotifyListener(mac);
+    }
+
+    @Override
+    public void registerConnectStatusListener(String mac, ConnectStatusListener listener) {
+        List<ConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
+        if (listeners == null) {
+            listeners = new ArrayList<ConnectStatusListener>();
+            mConnectStatusListeners.put(mac, listeners);
+        }
+
+        listeners.add(listener);
+    }
+
+    @Override
+    public void unregisterConnectStatusListener(String mac, ConnectStatusListener listener) {
+        List<ConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
     }
 
     @Override
@@ -386,6 +409,15 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         }
     }
 
+    private void dispatchConnectionStatus(String mac, int status) {
+        List<ConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
+        if (!ListUtils.isEmpty(listeners)) {
+            for (ConnectStatusListener listener : listeners) {
+                listener.onConnectStatusChanged(status);
+            }
+        }
+    }
+
     private void registerBluetoothReceiver() {
         if (mBluetoothReceiver == null) {
             mBluetoothReceiver = new BluetoothReceiver();
@@ -427,6 +459,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
                 }
             } else if (ACTION_CONNECT_STATUS_CHANGED.equals(action)) {
                 int status = intent.getIntExtra(IBluetoothBase.EXTRA_STATUS, 0);
+
+                dispatchConnectionStatus(mac, status);
 
                 if (status == STATUS_DISCONNECTED) {
                     clearNotifyListener(mac);

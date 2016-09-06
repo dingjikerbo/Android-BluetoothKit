@@ -11,4 +11,8 @@ public class UUIDUtils {
     public static UUID makeUUID(int value) {
         return UUID.fromString(String.format(UUID_FORMAT, value));
     }
+
+    public static int getValue(UUID uuid) {
+        return (int) (uuid.getMostSignificantBits() >>> 32);
+    }
 }

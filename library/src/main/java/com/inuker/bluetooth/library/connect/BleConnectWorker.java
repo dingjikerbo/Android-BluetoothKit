@@ -299,6 +299,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
             setConnectStatus(STATUS_DEVICE_CONNECTED);
             mBluetoothGatt.discoverServices();
+            BluetoothLog.v("discoverServices");
         } else {
             closeBluetoothGatt();
         }

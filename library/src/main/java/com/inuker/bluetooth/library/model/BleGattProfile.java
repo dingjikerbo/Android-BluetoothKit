@@ -29,7 +29,7 @@ public class BleGattProfile implements Parcelable {
         getServices().addAll(services);
     }
 
-    private List<BleGattService> getServices() {
+    public List<BleGattService> getServices() {
         if (services == null) {
             services = new ArrayList<BleGattService>();
         }

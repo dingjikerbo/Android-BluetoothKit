@@ -34,7 +34,11 @@ public class BleGattService implements Parcelable, Comparable {
         in.readTypedList(getCharacters(), ParcelUuid.CREATOR);
     }
 
-    private List<ParcelUuid> getCharacters() {
+    public UUID getUUID() {
+        return uuid;
+    }
+
+    public List<ParcelUuid> getCharacters() {
         if (characters == null) {
             characters = new ArrayList<ParcelUuid>();
         }
