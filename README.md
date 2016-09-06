@@ -156,3 +156,8 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
     }
 });
 ```
+
+Author
+------
+ - Email: dingjikerbo@gmail.com
+ - Welcome to contact me with any suggestions or ideas.
