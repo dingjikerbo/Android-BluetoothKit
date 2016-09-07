@@ -23,6 +23,8 @@ public interface IBleRequestProcessor extends IBluetoothBase {
 
     boolean openBluetoothGatt();
 
+    void disconnect();
+
     void closeBluetoothGatt();
 
     boolean readCharacteristic(UUID service, UUID character);

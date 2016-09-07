@@ -14,6 +14,7 @@ public interface IBluetoothApi extends IBluetoothBase {
     int CODE_NOTIFY = 5;
     int CODE_UNNOTIFY = 6;
     int CODE_READ_RSSI = 7;
+    int CODE_REFRESH = 8;
 
     int CODE_SEARCH = 10;
     int CODE_STOP_SESARCH = 11;

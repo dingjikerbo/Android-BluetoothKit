@@ -10,8 +10,8 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
  */
 public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
-    public BleReadRssiRequest(BluetoothResponse response) {
-        super(response);
+    public BleReadRssiRequest(String mac, BluetoothResponse response) {
+        super(mac, response);
     }
 
     @Override

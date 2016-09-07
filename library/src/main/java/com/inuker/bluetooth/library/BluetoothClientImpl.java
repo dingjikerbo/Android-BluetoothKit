@@ -320,14 +320,19 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
     }
 
     @Override
+    public void refreshCache(String mac) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        safeCallBluetoothApi(CODE_REFRESH, args, null);
+    }
+
+    @Override
     public void stopSearch() {
         safeCallBluetoothApi(CODE_STOP_SESARCH, null, null);
     }
 
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
         try {
-            BluetoothLog.v(String.format("BluetoothClient %s", getBluetoothCallName(code)));
-
             IBluetoothService service = getBluetoothService();
             if (service != null) {
                 args = (args != null ? args : new Bundle());
@@ -440,7 +445,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
             String action = intent.getAction();
 
-            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
+//            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
 
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
@@ -460,12 +465,25 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
             } else if (ACTION_CONNECT_STATUS_CHANGED.equals(action)) {
                 int status = intent.getIntExtra(IBluetoothBase.EXTRA_STATUS, 0);
 
+//                BluetoothLog.v(String.format(">>> status = %s", getConnectStatusText(status)));
+
                 dispatchConnectionStatus(mac, status);
 
                 if (status == STATUS_DISCONNECTED) {
                     clearNotifyListener(mac);
                 }
             }
+        }
+    }
+
+    private String getConnectStatusText(int status) {
+        switch (status) {
+            case STATUS_CONNECTED:
+                return "connected";
+            case STATUS_DISCONNECTED:
+                return "disconnected";
+            default:
+                return String.format("unknown %d", status);
         }
     }
 }

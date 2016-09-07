@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public class BleReadRequest extends BleRequest implements ReadCharacterListener {
 
-    public BleReadRequest(UUID service, UUID character, BluetoothResponse response) {
-        super(response);
+    public BleReadRequest(String mac, UUID service, UUID character, BluetoothResponse response) {
+        super(mac, response);
         mServiceUUID = service;
         mCharacterUUID = character;
     }

@@ -16,6 +16,7 @@ import android.util.SparseArray;
 
 import com.inuker.bluetooth.library.BluetoothService;
 import com.inuker.bluetooth.library.connect.gatt.BluetoothGattResponse;
+import com.inuker.bluetooth.library.connect.gatt.DisconnectListener;
 import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
 import com.inuker.bluetooth.library.connect.gatt.IBluetoothGattResponse;
 import com.inuker.bluetooth.library.connect.gatt.ReadCharacterListener;
@@ -92,7 +93,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
         for (BluetoothGattService service : services) {
 
-            BluetoothLog.v("Service: " + service.getUuid());
+//            BluetoothLog.v("Service: " + service.getUuid());
 
             Map<UUID, BluetoothGattCharacteristic> map = new HashMap<UUID, BluetoothGattCharacteristic>();
             newProfiles.put(service.getUuid(), map);
@@ -101,8 +102,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
                     .getCharacteristics();
 
             for (BluetoothGattCharacteristic character : characters) {
-                BluetoothLog.v("character: uuid = "
-                        + character.getUuid());
+//                BluetoothLog.v("character: uuid = "
+//                        + character.getUuid());
 
                 map.put(character.getUuid(), character);
             }
@@ -264,6 +265,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         }
 
         if (mBluetoothGatt == null) {
+            BluetoothLog.v(String.format("openBluetoothGatt for %s", mBluetoothDevice.getAddress()));
             mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false,
                     new BluetoothGattResponse(mBluetoothGattResponse));
         }
@@ -272,9 +274,20 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
+    public void disconnect() {
+        if (mBluetoothGatt != null) {
+            BluetoothLog.v(String.format("disconnect for %s", mBluetoothDevice.getAddress()));
+            mBluetoothGatt.disconnect();
+        }
+    }
+
+    @Override
     public void closeBluetoothGatt() {
         if (mBluetoothGatt != null) {
+            BluetoothLog.v(String.format("closeBluetoothGatt for %s", mBluetoothDevice.getAddress()));
+
             mBluetoothGatt.close();
+
             mBluetoothGatt = null;
 
             mDeviceProfile.clear();
@@ -293,15 +306,21 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onConnectionStateChange(int status, int newState) {
-        BluetoothLog.v(String.format("onConnectionStateChange status = %d, newState = %d",
-                status, newState));
+        BluetoothLog.v(String.format("onConnectionStateChange for %s status = %d, newState = %d",
+                mBluetoothDevice.getAddress(), status, newState));
 
         if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
             setConnectStatus(STATUS_DEVICE_CONNECTED);
+            BluetoothLog.v(String.format("discoverServices for %s", mBluetoothDevice.getAddress()));
             mBluetoothGatt.discoverServices();
-            BluetoothLog.v("discoverServices");
         } else {
-            closeBluetoothGatt();
+            DisconnectListener listener = getGattResponseListener(GATT_RESP_DISCONNECT);
+
+            if (listener != null) {
+                listener.onDisconnected();
+            } else {
+                closeBluetoothGatt();
+            }
         }
     }
 
@@ -311,8 +330,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onServicesDiscovered(int status) {
-        BluetoothLog.v(String.format("onServicesDiscovered status = %d in %s",
-                status, Thread.currentThread().getName()));
+        BluetoothLog.v(String.format("onServicesDiscovered for %s status = %d",
+                mBluetoothDevice.getAddress(), status));
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
             setConnectStatus(STATUS_DEVICE_SERVICE_READY);

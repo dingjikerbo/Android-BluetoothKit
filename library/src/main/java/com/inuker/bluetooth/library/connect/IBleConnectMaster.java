@@ -23,4 +23,6 @@ public interface IBleConnectMaster extends IBluetoothBase {
     void unnotify(UUID service, UUID character, BluetoothResponse response);
 
     void readRssi(BluetoothResponse response);
+
+    void refresh();
 }

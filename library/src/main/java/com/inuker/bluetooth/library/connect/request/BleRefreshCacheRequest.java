@@ -7,13 +7,13 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
  */
 public class BleRefreshCacheRequest extends BleRequest {
 
-    public BleRefreshCacheRequest(BluetoothResponse response) {
-        super(response);
+    public BleRefreshCacheRequest(String mac) {
+        super(mac, null);
     }
 
     @Override
     void processRequest() {
         refreshCache();
-        onRequestFinished(REQUEST_SUCCESS);
+        onRequestFinished(REQUEST_SUCCESS, 500);
     }
 }

@@ -18,6 +18,7 @@ import java.util.UUID;
 public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Callback {
 
     private static final int MSG_REQUEST_TIMEOUT = 0x22;
+    private static final int MSG_REQUEST_FINISHED = 0x32;
 
     private static final int DEFAULT_RETRY_LIMIT = 0;
     private static final int DEFAULT_TIMEOUT_LIMIT = 10000;
@@ -26,6 +27,8 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
     protected UUID mCharacterUUID;
 
     protected byte[] mBytes;
+
+    protected String mMac;
 
     protected BluetoothResponse mResponse;
 
@@ -36,11 +39,12 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
 
     protected Bundle mExtra;
 
-    private Handler mHandler;
+    protected Handler mHandler;
 
     protected IBleRequestProcessor mProcessor;
 
-    public BleRequest(BluetoothResponse response) {
+    public BleRequest(String mac, BluetoothResponse response) {
+        mMac = mac;
         mExtra = new Bundle();
         mResponse = response;
         mRetryLimit = getDefaultRetryLimit();
@@ -114,8 +118,8 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
     final public void process(IBleRequestProcessor processor) {
         mProcessor = processor;
 
-        BluetoothLog.v(String.format("%s.process, connectStatus = %s",
-                getClass().getSimpleName(), getConnectStatusText(getConnectStatus())));
+//        BluetoothLog.v(String.format("%s.process, connectStatus = %s",
+//                getClass().getSimpleName(), getConnectStatusText(getConnectStatus())));
 
         Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
         mHandler.sendMessageDelayed(msg, getTimeoutLimit());
@@ -161,32 +165,34 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
     }
 
     void onRequestFinished(int code) {
-        BluetoothLog.v(String.format("%s.notifyRequestResult code = %d",
-                getClass().getSimpleName(), code));
+        onRequestFinished(code, 0);
+    }
+
+    void onRequestFinished(int code, long delayInMillis) {
+        BluetoothLog.v(String.format("%s.onRequestFinished for %s, code = %d",
+                getClass().getSimpleName(), mMac, code));
 
         setRequestCode(code);
 
         mHandler.removeMessages(MSG_REQUEST_TIMEOUT);
 
         unregisterGattResponseListener(getGattResponseListenerId());
-        mProcessor.notifyRequestResult();
+
+        mHandler.sendEmptyMessageDelayed(MSG_REQUEST_FINISHED, delayInMillis);
     }
 
     @Override
     public boolean openBluetoothGatt() {
-        BluetoothLog.v(String.format("openBluetoothGatt"));
         return mProcessor.openBluetoothGatt();
     }
 
     @Override
     public void closeBluetoothGatt() {
-        BluetoothLog.v(String.format("closeBluetoothGatt"));
         mProcessor.closeBluetoothGatt();
     }
 
     @Override
     public boolean readCharacteristic(UUID service, UUID character) {
-        BluetoothLog.v(String.format("readCharacteristic service %s character %s", service, character));
         return mProcessor.readCharacteristic(service, character);
     }
 
@@ -196,14 +202,11 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
 
     @Override
     public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
-        BluetoothLog.v(String.format("writeCharacteristic service %s character %s, value = %s",
-                service, character, ByteUtils.byteToString(value)));
         return mProcessor.writeCharacteristic(service, character, value);
     }
 
     @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
-        BluetoothLog.v(String.format("setCharacteristicNotification service %s character %s %b", service, character, enable));
         return mProcessor.setCharacteristicNotification(service, character, enable);
     }
 
@@ -222,6 +225,9 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
         switch (msg.what) {
             case MSG_REQUEST_TIMEOUT:
                 onRequestFinished(REQUEST_TIMEDOUT);
+                break;
+            case MSG_REQUEST_FINISHED:
+                mProcessor.notifyRequestResult();
                 break;
         }
         return true;
@@ -247,6 +253,11 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
     @Override
     public BleGattProfile getGattProfile() {
         return mProcessor.getGattProfile();
+    }
+
+    @Override
+    public void disconnect() {
+        mProcessor.disconnect();
     }
 }
 

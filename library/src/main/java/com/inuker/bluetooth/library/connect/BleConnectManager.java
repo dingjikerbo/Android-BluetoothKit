@@ -51,6 +51,10 @@ public class BleConnectManager {
         getBleConnectMaster(mac).disconnect();
     }
 
+    public static void refresh(String mac) {
+        getBleConnectMaster(mac).refresh();
+    }
+
     public static void read(String mac, UUID service, UUID character, BluetoothResponse response) {
         getBleConnectMaster(mac).read(service, character, response);
     }

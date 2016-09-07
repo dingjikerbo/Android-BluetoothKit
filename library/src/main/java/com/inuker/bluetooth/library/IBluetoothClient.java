@@ -38,5 +38,7 @@ public interface IBluetoothClient extends IBluetoothApi {
 
     void search(SearchRequest request, SearchResponse response);
 
+    void refreshCache(String mac);
+
     void stopSearch();
 }

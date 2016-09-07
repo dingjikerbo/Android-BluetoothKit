@@ -75,6 +75,11 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     }
 
     @Override
+    public void refresh() {
+        getConnectDispatcher().refresh();
+    }
+
+    @Override
     public boolean onPreCalled(Object object, Method method, Object[] args) {
         mHandler.obtainMessage(0, new ProxyBulk(object, method, args)).sendToTarget();
         return false;

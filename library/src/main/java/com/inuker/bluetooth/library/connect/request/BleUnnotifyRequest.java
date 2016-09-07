@@ -13,8 +13,8 @@ import java.util.UUID;
  */
 public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorListener {
 
-    public BleUnnotifyRequest(UUID service, UUID character, BluetoothResponse response) {
-        super(response);
+    public BleUnnotifyRequest(String mac, UUID service, UUID character, BluetoothResponse response) {
+        super(mac, response);
         mServiceUUID = service;
         mCharacterUUID = character;
     }

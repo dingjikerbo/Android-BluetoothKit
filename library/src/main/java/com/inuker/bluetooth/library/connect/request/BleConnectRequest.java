@@ -9,8 +9,8 @@ import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 public class BleConnectRequest extends BleRequest implements ServiceDiscoverListener {
 
-    public BleConnectRequest(BluetoothResponse response) {
-        super(response);
+    public BleConnectRequest(String mac, BluetoothResponse response) {
+        super(mac, response);
     }
 
     @Override

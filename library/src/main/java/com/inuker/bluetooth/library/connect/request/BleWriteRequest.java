@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public class BleWriteRequest extends BleRequest implements WriteCharacterListener {
 
-    public BleWriteRequest(UUID service, UUID character, byte[] bytes,
+    public BleWriteRequest(String mac, UUID service, UUID character, byte[] bytes,
                            BluetoothResponse response) {
-        super(response);
+        super(mac, response);
         mServiceUUID = service;
         mCharacterUUID = character;
         mBytes = bytes;

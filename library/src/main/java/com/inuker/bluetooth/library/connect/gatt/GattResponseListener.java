@@ -16,4 +16,6 @@ public interface GattResponseListener extends IBluetoothBase {
     int GATT_RESP_DESCRIPTOR_WRITE = 4;
 
     int GATT_RESP_READ_RSSI = 5;
+
+    int GATT_RESP_DISCONNECT = 6;
 }

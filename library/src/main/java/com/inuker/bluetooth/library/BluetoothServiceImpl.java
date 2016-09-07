@@ -63,6 +63,10 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
                 BleConnectManager.disconnect(mac);
                 break;
 
+            case CODE_REFRESH:
+                BleConnectManager.refresh(mac);
+                break;
+
             case CODE_READ:
                 BleConnectManager.read(mac, service, character, response);
                 break;
