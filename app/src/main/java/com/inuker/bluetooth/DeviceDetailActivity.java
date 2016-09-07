@@ -11,7 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.connect.response.ConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Created by liwentian on 2016/9/2.
  */
-public class DeviceDetailActivity extends Activity implements ConnectStatusListener {
+public class DeviceDetailActivity extends Activity implements BleConnectStatusListener {
 
     private TextView mTvTitle;
     private ProgressBar mPbar;
@@ -32,6 +32,8 @@ public class DeviceDetailActivity extends Activity implements ConnectStatusListe
     private BluetoothDevice mDevice;
 
     private boolean mConnected;
+
+    private boolean mPause;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,6 @@ public class DeviceDetailActivity extends Activity implements ConnectStatusListe
             }
         });
 
-        ClientManager.getClient().registerConnectStatusListener(mDevice.getAddress(), this);
         connectDeviceIfNeeded();
     }
 
@@ -79,15 +80,21 @@ public class DeviceDetailActivity extends Activity implements ConnectStatusListe
     }
 
     private void connectDevice() {
+        BluetoothLog.v("connectDevice");
+
         mTvTitle.setText(String.format("%s%s", getString(R.string.connecting), mDevice.getAddress()));
+        mPbar.setVisibility(View.VISIBLE);
+        mListView.setVisibility(View.GONE);
+
         ClientManager.getClient().connect(mDevice.getAddress(), new BleConnectResponse() {
             @Override
             public void onResponse(int code, Bundle data) {
                 BluetoothLog.v(String.format("onResponse code = %d", code));
 
-                mPbar.setVisibility(View.GONE);
-
                 mTvTitle.setText(String.format("%s", mDevice.getAddress()));
+                mPbar.setVisibility(View.GONE);
+                mListView.setVisibility(View.VISIBLE);
+
 
                 if (code == REQUEST_SUCCESS) {
                     BleGattProfile profile = data.getParcelable(EXTRA_GATT_PROFILE);
@@ -95,17 +102,28 @@ public class DeviceDetailActivity extends Activity implements ConnectStatusListe
                     mAdapter.setGattProfile(profile);
                 }
             }
-        });
+        }, this);
     }
 
     @Override
     public void onConnectStatusChanged(int status) {
+        if (mPause) {
+            return;
+        }
+
+        BluetoothLog.v(String.format("Activity onConnectStatusChanged %d in %s",
+                status, Thread.currentThread().getName()));
+
         mConnected = (status == STATUS_CONNECTED);
+
+        Intent intent = new Intent(Constants.ACTION_CONNECT_STATUS_CHANGE);
+        intent.putExtra("status", status);
+        sendBroadcast(intent);
+
         connectDeviceIfNeeded();
     }
 
     private void connectDeviceIfNeeded() {
-        BluetoothLog.v(String.format("connectDeviceIfNeeded %b", mConnected));
         if (!mConnected) {
             connectDevice();
         }
@@ -113,8 +131,19 @@ public class DeviceDetailActivity extends Activity implements ConnectStatusListe
 
     @Override
     protected void onDestroy() {
-        ClientManager.getClient().unregisterConnectStatusListener(mDevice.getAddress(), this);
         ClientManager.getClient().disconnect(mDevice.getAddress());
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPause = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPause = true;
     }
 }

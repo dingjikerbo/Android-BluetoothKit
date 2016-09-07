@@ -1,7 +1,10 @@
 package com.inuker.bluetooth;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,19 +15,15 @@ import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.connect.response.ConnectStatusListener;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.inuker.bluetooth.library.utils.UUIDUtils;
-
-import org.w3c.dom.Text;
 
 import java.util.UUID;
 
 /**
  * Created by liwentian on 2016/9/6.
  */
-public class CharacterActivity extends Activity implements View.OnClickListener, ConnectStatusListener {
+public class CharacterActivity extends Activity implements View.OnClickListener, BleConnectStatusListener {
 
     private String mMac;
     private UUID mService;
@@ -39,6 +38,8 @@ public class CharacterActivity extends Activity implements View.OnClickListener,
 
     private Button mBtnNotify;
     private Button mBtnUnnotify;
+
+    private ConnectStatusReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,19 +163,38 @@ public class CharacterActivity extends Activity implements View.OnClickListener,
                 public void run() {
                     finish();
                 }
-            }, 500);
+            }, 300);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ClientManager.getClient().registerConnectStatusListener(mMac, this);
+
+        if (mReceiver == null) {
+            mReceiver = new ConnectStatusReceiver();
+            registerReceiver(mReceiver, new IntentFilter(Constants.ACTION_CONNECT_STATUS_CHANGE));
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        ClientManager.getClient().unregisterConnectStatusListener(mMac, this);
+
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+    }
+
+    private class ConnectStatusReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && Constants.ACTION_CONNECT_STATUS_CHANGE.equals(intent.getAction())) {
+                int status = intent.getIntExtra("status", 0);
+                onConnectStatusChanged(status);
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library.connect.gatt;
+package com.inuker.bluetooth.library.connect.listener;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 

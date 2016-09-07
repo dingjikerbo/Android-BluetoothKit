@@ -7,11 +7,10 @@ import android.os.Message;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
-import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
+import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
 

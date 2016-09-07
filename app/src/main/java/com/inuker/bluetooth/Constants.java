@@ -18,4 +18,6 @@ public class Constants {
     
     public static final String ARTICLE_ACTION_ONLINE = "com.dingjikerbo.article.online";
     public static final String ARTICLE_ACTION_UPDATE = "com.dingjikerbo.article.update";
+
+    public static final String ACTION_CONNECT_STATUS_CHANGE = "app.connection.status.change";
 }

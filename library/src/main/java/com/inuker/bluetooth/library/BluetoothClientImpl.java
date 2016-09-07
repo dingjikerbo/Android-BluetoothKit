@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListenerWrapper;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -21,8 +22,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.connect.response.ConnectStatusListener;
-import com.inuker.bluetooth.library.hook.BluetoothHooker;
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -43,6 +43,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHandler, Handler.Callback {
 
+    private static final int MSG_INVOKE_PROXY = 1;
+    private static final int MSG_DISPATCH_CONNECT_STATUS = 4;
+
     private static final String TAG = BluetoothClientImpl.class.getSimpleName();
 
     private Context mContext;
@@ -59,7 +62,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
     private BluetoothReceiver mBluetoothReceiver;
 
     private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
-    private HashMap<String, List<ConnectStatusListener>> mConnectStatusListeners;
+    private HashMap<String, BleConnectStatusListener> mConnectStatusListeners;
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
@@ -70,7 +73,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         mWorkerHandler = new Handler(mWorkerThread.getLooper(), this);
 
         mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
-        mConnectStatusListeners = new HashMap<String, List<ConnectStatusListener>>();
+        mConnectStatusListeners = new HashMap<String, BleConnectStatusListener>();
 
         registerBluetoothReceiver();
 
@@ -123,10 +126,12 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         }
     };
 
+
     @Override
-    public void connect(String mac, final BleConnectResponse response) {
+    public void connect(String mac, final BleConnectResponse response, BleConnectStatusListener listener) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
+        setConnectStatusListener(mac, new BleConnectStatusListenerWrapper(listener));
         safeCallBluetoothApi(CODE_CONNECT, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -145,22 +150,9 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         clearNotifyListener(mac);
     }
 
-    @Override
-    public void registerConnectStatusListener(String mac, ConnectStatusListener listener) {
-        List<ConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
-        if (listeners == null) {
-            listeners = new ArrayList<ConnectStatusListener>();
-            mConnectStatusListeners.put(mac, listeners);
-        }
-
-        listeners.add(listener);
-    }
-
-    @Override
-    public void unregisterConnectStatusListener(String mac, ConnectStatusListener listener) {
-        List<ConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
-        if (listeners != null) {
-            listeners.remove(listener);
+    public void setConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        if (listener != null) {
+            mConnectStatusListeners.put(mac, listener);
         }
     }
 
@@ -361,7 +353,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
     @Override
     public boolean onPreCalled(final Object object, final Method method, final Object[] args) {
-        mWorkerHandler.obtainMessage(0, new ProxyBulk(object, method, args)).sendToTarget();
+        mWorkerHandler.obtainMessage(MSG_INVOKE_PROXY, new ProxyBulk(object, method, args))
+                .sendToTarget();
         return false;
     }
 
@@ -397,7 +390,14 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
     @Override
     public boolean handleMessage(Message msg) {
-        ProxyBulk.safeInvoke(msg.obj);
+        switch (msg.what) {
+            case MSG_INVOKE_PROXY:
+                ProxyBulk.safeInvoke(msg.obj);
+                break;
+            case MSG_DISPATCH_CONNECT_STATUS:
+                dispatchConnectionStatus((String) msg.obj, msg.arg1);
+                break;
+        }
         return true;
     }
 
@@ -415,11 +415,9 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
     }
 
     private void dispatchConnectionStatus(String mac, int status) {
-        List<ConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
-        if (!ListUtils.isEmpty(listeners)) {
-            for (ConnectStatusListener listener : listeners) {
-                listener.onConnectStatusChanged(status);
-            }
+        BleConnectStatusListener listener = mConnectStatusListeners.get(mac);
+        if (listener != null) {
+            listener.onConnectStatusChanged(status);
         }
     }
 
@@ -445,7 +443,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
             String action = intent.getAction();
 
-//            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
+            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
 
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
@@ -467,7 +465,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
 //                BluetoothLog.v(String.format(">>> status = %s", getConnectStatusText(status)));
 
-                dispatchConnectionStatus(mac, status);
+                mWorkerHandler.obtainMessage(MSG_DISPATCH_CONNECT_STATUS, status, 0, mac).sendToTarget();
 
                 if (status == STATUS_DISCONNECTED) {
                     clearNotifyListener(mac);

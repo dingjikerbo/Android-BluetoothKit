@@ -1,9 +1,11 @@
-package com.inuker.bluetooth.library.connect.gatt;
+package com.inuker.bluetooth.library.connect.response;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+
+import com.inuker.bluetooth.library.connect.listener.IBluetoothGattResponse;
 
 /**
  * Created by dingjikerbo on 2016/8/25.

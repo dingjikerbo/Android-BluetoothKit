@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.connect;
 
 import com.inuker.bluetooth.library.IBluetoothBase;
-import com.inuker.bluetooth.library.connect.gatt.GattResponseListener;
+import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 
 import java.util.UUID;

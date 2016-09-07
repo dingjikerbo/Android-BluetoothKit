@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library.connect.gatt;
+package com.inuker.bluetooth.library.connect.listener;
 
 /**
  * Created by liwentian on 2016/9/7.

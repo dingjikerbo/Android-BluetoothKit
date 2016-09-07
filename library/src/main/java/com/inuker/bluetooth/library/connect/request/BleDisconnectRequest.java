@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.connect.request;
 
 
-import com.inuker.bluetooth.library.connect.gatt.DisconnectListener;
+import com.inuker.bluetooth.library.connect.listener.DisconnectListener;
 
 public class BleDisconnectRequest extends BleRequest implements DisconnectListener {
 

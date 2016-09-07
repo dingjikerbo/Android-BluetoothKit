@@ -1,5 +1,7 @@
 package com.inuker.bluetooth.library.beacon;
 
+import com.inuker.bluetooth.library.utils.ByteUtils;
+
 /**
  * Created by liwentian on 2016/9/5.
  */
@@ -41,8 +43,14 @@ public class BeaconItem {
 
         sb.append(" -> ");
 
-        for (byte b : bytes) {
-            sb.append(String.format(format, b));
+        StringBuilder sbSub = new StringBuilder();
+        try {
+            for (byte b : bytes) {
+                sbSub.append(String.format(format, b & 0xff));
+            }
+            sb.append(sbSub.toString());
+        } catch (Exception e) {
+            sb.append(ByteUtils.byteToString(bytes));
         }
 
         return sb.toString();

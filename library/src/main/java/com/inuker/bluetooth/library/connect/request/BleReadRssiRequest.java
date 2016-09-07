@@ -2,7 +2,7 @@ package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
 
-import com.inuker.bluetooth.library.connect.gatt.ReadRssiListener;
+import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 /**
