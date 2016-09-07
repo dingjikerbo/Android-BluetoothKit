@@ -70,7 +70,7 @@ You could stop the whole scan by just one line:
 ```Java
 mClient.stopSearch();
 ```
-<br/>
+
 ## **Bluetooth LE Connection** 
 
 ### **1. Connect**
