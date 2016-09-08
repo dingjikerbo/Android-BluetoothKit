@@ -18,6 +18,8 @@ public interface IBleConnectMaster extends IBluetoothBase {
 
     void write(UUID service, UUID character, byte[] bytes, BluetoothResponse response);
 
+    void writeNoRsp(UUID service, UUID character, byte[] bytes, BluetoothResponse response);
+
     void notify(UUID service, UUID character, BluetoothResponse response);
 
     void unnotify(UUID service, UUID character, BluetoothResponse response);

@@ -26,6 +26,8 @@ public interface IBluetoothClient extends IBluetoothApi {
 
     void write(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response);
 
+    void writeNoRsp(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response);
+
     void notify(String mac, UUID service, UUID character, BleNotifyResponse response);
 
     void unnotify(String mac, UUID service, UUID character, BleUnnotifyResponse response);

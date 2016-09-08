@@ -152,6 +152,16 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
+    public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
+        if (characteristic != null) {
+            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+            return mBluetoothGatt.writeCharacteristic(characteristic);
+        }
+        return false;
+    }
+
+    @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character);
 

@@ -191,6 +191,23 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         });
     }
 
+    @Override
+    public void writeNoRsp(String mac, UUID service, UUID character, byte[] value, final BleWriteResponse response) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
+        args.putByteArray(EXTRA_BYTE_VALUE, value);
+        safeCallBluetoothApi(CODE_WRITE_NORSP, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code);
+                }
+            }
+        });
+    }
+
     private void saveNotifyListener(String mac, UUID service, UUID character, BleNotifyResponse response) {
         HashMap<String, List<BleNotifyResponse>> listenerMap = mNotifyResponses.get(mac);
         if (listenerMap == null) {

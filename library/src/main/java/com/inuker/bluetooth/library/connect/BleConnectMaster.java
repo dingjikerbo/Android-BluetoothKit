@@ -60,6 +60,11 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     }
 
     @Override
+    public void writeNoRsp(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
+        getConnectDispatcher().writeNoRsp(service, character, bytes, response);
+    }
+
+    @Override
     public void notify(UUID service, UUID character, BluetoothResponse response) {
         getConnectDispatcher().notify(service, character, response);
     }

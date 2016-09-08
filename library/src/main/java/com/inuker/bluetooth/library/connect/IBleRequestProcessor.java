@@ -31,6 +31,8 @@ public interface IBleRequestProcessor extends IBluetoothBase {
 
     boolean writeCharacteristic(UUID service, UUID character, byte[] value);
 
+    boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value);
+
     boolean setCharacteristicNotification(UUID service, UUID character, boolean enable);
 
     boolean readRemoteRssi();

@@ -9,6 +9,7 @@
  - 写一个完整的demo  done
  - 当调用refreshCache后，先记下来，下次连接的时候会refreshCache
  - connect回调别用Bundle  done
+ - 支持write no resp
 
  1.2.0
  - 异步任务队列单独抽象出来，可参考RxAndroid

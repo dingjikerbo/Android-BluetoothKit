@@ -205,6 +205,11 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
     }
 
     @Override
+    public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
+        return mProcessor.writeCharacteristicWithNoRsp(service, character, value);
+    }
+
+    @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
         return mProcessor.setCharacteristicNotification(service, character, enable);
     }

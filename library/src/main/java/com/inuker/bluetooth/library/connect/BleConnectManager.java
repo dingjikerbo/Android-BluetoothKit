@@ -63,6 +63,10 @@ public class BleConnectManager {
         getBleConnectMaster(mac).write(service, character, value, response);
     }
 
+    public static void writeNoRsp(String mac, UUID service, UUID character, byte[] value, BluetoothResponse response) {
+        getBleConnectMaster(mac).writeNoRsp(service, character, value, response);
+    }
+
     public static void notify(String mac, UUID service, UUID character, BluetoothResponse response) {
         getBleConnectMaster(mac).notify(service, character, response);
     }

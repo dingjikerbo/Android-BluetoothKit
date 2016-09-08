@@ -10,6 +10,7 @@ import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
 import com.inuker.bluetooth.library.connect.request.BleRefreshCacheRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
+import com.inuker.bluetooth.library.connect.request.BleWriteNoRspRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -58,6 +59,11 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
     @Override
     public void write(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
         addNewRequest(new BleWriteRequest(mMac, service, character, bytes, response));
+    }
+
+    @Override
+    public void writeNoRsp(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
+        addNewRequest(new BleWriteNoRspRequest(mMac, service, character, bytes, response));
     }
 
     @Override

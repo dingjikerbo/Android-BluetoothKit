@@ -60,6 +60,13 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
+    public void writeNoRsp(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response) {
+        BluetoothLog.v(String.format("writeNoRsp %s: service = %d, character = %d, value = %s", mac,
+                UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
+        mClient.writeNoRsp(mac, service, character, value, ProxyUtils.getWeakProxy(response));
+    }
+
+    @Override
     public void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
         BluetoothLog.v(String.format("notify %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
