@@ -88,7 +88,7 @@ public class DeviceDetailActivity extends Activity implements BleConnectStatusLi
 
         ClientManager.getClient().connect(mDevice.getAddress(), new BleConnectResponse() {
             @Override
-            public void onResponse(int code, Bundle data) {
+            public void onResponse(int code, BleGattProfile profile) {
                 BluetoothLog.v(String.format("onResponse code = %d", code));
 
                 mTvTitle.setText(String.format("%s", mDevice.getAddress()));
@@ -97,7 +97,6 @@ public class DeviceDetailActivity extends Activity implements BleConnectStatusLi
 
 
                 if (code == REQUEST_SUCCESS) {
-                    BleGattProfile profile = data.getParcelable(EXTRA_GATT_PROFILE);
 //                    BluetoothLog.v(String.format("Profiles: \n%s", profile));
                     mAdapter.setGattProfile(profile);
                 }

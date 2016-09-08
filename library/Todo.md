@@ -8,6 +8,7 @@
  - 代码优化，proxy优化一下，名称精简 done
  - 写一个完整的demo  done
  - 当调用refreshCache后，先记下来，下次连接的时候会refreshCache
+ - connect回调别用Bundle  done
 
  1.2.0
  - 异步任务队列单独抽象出来，可参考RxAndroid

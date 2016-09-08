@@ -23,6 +23,7 @@ import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -136,7 +137,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
                 if (response != null) {
-                    response.onResponse(code, data);
+                    BleGattProfile profile = data.getParcelable(EXTRA_GATT_PROFILE);
+                    response.onResponse(code, profile);
                 }
             }
         });

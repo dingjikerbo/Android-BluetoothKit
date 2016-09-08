@@ -16,6 +16,7 @@ import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -53,14 +54,14 @@ public abstract class BleSecurityConnector {
 
     private final BleConnectResponse mBleConnectResponse = new BleConnectResponse() {
         @Override
-        public void onResponse(int code, Bundle data) {
+        public void onResponse(int code, BleGattProfile profile) {
             BluetoothLog.v(String.format("code onResponse: code = %d", code));
 
             if (code == REQUEST_SUCCESS) {
-                if (data != null) {
-                    mBundle.putAll(data);
+                if (profile != null) {
+                    mBundle.putParcelable("profile", profile);
                 }
-                mNeedBindToServer = checkNeedBindToServer(data);
+                mNeedBindToServer = checkNeedBindToServer(profile);
                 processStep1();
             } else {
                 dispatchResult(REQUEST_FAILED);
@@ -76,7 +77,7 @@ public abstract class BleSecurityConnector {
      * 根据设备中是否有SN和beaconKey的character来判断是否要去云端绑定
      * @return
      */
-    protected boolean checkNeedBindToServer(Bundle bundle) {
+    protected boolean checkNeedBindToServer(BleGattProfile profile) {
         return true;
     }
 
