@@ -113,6 +113,16 @@ mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
         }
     }
 });
+
+// with WRITE_TYPE_NO_RESPONSE
+mClient.writeNoRsp(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
+    @Override
+    public void onResponse(int code) {
+        if (code == REQUEST_SUCCESS) {
+
+        }
+    }
+});
 ```
 
 ### **5. Open Notify**
