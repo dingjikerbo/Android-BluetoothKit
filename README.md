@@ -78,9 +78,9 @@ mClient.stopSearch();
 ```Java
 mClient.connect(MAC, new BleConnectResponse() {
     @Override
-    public void onResponse(int code, Bundle data) {
+    public void onResponse(int code, BleGattProfile profile) {
         if (code == REQUEST_SUCCESS) {
-            BleGattProfile profile = data.getParcelable(EXTRA_GATT_PROFILE);
+        
         }
     }
 });
