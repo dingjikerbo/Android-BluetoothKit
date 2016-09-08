@@ -80,7 +80,7 @@ mClient.connect(MAC, new BleConnectResponse() {
     @Override
     public void onResponse(int code, Bundle data) {
         if (code == REQUEST_SUCCESS) {
-            
+            BleGattProfile profile = data.getParcelable(EXTRA_GATT_PROFILE);
         }
     }
 });
