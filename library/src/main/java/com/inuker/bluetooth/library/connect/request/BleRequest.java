@@ -133,15 +133,6 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
 
     abstract void processRequest();
 
-    private String getConnectStatusText(int status) {
-        switch (status) {
-            case STATUS_DEVICE_CONNECTED: return "connected";
-            case STATUS_DEVICE_DISCONNECTED: return "disconnected";
-            case STATUS_DEVICE_SERVICE_READY: return "service ready";
-            default: return String.format("unknown %d", status);
-        }
-    }
-
     @Override
     public void registerGattResponseListener(int responseId, GattResponseListener listener) {
 //        BluetoothLog.v(String.format("registerGattResponseListener responseId = %d", responseId));

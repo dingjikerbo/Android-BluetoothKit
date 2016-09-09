@@ -51,12 +51,6 @@ public interface IBluetoothBase {
     String ACTION_CONNECT_STATUS_CHANGED = "action.connect_status_changed";
     String ACTION_CHARACTER_CHANGED = "action.character_changed";
 
-    int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
-    int STATUS_DEVICE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
-    int STATUS_DEVICE_SERVICE_READY = 0x13;
-
-    int GATT_ERROR = 133;
-
     int SEARCH_TYPE_CLASSIC = 1;
     int SEARCH_TYPE_BLE = 2;
 
