@@ -22,7 +22,7 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
     void processRequest() {
         switch (getConnectStatus()) {
             case STATUS_DEVICE_SERVICE_READY:
-                if (writeCharacteristic(mServiceUUID, mCharacterUUID, mBytes)) {
+                if (write(mServiceUUID, mCharacterUUID, mBytes)) {
                     registerGattResponseListener(this);
                 } else {
                     onRequestFinished(REQUEST_FAILED);
@@ -51,6 +51,10 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
         } else {
             onRequestFinished(REQUEST_FAILED);
         }
+    }
+
+    boolean write(UUID service, UUID character, byte[] value) {
+        return writeCharacteristic(service, character, value);
     }
 
     private boolean checkCharacteristic(BluetoothGattCharacteristic characteristic) {
