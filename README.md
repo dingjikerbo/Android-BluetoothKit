@@ -194,4 +194,5 @@ mClient.refreshCache(MAC);
 <br/>
 # **Author**
  - Email: dingjikerbo@gmail.com
+ - Blog: http://blog.csdn.net/dingjikerbo
  - Welcome to contact me with any suggestions or ideas.
