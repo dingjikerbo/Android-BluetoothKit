@@ -126,6 +126,9 @@ mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
 ```
 
 ### **● Write Characteristic**
+
+The data to write should be no more than 20 bytes.
+
 ```Java
 mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
     @Override
