@@ -73,7 +73,7 @@ mClient.stopSearch();
 
 ## **Bluetooth LE Connection** 
 
-### **1. Connect**
+### **● Connect**
 
 ```Java
 mClient.connect(MAC, new BleConnectResponse() {
@@ -84,7 +84,11 @@ mClient.connect(MAC, new BleConnectResponse() {
         }
     }
 });
+```
 
+### **● Connect Status**
+
+```
 mClient.registerConnectStatusListener(MAC, mBleConnectStatusListener);
 
 private final BleConnectStatusListener mBleConnectStatusListener = new BleConnectStatusListener() {
@@ -102,12 +106,12 @@ private final BleConnectStatusListener mBleConnectStatusListener = new BleConnec
 mClient.unregisterConnectStatusListener(MAC, mBleConnectStatusListener);
 ```
 
-### **2. Disconnect**
+### **● Disconnect**
 ```Java
 mClient.disconnect(MAC);
 ```
 
-### **3. Read Characteristic**
+### **● Read Characteristic**
 ```Java
 mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
     @Override
@@ -119,7 +123,7 @@ mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
 });
 ```
 
-### **4. Write Characteristic**
+### **● Write Characteristic**
 ```Java
 mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
     @Override
@@ -141,7 +145,7 @@ mClient.writeNoRsp(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse(
 });
 ```
 
-### **5. Open Notify**
+### **● Open Notify**
 
 ```Java
 mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
@@ -159,7 +163,7 @@ mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
 });
 ```
 
-### **6. Close Notify**
+### **● Close Notify**
 ```Java
 mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
     @Override
@@ -171,7 +175,7 @@ mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
 });
 ```
 
-### **7. Read Rssi**
+### **● Read Rssi**
 ```Java
 mClient.readRssi(MAC, new BleReadRssiResponse() {
     @Override
@@ -183,7 +187,7 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
 });
 ```
 
-### **8. Refresh Cache**
+### **● Refresh Cache**
 ```Java
 mClient.refreshCache(MAC);
 ```
