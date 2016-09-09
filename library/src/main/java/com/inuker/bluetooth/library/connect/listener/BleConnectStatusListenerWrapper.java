@@ -2,16 +2,19 @@ package com.inuker.bluetooth.library.connect.listener;
 
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
+import com.inuker.bluetooth.library.utils.ProxyUtils;
 
 /**
  * Created by liwentian on 2016/9/7.
  */
-public class BleConnectStatusListenerWrapper implements BleConnectStatusListener {
+public class BleConnectStatusListenerWrapper extends BleConnectStatusListener {
 
-    private BleConnectStatusListener mListener;
+    private BleConnectStatusListenerWrapper(BleConnectStatusListener listener) {
+        super(listener);
+    }
 
-    public BleConnectStatusListenerWrapper(BleConnectStatusListener listener) {
-        mListener = listener;
+    public static BleConnectStatusListener from(BleConnectStatusListener listener) {
+        return new BleConnectStatusListenerWrapper(listener);
     }
 
     @Override
@@ -20,9 +23,9 @@ public class BleConnectStatusListenerWrapper implements BleConnectStatusListener
 
             @Override
             public void run() {
-                if (mListener != null) {
+                if (listener != null) {
                     try {
-                        mListener.onConnectStatusChanged(status);
+                        listener.onConnectStatusChanged(status);
                     } catch (Throwable e) {
                         BluetoothLog.e(e);
                     }

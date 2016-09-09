@@ -11,11 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
@@ -23,7 +25,7 @@ import java.util.UUID;
 /**
  * Created by liwentian on 2016/9/6.
  */
-public class CharacterActivity extends Activity implements View.OnClickListener, BleConnectStatusListener {
+public class CharacterActivity extends Activity implements View.OnClickListener {
 
     private String mMac;
     private UUID mService;
@@ -38,8 +40,6 @@ public class CharacterActivity extends Activity implements View.OnClickListener,
 
     private Button mBtnNotify;
     private Button mBtnUnnotify;
-
-    private ConnectStatusReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,53 +148,38 @@ public class CharacterActivity extends Activity implements View.OnClickListener,
         }
     }
 
-    @Override
-    public void onConnectStatusChanged(int status) {
-        if (status == STATUS_DISCONNECTED) {
-            CommonUtils.toast("disconnected");
-            mBtnRead.setEnabled(false);
-            mBtnWrite.setEnabled(false);
-            mBtnNotify.setEnabled(false);
-            mBtnUnnotify.setEnabled(false);
+    private final BleConnectStatusListener mConnectStatusListener = new BleConnectStatusListener() {
+        @Override
+        public void onConnectStatusChanged(int status) {
+            BluetoothLog.v(String.format("CharacterActivity.onConnectStatusChanged status = %d", status));
 
-            mTvTitle.postDelayed(new Runnable() {
+            if (status == STATUS_DISCONNECTED) {
+                CommonUtils.toast("disconnected");
+                mBtnRead.setEnabled(false);
+                mBtnWrite.setEnabled(false);
+                mBtnNotify.setEnabled(false);
+                mBtnUnnotify.setEnabled(false);
 
-                @Override
-                public void run() {
-                    finish();
-                }
-            }, 300);
+                mTvTitle.postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                }, 300);
+            }
         }
-    }
+    };
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (mReceiver == null) {
-            mReceiver = new ConnectStatusReceiver();
-            registerReceiver(mReceiver, new IntentFilter(Constants.ACTION_CONNECT_STATUS_CHANGE));
-        }
+        ClientManager.getClient().registerConnectStatusListener(mMac, mConnectStatusListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-            mReceiver = null;
-        }
-    }
-
-    private class ConnectStatusReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null && Constants.ACTION_CONNECT_STATUS_CHANGE.equals(intent.getAction())) {
-                int status = intent.getIntExtra("status", 0);
-                onConnectStatusChanged(status);
-            }
-        }
+        ClientManager.getClient().unregisterConnectStatusListener(mMac, mConnectStatusListener);
     }
 }

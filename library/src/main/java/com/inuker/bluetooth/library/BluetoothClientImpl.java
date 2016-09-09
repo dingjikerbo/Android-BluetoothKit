@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListenerWrapper;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -22,7 +23,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
@@ -63,7 +64,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
     private BluetoothReceiver mBluetoothReceiver;
 
     private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
-    private HashMap<String, BleConnectStatusListener> mConnectStatusListeners;
+    private HashMap<String, List<BleConnectStatusListener>> mConnectStatusListeners;
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
@@ -74,7 +75,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         mWorkerHandler = new Handler(mWorkerThread.getLooper(), this);
 
         mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
-        mConnectStatusListeners = new HashMap<String, BleConnectStatusListener>();
+        mConnectStatusListeners = new HashMap<String, List<BleConnectStatusListener>>();
 
         registerBluetoothReceiver();
 
@@ -129,10 +130,9 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
 
     @Override
-    public void connect(String mac, final BleConnectResponse response, BleConnectStatusListener listener) {
+    public void connect(String mac, final BleConnectResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
-        setConnectStatusListener(mac, new BleConnectStatusListenerWrapper(listener));
         safeCallBluetoothApi(CODE_CONNECT, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
@@ -152,9 +152,23 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         clearNotifyListener(mac);
     }
 
-    public void setConnectStatusListener(String mac, BleConnectStatusListener listener) {
-        if (listener != null) {
-            mConnectStatusListeners.put(mac, listener);
+    @Override
+    public void registerConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        List<BleConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
+        if (listeners == null) {
+            listeners = new ArrayList<BleConnectStatusListener>();
+            mConnectStatusListeners.put(mac, listeners);
+        }
+        if (!listeners.contains(listener)) {
+            listeners.add(BleConnectStatusListenerWrapper.from(listener));
+        }
+    }
+
+    @Override
+    public void unregisterConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        List<BleConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
+        if (!ListUtils.isEmpty(listeners)) {
+            listeners.remove(listener);
         }
     }
 
@@ -434,9 +448,11 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
     }
 
     private void dispatchConnectionStatus(String mac, int status) {
-        BleConnectStatusListener listener = mConnectStatusListeners.get(mac);
-        if (listener != null) {
-            listener.onConnectStatusChanged(status);
+        List<BleConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
+        if (!ListUtils.isEmpty(listeners)) {
+            for (BleConnectStatusListener listener : listeners) {
+                listener.onConnectStatusChanged(status);
+            }
         }
     }
 

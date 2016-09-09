@@ -10,8 +10,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -21,7 +22,7 @@ import java.util.UUID;
 /**
  * Created by liwentian on 2016/9/2.
  */
-public class DeviceDetailActivity extends Activity implements BleConnectStatusListener {
+public class DeviceDetailActivity extends Activity {
 
     private TextView mTvTitle;
     private ProgressBar mPbar;
@@ -32,8 +33,6 @@ public class DeviceDetailActivity extends Activity implements BleConnectStatusLi
     private BluetoothDevice mDevice;
 
     private boolean mConnected;
-
-    private boolean mPause;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +67,21 @@ public class DeviceDetailActivity extends Activity implements BleConnectStatusLi
             }
         });
 
+        ClientManager.getClient().registerConnectStatusListener(mDevice.getAddress(), mConnectStatusListener);
+
         connectDeviceIfNeeded();
     }
+
+    private final BleConnectStatusListener mConnectStatusListener = new BleConnectStatusListener() {
+        @Override
+        public void onConnectStatusChanged(int status) {
+            BluetoothLog.v(String.format("DeviceDetailActivity onConnectStatusChanged %d in %s",
+                    status, Thread.currentThread().getName()));
+
+            mConnected = (status == STATUS_CONNECTED);
+            connectDeviceIfNeeded();
+        }
+    };
 
     private void startCharacterActivity(UUID service, UUID character) {
         Intent intent = new Intent(this, CharacterActivity.class);
@@ -101,25 +113,7 @@ public class DeviceDetailActivity extends Activity implements BleConnectStatusLi
                     mAdapter.setGattProfile(profile);
                 }
             }
-        }, this);
-    }
-
-    @Override
-    public void onConnectStatusChanged(int status) {
-        if (mPause) {
-            return;
-        }
-
-        BluetoothLog.v(String.format("Activity onConnectStatusChanged %d in %s",
-                status, Thread.currentThread().getName()));
-
-        mConnected = (status == STATUS_CONNECTED);
-
-        Intent intent = new Intent(Constants.ACTION_CONNECT_STATUS_CHANGE);
-        intent.putExtra("status", status);
-        sendBroadcast(intent);
-
-        connectDeviceIfNeeded();
+        });
     }
 
     private void connectDeviceIfNeeded() {
@@ -131,18 +125,7 @@ public class DeviceDetailActivity extends Activity implements BleConnectStatusLi
     @Override
     protected void onDestroy() {
         ClientManager.getClient().disconnect(mDevice.getAddress());
+        ClientManager.getClient().unregisterConnectStatusListener(mDevice.getAddress(), mConnectStatusListener);
         super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mPause = false;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mPause = true;
     }
 }

@@ -2,13 +2,14 @@ package com.inuker.bluetooth.library;
 
 import android.content.Context;
 
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
@@ -29,20 +30,26 @@ public class BluetoothClient implements IBluetoothClient {
         mClient = BluetoothClientImpl.getInstance(context);
     }
 
-    public void connect(String mac, BleConnectResponse response) {
-        connect(mac, response, null);
-    }
-
     @Override
-    public void connect(String mac, BleConnectResponse response, BleConnectStatusListener listener) {
+    public void connect(String mac, BleConnectResponse response) {
         BluetoothLog.v(String.format("Connect %s", mac));
-        mClient.connect(mac, ProxyUtils.getWeakProxy(response), ProxyUtils.getWeakProxy(listener));
+        mClient.connect(mac, ProxyUtils.getWeakProxy(response));
     }
 
     @Override
     public void disconnect(String mac) {
         BluetoothLog.v(String.format("Disconnect %s", mac));
         mClient.disconnect(mac);
+    }
+
+    @Override
+    public void registerConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        mClient.registerConnectStatusListener(mac, listener);
+    }
+
+    @Override
+    public void unregisterConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        mClient.unregisterConnectStatusListener(mac, listener);
     }
 
     @Override

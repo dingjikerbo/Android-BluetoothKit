@@ -2,6 +2,7 @@ package com.inuker.bluetooth.library;
 
 import com.inuker.bluetooth.library.connect.IBluetoothApi;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -18,9 +19,13 @@ import java.util.UUID;
  */
 public interface IBluetoothClient extends IBluetoothApi {
 
-    void connect(String mac, BleConnectResponse response, BleConnectStatusListener listener);
+    void connect(String mac, BleConnectResponse response);
 
     void disconnect(String mac);
+
+    void registerConnectStatusListener(String mac, BleConnectStatusListener listener);
+
+    void unregisterConnectStatusListener(String mac, BleConnectStatusListener listener);
 
     void read(String mac, UUID service, UUID character, BleReadResponse response);
 
