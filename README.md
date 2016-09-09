@@ -190,6 +190,9 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
 ```
 
 ### **● Refresh Cache**
+
+Refresh cache at the beginning of next connection.
+
 ```Java
 mClient.refreshCache(MAC);
 ```
