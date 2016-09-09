@@ -75,6 +75,8 @@ mClient.stopSearch();
 
 ### **● Connect**
 
+BleGattProfile contains all service and characteristic uuid.
+
 ```Java
 mClient.connect(MAC, new BleConnectResponse() {
     @Override
