@@ -67,6 +67,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
 
+    private volatile boolean mPendingRefreshCache;
+
     public static BleConnectWorker attch(String mac, IBleConnectDispatcher dispatcher) {
         return new BleConnectWorker(mac, dispatcher);
     }
@@ -187,6 +189,10 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void refreshCache() {
+        mPendingRefreshCache = true;
+    }
+
+    private void doRefreshCache() {
         try {
             if (mBluetoothGatt != null) {
                 Method refresh = BluetoothGatt.class.getMethod("refresh");
@@ -278,6 +284,11 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
             BluetoothLog.v(String.format("openBluetoothGatt for %s", mBluetoothDevice.getAddress()));
             mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false,
                     new BluetoothGattResponse(mBluetoothGattResponse));
+
+            if (mPendingRefreshCache) {
+                mPendingRefreshCache = false;
+                doRefreshCache();
+            }
         }
 
         return mBluetoothGatt != null;
