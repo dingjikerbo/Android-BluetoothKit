@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by liwentian on 2016/9/5.
+ * Created by dingjikerbo on 2016/9/5.
  */
 public class Beacon {
 

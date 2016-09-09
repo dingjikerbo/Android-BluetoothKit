@@ -2,10 +2,9 @@ package com.inuker.bluetooth.library.connect.listener;
 
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
 
 /**
- * Created by liwentian on 2016/9/7.
+ * Created by dingjikerbo on 2016/9/7.
  */
 public class BleConnectStatusListenerWrapper extends BleConnectStatusListener {
 

@@ -1,7 +1,5 @@
 package com.inuker.bluetooth.library.connect.response;
 
-import android.os.Bundle;
-
 import com.inuker.bluetooth.library.model.BleGattProfile;
 
 /**

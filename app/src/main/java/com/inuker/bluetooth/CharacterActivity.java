@@ -1,10 +1,7 @@
 package com.inuker.bluetooth;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,14 +13,13 @@ import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/9/6.
+ * Created by dingjikerbo on 2016/9/6.
  */
 public class CharacterActivity extends Activity implements View.OnClickListener {
 

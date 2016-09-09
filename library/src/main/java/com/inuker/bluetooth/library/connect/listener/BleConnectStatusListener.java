@@ -5,7 +5,7 @@ import com.inuker.bluetooth.library.utils.ProxyUtils;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/9/9.
+ * Created by dingjikerbo on 2016/9/9.
  */
 public abstract class BleConnectStatusListener implements IBleConnectStatusListener {
 

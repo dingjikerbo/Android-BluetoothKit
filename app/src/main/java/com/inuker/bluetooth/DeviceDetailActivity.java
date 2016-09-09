@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.connect.listener.IBleConnectStatusListener;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -20,7 +19,7 @@ import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/9/2.
+ * Created by dingjikerbo on 2016/9/2.
  */
 public class DeviceDetailActivity extends Activity {
 

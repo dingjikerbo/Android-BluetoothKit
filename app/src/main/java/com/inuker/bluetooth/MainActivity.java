@@ -2,15 +2,12 @@ package com.inuker.bluetooth;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.library.utils.ListUtils;
 import com.inuker.bluetooth.view.PullRefreshListView;
 import com.inuker.bluetooth.view.PullToRefreshFrameLayout;
 

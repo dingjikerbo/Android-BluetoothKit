@@ -1,7 +1,5 @@
 package com.inuker.bluetooth.library;
 
-import android.bluetooth.BluetoothProfile;
-
 import java.util.UUID;
 
 /**

@@ -1,7 +1,6 @@
 package com.inuker.bluetooth;
 
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +10,7 @@ import java.util.Locale;
 import java.util.Random;
 
 /**
- * Created by liwentian on 2016/9/1.
+ * Created by dingjikerbo on 2016/9/1.
  */
 public class StringUtils {
 

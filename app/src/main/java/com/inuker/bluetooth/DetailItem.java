@@ -3,7 +3,7 @@ package com.inuker.bluetooth;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/9/5.
+ * Created by dingjikerbo on 2016/9/5.
  */
 public class DetailItem {
 

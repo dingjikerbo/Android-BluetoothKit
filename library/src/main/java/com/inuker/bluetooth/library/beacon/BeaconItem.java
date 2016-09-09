@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library.beacon;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 
 /**
- * Created by liwentian on 2016/9/5.
+ * Created by dingjikerbo on 2016/9/5.
  */
 public class BeaconItem {
 

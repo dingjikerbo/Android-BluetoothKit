@@ -1,7 +1,6 @@
 package com.inuker.bluetooth;
 
 import com.inuker.bluetooth.library.BluetoothClient;
-import com.inuker.bluetooth.library.IBluetoothClient;
 
 /**
  * Created by dingjikerbo on 2016/8/27.

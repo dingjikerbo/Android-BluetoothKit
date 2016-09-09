@@ -5,13 +5,12 @@ import android.os.ParcelUuid;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/9/5.
+ * Created by dingjikerbo on 2016/9/5.
  */
 public class BleGattService implements Parcelable, Comparable {
 

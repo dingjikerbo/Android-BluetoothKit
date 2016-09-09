@@ -15,7 +15,6 @@ import android.os.Message;
 import android.util.SparseArray;
 
 import com.inuker.bluetooth.library.BluetoothService;
-import com.inuker.bluetooth.library.connect.response.BluetoothGattResponse;
 import com.inuker.bluetooth.library.connect.listener.DisconnectListener;
 import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.listener.IBluetoothGattResponse;
@@ -25,6 +24,7 @@ import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.listener.WriteCharacterListener;
 import com.inuker.bluetooth.library.connect.listener.WriteDescriptorListener;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
+import com.inuker.bluetooth.library.connect.response.BluetoothGattResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.model.BleGattService;
 import com.inuker.bluetooth.library.utils.BluetoothLog;

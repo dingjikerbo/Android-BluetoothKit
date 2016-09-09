@@ -4,13 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by liwentian on 2016/9/5.
+ * Created by dingjikerbo on 2016/9/5.
  */
 public class BleGattProfile implements Parcelable {
 

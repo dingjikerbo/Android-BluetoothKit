@@ -9,7 +9,7 @@ import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 
 /**
- * Created by liwentian on 2016/9/7.
+ * Created by dingjikerbo on 2016/9/7.
  */
 public class TestActivity extends Activity {
 

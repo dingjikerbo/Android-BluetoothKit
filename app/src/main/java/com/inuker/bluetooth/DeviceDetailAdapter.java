@@ -2,7 +2,6 @@ package com.inuker.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
 import android.os.ParcelUuid;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -11,19 +10,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.inuker.bluetooth.library.IBluetoothBase;
-import com.inuker.bluetooth.library.beacon.Beacon;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.model.BleGattService;
-import com.inuker.bluetooth.library.search.SearchResult;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/9/5.
+ * Created by dingjikerbo on 2016/9/5.
  */
 public class DeviceDetailAdapter extends BaseAdapter {
 

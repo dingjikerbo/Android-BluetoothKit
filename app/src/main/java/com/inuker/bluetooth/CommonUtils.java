@@ -3,7 +3,7 @@ package com.inuker.bluetooth;
 import android.widget.Toast;
 
 /**
- * Created by liwentian on 2016/9/6.
+ * Created by dingjikerbo on 2016/9/6.
  */
 public class CommonUtils {
 
