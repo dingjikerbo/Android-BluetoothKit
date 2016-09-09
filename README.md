@@ -84,6 +84,22 @@ mClient.connect(MAC, new BleConnectResponse() {
         }
     }
 });
+
+mClient.registerConnectStatusListener(MAC, mBleConnectStatusListener);
+
+private final BleConnectStatusListener mBleConnectStatusListener = new BleConnectStatusListener() {
+
+    @Override
+    public void onConnectStatusChanged(int status) {
+        if (status == STATUS_CONNECTED) {
+
+        } else if (status == STATUS_DISCONNECTED) {
+
+        }
+    }
+};
+
+mClient.unregisterConnectStatusListener(MAC, mBleConnectStatusListener);
 ```
 
 ### **2. Disconnect**
