@@ -7,7 +7,7 @@
  - 设备连接队列监控，及时断开多余设备连接，策略可配置
  - 代码优化，proxy优化一下，名称精简 done
  - 写一个完整的demo  done
- - 当调用refreshCache后，先记下来，下次连接的时候会refreshCache
+ - 当调用refreshCache后，先记下来，下次连接的时候会refreshCache done
  - connect回调别用Bundle  done
  - 支持write no resp done
  - Hook掉系统的BluetoothGatt
