@@ -12,6 +12,7 @@
  - 支持write no resp done
  - Hook掉系统的BluetoothGatt
  - 完善连接状态监听 done
+ - 可打开和关闭蓝牙 done
 
  1.2.0
  - 异步任务队列单独抽象出来，可参考RxAndroid

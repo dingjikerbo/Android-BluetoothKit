@@ -82,6 +82,22 @@ public class BluetoothUtils {
         return adapter != null && adapter.isEnabled();
     }
 
+    public static boolean openBluetooth() {
+        BluetoothAdapter adapter = getBluetoothClassicAdapter();
+        if (adapter != null) {
+            return adapter.enable();
+        }
+        return false;
+    }
+
+    public static boolean closeBluetooth() {
+        BluetoothAdapter adapter = getBluetoothClassicAdapter();
+        if (adapter != null) {
+            return adapter.disable();
+        }
+        return false;
+    }
+
     public static BluetoothManager getBluetoothManager() {
         if (isBleSupported()) {
             if (mBluetoothManager == null) {

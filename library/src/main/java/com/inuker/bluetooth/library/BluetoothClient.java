@@ -11,6 +11,8 @@ import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResponse;
+import com.inuker.bluetooth.library.state.CloseBluetoothResponse;
+import com.inuker.bluetooth.library.state.OpenBluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.inuker.bluetooth.library.utils.ProxyUtils;
@@ -106,5 +108,15 @@ public class BluetoothClient implements IBluetoothClient {
     @Override
     public void stopSearch() {
         mClient.stopSearch();
+    }
+
+    @Override
+    public void openBluetooth(OpenBluetoothResponse response) {
+        mClient.openBluetooth(response);
+    }
+
+    @Override
+    public void closeBluetooth(CloseBluetoothResponse response) {
+        mClient.closeBluetooth(response);
     }
 }
