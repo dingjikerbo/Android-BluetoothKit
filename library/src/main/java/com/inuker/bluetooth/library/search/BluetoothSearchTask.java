@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.IBluetoothBase;
+import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 
 public class BluetoothSearchTask implements IBluetoothBase, Handler.Callback {
 

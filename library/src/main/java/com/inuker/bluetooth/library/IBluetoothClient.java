@@ -9,9 +9,9 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.search.SearchRequest;
-import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.state.CloseBluetoothResponse;
 import com.inuker.bluetooth.library.state.OpenBluetoothResponse;
+import com.inuker.bluetooth.library.search.response.SearchResponse;
 
 import java.util.UUID;
 

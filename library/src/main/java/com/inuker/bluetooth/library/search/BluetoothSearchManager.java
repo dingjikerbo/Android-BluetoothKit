@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 
 /**
  * Created by dingjikerbo on 2016/8/28.

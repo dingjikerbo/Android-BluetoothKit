@@ -14,7 +14,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.SparseArray;
 
-import com.inuker.bluetooth.library.BluetoothService;
 import com.inuker.bluetooth.library.connect.listener.DisconnectListener;
 import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.listener.IBluetoothGattResponse;
@@ -442,6 +441,6 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     private Context getContext() {
-        return BluetoothService.getContext();
+        return BluetoothUtils.getContext();
     }
 }

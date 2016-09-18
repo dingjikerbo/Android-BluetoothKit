@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.inuker.bluetooth.library.utils.BluetoothLog;
+
 /**
  * Created by dingjikerbo on 16/4/8.
  */
@@ -19,12 +21,13 @@ public class BluetoothService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        BluetoothLog.v(String.format("BluetoothService onCreate"));
         mContext = getApplicationContext();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        BluetoothLog.v(String.format("BluetoothService onBind"));
         return BluetoothServiceImpl.getInstance();
     }
 }

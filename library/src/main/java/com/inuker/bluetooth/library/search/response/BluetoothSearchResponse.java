@@ -1,4 +1,6 @@
-package com.inuker.bluetooth.library.search;
+package com.inuker.bluetooth.library.search.response;
+
+import com.inuker.bluetooth.library.search.SearchResult;
 
 public interface BluetoothSearchResponse {
     void onSearchStarted();

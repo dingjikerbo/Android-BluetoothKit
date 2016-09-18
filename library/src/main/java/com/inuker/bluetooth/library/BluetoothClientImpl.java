@@ -25,10 +25,10 @@ import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchRequest;
-import com.inuker.bluetooth.library.search.SearchResponse;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.state.CloseBluetoothResponse;
 import com.inuker.bluetooth.library.state.OpenBluetoothResponse;
+import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
@@ -116,6 +116,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         intent.setClass(mContext, BluetoothService.class);
 
         if (mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)) {
+            BluetoothLog.v(String.format("BluetoothService registered"));
             waitBluetoothManagerReady();
         } else {
             BluetoothLog.v(String.format("BluetoothService not registered"));

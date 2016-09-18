@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.search.classic.BluetoothClassicSearcher;
 import com.inuker.bluetooth.library.search.le.BluetoothLESearcher;
+import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 
 public class BluetoothSearcher implements IBluetoothBase {
 

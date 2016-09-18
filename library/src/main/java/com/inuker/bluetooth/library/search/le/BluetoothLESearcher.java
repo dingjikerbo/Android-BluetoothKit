@@ -5,9 +5,9 @@ import android.bluetooth.BluetoothAdapter.LeScanCallback;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 
-import com.inuker.bluetooth.library.search.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearcher;
 import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 

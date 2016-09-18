@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.inuker.bluetooth.library.search.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearcher;
 import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
 /**
