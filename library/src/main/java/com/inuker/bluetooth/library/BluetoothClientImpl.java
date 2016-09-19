@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Handler.Callback;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
@@ -26,14 +27,12 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
-import com.inuker.bluetooth.library.state.CloseBluetoothResponse;
-import com.inuker.bluetooth.library.state.OpenBluetoothResponse;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
+import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,12 +44,10 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHandler, Handler.Callback {
+public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, Callback {
 
     private static final int MSG_INVOKE_PROXY = 1;
     private static final int MSG_DISPATCH_CONNECT_STATUS = 4;
-    private static final int MSG_BLUETOOTH_ENABLE = 8;
-    private static final int MSG_BLUETOOTH_DISABLE = 16;
 
     private static final String TAG = BluetoothClientImpl.class.getSimpleName();
 
@@ -69,8 +66,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
     private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
     private HashMap<String, List<BleConnectStatusListener>> mConnectStatusListeners;
-    private List<OpenBluetoothResponse> mOpenBluetoothResponses;
-    private List<CloseBluetoothResponse> mCloseBluetoothResponses;
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
@@ -82,8 +77,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
 
         mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
         mConnectStatusListeners = new HashMap<String, List<BleConnectStatusListener>>();
-        mOpenBluetoothResponses = new ArrayList<OpenBluetoothResponse>();
-        mCloseBluetoothResponses = new ArrayList<CloseBluetoothResponse>();
 
         registerBluetoothReceiver();
 
@@ -365,46 +358,12 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         safeCallBluetoothApi(CODE_STOP_SESARCH, null, null);
     }
 
-    @Override
-    public void openBluetooth(OpenBluetoothResponse response) {
-        if (BluetoothUtils.isBluetoothEnabled()) {
-            if (response != null) {
-                response.onBluetoothOpen(true);
-            }
-        } else {
-            if (!BluetoothUtils.openBluetooth()) {
-                if (response != null) {
-                    response.onBluetoothOpen(false);
-                }
-            } else {
-                mOpenBluetoothResponses.add(ProxyUtils.getWeakProxy(response, OpenBluetoothResponse.class));
-            }
-        }
-    }
-
-    @Override
-    public void closeBluetooth(CloseBluetoothResponse response) {
-        if (!BluetoothUtils.isBluetoothEnabled()) {
-            if (response != null) {
-                response.onBluetoothClosed(true);
-            }
-        } else {
-            if (!BluetoothUtils.closeBluetooth()) {
-                if (response != null) {
-                    response.onBluetoothClosed(false);
-                }
-            } else {
-                mCloseBluetoothResponses.add(ProxyUtils.getWeakProxy(response, CloseBluetoothResponse.class));
-            }
-        }
-    }
-
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
         try {
             IBluetoothService service = getBluetoothService();
             if (service != null) {
                 args = (args != null ? args : new Bundle());
-                service.callBluetoothApi(code, args, new BluetoothResponseWrapper(response));
+                service.callBluetoothApi(code, args, response);
             } else {
                 response.onResponse(SERVICE_UNREADY, null);
             }
@@ -413,25 +372,11 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         }
     }
 
-    private class BluetoothResponseWrapper extends BluetoothResponse {
-
-        BluetoothResponse response;
-
-        BluetoothResponseWrapper(BluetoothResponse response) {
-            this.response = response;
-        }
-
-        @Override
-        public void onResponse(final int code, final Bundle data) {
-            response.onMainResponse(code, data);
-        }
-    }
-
     @Override
-    public boolean onPreCalled(final Object object, final Method method, final Object[] args) {
+    public boolean onIntercept(final Object object, final Method method, final Object[] args) {
         mWorkerHandler.obtainMessage(MSG_INVOKE_PROXY, new ProxyBulk(object, method, args))
                 .sendToTarget();
-        return false;
+        return true;
     }
 
     private void notifyBluetoothManagerReady() {
@@ -449,21 +394,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         }
     }
 
-    private String getBluetoothCallName(int code) {
-        switch (code) {
-            case CODE_CONNECT: return "connect";
-            case CODE_DISCONNECT: return "disconnect";
-            case CODE_READ: return "read";
-            case CODE_WRITE: return "write";
-            case CODE_NOTIFY: return "notify";
-            case CODE_UNNOTIFY: return "unnotify";
-            case CODE_READ_RSSI: return "readRssi";
-            case CODE_SEARCH: return "search";
-            case CODE_STOP_SESARCH: return "stop search";
-            default: return String.format("unknown %d", code);
-        }
-    }
-
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -472,12 +402,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
                 break;
             case MSG_DISPATCH_CONNECT_STATUS:
                 dispatchConnectionStatus((String) msg.obj, msg.arg1);
-                break;
-            case MSG_BLUETOOTH_DISABLE:
-                onBluetoothClose();
-                break;
-            case MSG_BLUETOOTH_ENABLE:
-                onBluetoothOpen();
                 break;
             default:
                 break;
@@ -517,21 +441,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
         }
     }
 
-    private void onBluetoothOpen() {
-        for (OpenBluetoothResponse response : mOpenBluetoothResponses) {
-            response.onBluetoothOpen(true);
-        }
-        mOpenBluetoothResponses.clear();
-    }
-
-    private void onBluetoothClose() {
-        for (CloseBluetoothResponse response : mCloseBluetoothResponses) {
-            response.onBluetoothClosed(true);
-        }
-        mCloseBluetoothResponses.clear();
-        stopSearch();
-    }
-
     private class BluetoothReceiver extends BroadcastReceiver {
 
         @Override
@@ -549,12 +458,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
                 int previousState = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_STATE, 0);
-
-                if (state == BluetoothAdapter.STATE_OFF && previousState != BluetoothAdapter.STATE_OFF) {
-                    mWorkerHandler.obtainMessage(MSG_BLUETOOTH_DISABLE).sendToTarget();
-                } else if (state == BluetoothAdapter.STATE_ON && previousState != BluetoothAdapter.STATE_ON) {
-                    mWorkerHandler.obtainMessage(MSG_BLUETOOTH_ENABLE).sendToTarget();
-                }
             } else if (ACTION_CHARACTER_CHANGED.equals(action)) {
                 UUID service = (UUID) intent.getSerializableExtra(EXTRA_SERVICE_UUID);
                 UUID character = (UUID) intent.getSerializableExtra(EXTRA_CHARACTER_UUID);
@@ -566,25 +469,12 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyUtils.ProxyHa
             } else if (ACTION_CONNECT_STATUS_CHANGED.equals(action)) {
                 int status = intent.getIntExtra(IBluetoothBase.EXTRA_STATUS, 0);
 
-//                BluetoothLog.v(String.format(">>> status = %s", getConnectStatusText(status)));
-
                 mWorkerHandler.obtainMessage(MSG_DISPATCH_CONNECT_STATUS, status, 0, mac).sendToTarget();
 
                 if (status == STATUS_DISCONNECTED) {
                     clearNotifyListener(mac);
                 }
             }
-        }
-    }
-
-    private String getConnectStatusText(int status) {
-        switch (status) {
-            case STATUS_CONNECTED:
-                return "connected";
-            case STATUS_DISCONNECTED:
-                return "disconnected";
-            default:
-                return String.format("unknown %d", status);
         }
     }
 }

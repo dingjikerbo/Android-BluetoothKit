@@ -1,12 +1,14 @@
 package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
+import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
+import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -14,7 +16,7 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 16/8/24.
  */
-public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHandler, Handler.Callback {
+public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Callback {
 
     private Handler mHandler;
 
@@ -36,7 +38,7 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
 
     static IBleConnectMaster newInstance(String mac, Looper looper) {
         BleConnectMaster master = new BleConnectMaster(mac, looper);
-        return ProxyUtils.getProxy(master, master);
+        return ProxyUtils.getProxy(master, IBleConnectMaster.class, master);
     }
 
     @Override
@@ -85,9 +87,9 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyUtils.ProxyHand
     }
 
     @Override
-    public boolean onPreCalled(Object object, Method method, Object[] args) {
+    public boolean onIntercept(Object object, Method method, Object[] args) {
         mHandler.obtainMessage(0, new ProxyBulk(object, method, args)).sendToTarget();
-        return false;
+        return true;
     }
 
     @Override

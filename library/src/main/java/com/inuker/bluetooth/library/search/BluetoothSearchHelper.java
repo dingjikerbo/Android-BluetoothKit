@@ -1,21 +1,22 @@
 package com.inuker.bluetooth.library.search;
 
 import android.os.Handler;
+import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
-import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyHandler;
+import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
+import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.lang.reflect.Method;
 
 /**
  * Created by dingjikerbo on 2016/8/28.
  */
-public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyHandler, Handler.Callback {
+public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyInterceptor, Callback {
 
     private BluetoothSearchRequest mCurrentRequest;
 
@@ -32,7 +33,7 @@ public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyHandl
             synchronized (BluetoothSearchHelper.class) {
                 if (sInstance == null) {
                     BluetoothSearchHelper helper = new BluetoothSearchHelper();
-                    sInstance = ProxyUtils.getProxy(helper, helper);
+                    sInstance = ProxyUtils.getProxy(helper, IBluetoothSearchHelper.class, helper);
                 }
             }
         }
@@ -95,9 +96,9 @@ public class BluetoothSearchHelper implements IBluetoothSearchHelper, ProxyHandl
     }
 
     @Override
-    public boolean onPreCalled(Object object, Method method, Object[] args) {
+    public boolean onIntercept(Object object, Method method, Object[] args) {
         mHandler.obtainMessage(0, new ProxyBulk(object, method,args)).sendToTarget();
-        return false;
+        return true;
     }
 
     @Override

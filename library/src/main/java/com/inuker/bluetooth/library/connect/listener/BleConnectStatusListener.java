@@ -1,6 +1,6 @@
 package com.inuker.bluetooth.library.connect.listener;
 
-import com.inuker.bluetooth.library.utils.ProxyUtils;
+import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.util.UUID;
 
@@ -19,7 +19,7 @@ public abstract class BleConnectStatusListener implements IBleConnectStatusListe
 
     BleConnectStatusListener(BleConnectStatusListener listener) {
         this.uuid = listener.uuid;
-        this.listener = ProxyUtils.getWeakProxy(listener, IBleConnectStatusListener.class);
+        this.listener = ProxyUtils.getWeakUIProxy(listener, IBleConnectStatusListener.class);
     }
 
     @Override

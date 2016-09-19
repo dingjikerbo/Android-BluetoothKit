@@ -78,8 +78,12 @@ public class BluetoothUtils {
     }
 
     public static boolean isBluetoothEnabled() {
+        return getBluetoothState() == BluetoothAdapter.STATE_ON;
+    }
+
+    public static int getBluetoothState() {
         BluetoothAdapter adapter = getBluetoothClassicAdapter();
-        return adapter != null && adapter.isEnabled();
+        return adapter != null ? adapter.getState() : 0;
     }
 
     public static boolean openBluetooth() {

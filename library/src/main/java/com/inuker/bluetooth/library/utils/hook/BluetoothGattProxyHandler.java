@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library.hook;
+package com.inuker.bluetooth.library.utils.hook;
 
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 

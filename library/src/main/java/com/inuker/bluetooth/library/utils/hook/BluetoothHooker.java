@@ -1,9 +1,8 @@
-package com.inuker.bluetooth.library.hook;
+package com.inuker.bluetooth.library.utils.hook;
 
 import android.os.IBinder;
 
-import com.inuker.bluetooth.library.hook.compat.ServiceManagerCompat;
-import com.inuker.bluetooth.library.utils.HookUtils;
+import com.inuker.bluetooth.library.utils.hook.compat.ServiceManagerCompat;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

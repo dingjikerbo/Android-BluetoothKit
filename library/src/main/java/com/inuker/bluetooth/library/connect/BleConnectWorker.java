@@ -29,8 +29,9 @@ import com.inuker.bluetooth.library.model.BleGattService;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
+import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
+import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor, IBluetoothGattResponse, ProxyUtils.ProxyHandler, GattResponseListener {
+public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor, IBluetoothGattResponse, ProxyInterceptor, GattResponseListener {
 
     public static final int MSG_SCHEDULE_NEXT = 0x160;
     public static final int MSG_GATT_RESPONSE = 0x180;
@@ -419,10 +420,10 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public boolean onPreCalled(Object object, Method method, Object[] args) {
+    public boolean onIntercept(Object object, Method method, Object[] args) {
         mWorkerHandler.obtainMessage(MSG_GATT_RESPONSE,
                 new ProxyBulk(object, method, args)).sendToTarget();
-        return false;
+        return true;
     }
 
     @Override

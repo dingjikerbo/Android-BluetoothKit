@@ -10,13 +10,11 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.search.SearchRequest;
-import com.inuker.bluetooth.library.state.CloseBluetoothResponse;
-import com.inuker.bluetooth.library.state.OpenBluetoothResponse;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.inuker.bluetooth.library.utils.ProxyUtils;
 import com.inuker.bluetooth.library.utils.UUIDUtils;
+import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.util.UUID;
 
@@ -34,7 +32,9 @@ public class BluetoothClient implements IBluetoothClient {
     @Override
     public void connect(String mac, BleConnectResponse response) {
         BluetoothLog.v(String.format("Connect %s", mac));
-        mClient.connect(mac, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.connect(mac, response);
     }
 
     @Override
@@ -57,46 +57,59 @@ public class BluetoothClient implements IBluetoothClient {
     public void read(String mac, UUID service, UUID character, BleReadResponse response) {
         BluetoothLog.v(String.format("Read %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
-        mClient.read(mac, service, character, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.read(mac, service, character, response);
     }
 
     @Override
     public void write(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response) {
         BluetoothLog.v(String.format("write %s: service = %d, character = %d, value = %s", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
-        mClient.write(mac, service, character, value, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.write(mac, service, character, value, response);
     }
 
     @Override
     public void writeNoRsp(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response) {
         BluetoothLog.v(String.format("writeNoRsp %s: service = %d, character = %d, value = %s", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
-        mClient.writeNoRsp(mac, service, character, value, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.writeNoRsp(mac, service, character, value, response);
     }
 
     @Override
     public void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
         BluetoothLog.v(String.format("notify %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
-        mClient.notify(mac, service, character, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.notify(mac, service, character, response);
     }
 
     @Override
     public void unnotify(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
         BluetoothLog.v(String.format("unnotify %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
-        mClient.unnotify(mac, service, character, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.unnotify(mac, service, character, response);
     }
 
     @Override
     public void readRssi(String mac, BleReadRssiResponse response) {
         BluetoothLog.v(String.format("readRssi %s", mac));
-        mClient.readRssi(mac, ProxyUtils.getWeakProxy(response));
+
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.readRssi(mac, response);
     }
 
     @Override
     public void search(SearchRequest request, SearchResponse response) {
-        mClient.search(request, ProxyUtils.getWeakProxy(response));
+        response = ProxyUtils.getWeakUIProxy(response);
+        mClient.search(request, response);
     }
 
     @Override
@@ -108,15 +121,5 @@ public class BluetoothClient implements IBluetoothClient {
     @Override
     public void stopSearch() {
         mClient.stopSearch();
-    }
-
-    @Override
-    public void openBluetooth(OpenBluetoothResponse response) {
-        mClient.openBluetooth(response);
-    }
-
-    @Override
-    public void closeBluetooth(CloseBluetoothResponse response) {
-        mClient.closeBluetooth(response);
     }
 }
