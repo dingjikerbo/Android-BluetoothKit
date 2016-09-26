@@ -69,7 +69,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     private volatile boolean mPendingRefreshCache;
 
-    public static BleConnectWorker attch(String mac, IBleConnectDispatcher dispatcher) {
+    public static BleConnectWorker attach(String mac, IBleConnectDispatcher dispatcher) {
         return new BleConnectWorker(mac, dispatcher);
     }
 
@@ -141,33 +141,60 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
         mCurrentRequest.process(this);
     }
 
+    private boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && (characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0;
+    }
+
+    private boolean isCharacteristicWritable(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && (characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0;
+    }
+
+    private boolean isCharacteristicNoRspWritable(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && (characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0;
+    }
+
+    private boolean isCharacteristicNotifyable(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && (characteristic.getProperties()
+                & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0;
+    }
+
     @Override
     public boolean readCharacteristic(UUID service, UUID character) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character);
-        return characteristic != null ? mBluetoothGatt.readCharacteristic(characteristic) : false;
+        return isCharacteristicReadable(characteristic) ? mBluetoothGatt.readCharacteristic(characteristic): false;
     }
 
     @Override
     public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
-        return characteristic != null ? mBluetoothGatt.writeCharacteristic(characteristic) : false;
+        if (isCharacteristicWritable(characteristic)) {
+            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+        } else {
+            return false;
+        }
+        return mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
     @Override
     public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
-        if (characteristic != null) {
+        if (isCharacteristicNoRspWritable(characteristic)) {
             characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-            return mBluetoothGatt.writeCharacteristic(characteristic);
+        } else {
+            return false;
         }
-        return false;
+        return mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
     @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character);
 
-        if (characteristic == null || !mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+        if (!isCharacteristicNotifyable(characteristic)) {
+            return false;
+        }
+
+        if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
             return false;
         }
 

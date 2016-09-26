@@ -37,7 +37,7 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
 
     private BleConnectDispatcher(String mac) {
         mMac = mac;
-        BleConnectWorker.attch(mac, this);
+        BleConnectWorker.attach(mac, this);
         mBleWorkList = new ArrayList<BleRequest>();
     }
 
