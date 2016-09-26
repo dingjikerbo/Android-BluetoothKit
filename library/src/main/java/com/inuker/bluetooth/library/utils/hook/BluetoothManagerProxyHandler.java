@@ -4,6 +4,7 @@ import android.os.IBinder;
 import android.os.IInterface;
 
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.hook.utils.HookUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

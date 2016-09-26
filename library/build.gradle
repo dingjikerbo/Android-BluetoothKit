@@ -25,8 +25,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'com.android.support:appcompat-v7:23.1.0'
 }
 
 def siteUrl = 'https://github.com/dingjikerbo/BluetoothKit' // 项目的主页
