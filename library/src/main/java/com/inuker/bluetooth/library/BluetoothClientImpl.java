@@ -17,6 +17,7 @@ import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListenerWrapper;
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -132,13 +133,15 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
 
     @Override
-    public void connect(String mac, final BleConnectResponse response) {
+    public void connect(String mac, BleConnectOption options, final BleConnectResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
+        args.putParcelable(EXTRA_OPTIONS, options);
         safeCallBluetoothApi(CODE_CONNECT, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
                 if (response != null) {
+                    data.setClassLoader(getClass().getClassLoader());
                     BleGattProfile profile = data.getParcelable(EXTRA_GATT_PROFILE);
                     response.onResponse(code, profile);
                 }

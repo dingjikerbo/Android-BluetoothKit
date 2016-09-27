@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library.connect;
 
 import com.inuker.bluetooth.library.IBluetoothBase;
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.UUID;
@@ -10,7 +11,7 @@ import java.util.UUID;
  */
 public interface IBleConnectMaster extends IBluetoothBase {
 
-    void connect(BluetoothResponse response);
+    void connect(BleConnectOption options, BluetoothResponse response);
 
     void disconnect();
 

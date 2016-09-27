@@ -5,6 +5,7 @@ import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
 
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
@@ -42,8 +43,8 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
-    public void connect(BluetoothResponse response) {
-        getConnectDispatcher().connect(response);
+    public void connect(BleConnectOption options, BluetoothResponse response) {
+        getConnectDispatcher().connect(options, response);
     }
 
     @Override

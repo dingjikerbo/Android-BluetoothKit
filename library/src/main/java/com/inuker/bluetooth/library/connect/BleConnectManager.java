@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library.connect;
 import android.os.HandlerThread;
 import android.os.Looper;
 
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.HashMap;
@@ -43,8 +44,8 @@ public class BleConnectManager {
         return master;
     }
 
-    public static void connect(String mac, BluetoothResponse response) {
-        getBleConnectMaster(mac).connect(response);
+    public static void connect(String mac, BleConnectOption options, BluetoothResponse response) {
+        getBleConnectMaster(mac).connect(options, response);
     }
 
     public static void disconnect(String mac) {

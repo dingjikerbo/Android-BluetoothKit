@@ -8,6 +8,7 @@ import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.BleConnectManager;
 import com.inuker.bluetooth.library.connect.IBluetoothApi;
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearchManager;
 import com.inuker.bluetooth.library.search.SearchRequest;
@@ -41,6 +42,7 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
     @Override
     public void callBluetoothApi(int code, Bundle args, IResponse response) throws RemoteException {
         Message msg = mHandler.obtainMessage(code, response);
+        args.setClassLoader(getClass().getClassLoader());
         msg.setData(args);
         msg.sendToTarget();
     }
@@ -56,7 +58,8 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
         switch (msg.what) {
             case CODE_CONNECT:
-                BleConnectManager.connect(mac, response);
+                BleConnectOption options = args.getParcelable(EXTRA_OPTIONS);
+                BleConnectManager.connect(mac, options, response);
                 break;
 
             case CODE_DISCONNECT:

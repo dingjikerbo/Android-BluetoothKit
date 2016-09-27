@@ -2,6 +2,7 @@ package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
 
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
@@ -42,8 +43,8 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
     }
 
     @Override
-    public void connect(BluetoothResponse response) {
-        addNewRequest(new BleConnectRequest(mMac, response));
+    public void connect(BleConnectOption options, BluetoothResponse response) {
+        addNewRequest(new BleConnectRequest(mMac, options, response));
     }
 
     @Override

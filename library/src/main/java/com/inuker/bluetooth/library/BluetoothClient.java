@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library;
 import android.content.Context;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -29,12 +30,16 @@ public class BluetoothClient implements IBluetoothClient {
         mClient = BluetoothClientImpl.getInstance(context);
     }
 
-    @Override
     public void connect(String mac, BleConnectResponse response) {
+        connect(mac, null, response);
+    }
+
+    @Override
+    public void connect(String mac, BleConnectOption options, BleConnectResponse response) {
         BluetoothLog.v(String.format("Connect %s", mac));
 
         response = ProxyUtils.getWeakUIProxy(response);
-        mClient.connect(mac, response);
+        mClient.connect(mac, options, response);
     }
 
     @Override

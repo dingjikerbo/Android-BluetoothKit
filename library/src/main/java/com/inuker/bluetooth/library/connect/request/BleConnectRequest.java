@@ -3,23 +3,27 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 public class BleConnectRequest extends BleRequest implements ServiceDiscoverListener {
 
-    public BleConnectRequest(String mac, BluetoothResponse response) {
+    private BleConnectOption mOptions;
+
+    public BleConnectRequest(String mac, BleConnectOption options, BluetoothResponse response) {
         super(mac, response);
+        mOptions = options;
     }
 
     @Override
     protected int getDefaultRetryLimit() {
         // TODO Auto-generated method stub
-        return 1;
+        return mOptions != null ? mOptions.getMaxRetry() : 1;
     }
 
     @Override
     public int getTimeoutLimit() {
-        return 30000;
+        return mOptions != null ? mOptions.getTimeoutInMillis() : 60000;
     }
 
     @Override
