@@ -24,17 +24,17 @@ public interface IBluetoothBase {
     /**
      * CallBluetoothApi response code
      */
-    int REQUEST_SUCCESS = 0;
-    int REQUEST_FAILED = -1;
-    int REQUEST_CANCELED = -2;
-    int ILLEGAL_ARGUMENT = -3;
-    int BLE_NOT_SUPPORTED = -4;
-    int BLUETOOTH_DISABLED = -5;
-    int CONNECTION_NOT_READY = -6;
-    int REQUEST_TIMEDOUT = -7;
-    int REQUEST_OVERFLOW = -8;
-    int REQUEST_EXCEPTION = -9;
-    int SERVICE_UNREADY = -10;
+    int REQUEST_SUCCESS = Code.REQUEST_SUCCESS;
+    int REQUEST_FAILED = Code.REQUEST_FAILED;
+    int REQUEST_CANCELED = Code.REQUEST_CANCELED;
+    int ILLEGAL_ARGUMENT = Code.ILLEGAL_ARGUMENT;
+    int BLE_NOT_SUPPORTED = Code.BLE_NOT_SUPPORTED;
+    int BLUETOOTH_DISABLED = Code.BLUETOOTH_DISABLED;
+    int SERVICE_UNREADY = Code.SERVICE_UNREADY;
+    int REQUEST_TIMEDOUT = Code.REQUEST_TIMEDOUT;
+    int REQUEST_OVERFLOW = Code.REQUEST_OVERFLOW;
+    int REQUEST_DENIED = Code.REQUEST_DENIED;
+    int REQUEST_EXCEPTION = Code.REQUEST_EXCEPTION;
 
     /**
      * Scan Response code
