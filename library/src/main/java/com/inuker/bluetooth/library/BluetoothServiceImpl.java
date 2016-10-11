@@ -40,8 +40,15 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
     }
 
     @Override
-    public void callBluetoothApi(int code, Bundle args, IResponse response) throws RemoteException {
-        Message msg = mHandler.obtainMessage(code, response);
+    public void callBluetoothApi(int code, Bundle args, final IResponse response) throws RemoteException {
+        Message msg = mHandler.obtainMessage(code, new BluetoothResponse() {
+
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                response.onResponse(code, data);
+            }
+        });
+
         args.setClassLoader(getClass().getClassLoader());
         msg.setData(args);
         msg.sendToTarget();

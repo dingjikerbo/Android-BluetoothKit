@@ -38,7 +38,7 @@ public class BluetoothClient implements IBluetoothClient {
     public void connect(String mac, BleConnectOption options, BleConnectResponse response) {
         BluetoothLog.v(String.format("Connect %s", mac));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.connect(mac, options, response);
     }
 
@@ -63,7 +63,7 @@ public class BluetoothClient implements IBluetoothClient {
         BluetoothLog.v(String.format("Read %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.read(mac, service, character, response);
     }
 
@@ -72,7 +72,7 @@ public class BluetoothClient implements IBluetoothClient {
         BluetoothLog.v(String.format("write %s: service = %d, character = %d, value = %s", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.write(mac, service, character, value, response);
     }
 
@@ -81,7 +81,7 @@ public class BluetoothClient implements IBluetoothClient {
         BluetoothLog.v(String.format("writeNoRsp %s: service = %d, character = %d, value = %s", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.writeNoRsp(mac, service, character, value, response);
     }
 
@@ -90,7 +90,7 @@ public class BluetoothClient implements IBluetoothClient {
         BluetoothLog.v(String.format("notify %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.notify(mac, service, character, response);
     }
 
@@ -99,7 +99,7 @@ public class BluetoothClient implements IBluetoothClient {
         BluetoothLog.v(String.format("unnotify %s: service = %d, character = %d", mac,
                 UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.unnotify(mac, service, character, response);
     }
 
@@ -107,13 +107,13 @@ public class BluetoothClient implements IBluetoothClient {
     public void readRssi(String mac, BleReadRssiResponse response) {
         BluetoothLog.v(String.format("readRssi %s", mac));
 
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.readRssi(mac, response);
     }
 
     @Override
     public void search(SearchRequest request, SearchResponse response) {
-        response = ProxyUtils.getWeakUIProxy(response);
+        response = ProxyUtils.getUIProxy(response);
         mClient.search(request, response);
     }
 
