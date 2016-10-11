@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library.connect.request;
 
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.UUID;
@@ -7,7 +8,7 @@ import java.util.UUID;
 public class BleWriteNoRspRequest extends BleWriteRequest {
 
     public BleWriteNoRspRequest(String mac, UUID service, UUID character, byte[] bytes,
-                                BluetoothResponse response) {
+                                BleGeneralResponse response) {
         super(mac, service, character, bytes, response);
     }
 

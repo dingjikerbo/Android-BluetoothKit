@@ -324,6 +324,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                     return;
                 }
 
+                data.setClassLoader(getClass().getClassLoader());
+
                 switch (code) {
                     case SEARCH_START:
                         response.onSearchStarted();

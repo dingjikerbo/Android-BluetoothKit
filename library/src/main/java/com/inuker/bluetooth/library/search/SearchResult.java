@@ -32,7 +32,7 @@ public class SearchResult implements Parcelable {
     }
 
     public String getAddress() {
-        return device.getAddress();
+        return device != null ? device.getAddress() : "";
     }
 
     @Override

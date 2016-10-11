@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.inuker.bluetooth.library.beacon.Beacon;
 import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.ArrayList;
 import java.util.Collections;

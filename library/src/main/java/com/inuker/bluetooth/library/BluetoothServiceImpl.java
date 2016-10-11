@@ -9,9 +9,12 @@ import android.os.RemoteException;
 import com.inuker.bluetooth.library.connect.BleConnectManager;
 import com.inuker.bluetooth.library.connect.IBluetoothApi;
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearchManager;
 import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.UUID;
 
@@ -41,11 +44,20 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
     @Override
     public void callBluetoothApi(int code, Bundle args, final IResponse response) throws RemoteException {
-        Message msg = mHandler.obtainMessage(code, new BluetoothResponse() {
+        Message msg = mHandler.obtainMessage(code, new BleGeneralResponse() {
 
             @Override
-            public void onResponse(int code, Bundle data) throws RemoteException {
-                response.onResponse(code, data);
+            public void onResponse(int code, Bundle data) {
+                if (response != null) {
+                    if (data == null) {
+                        data = new Bundle();
+                    }
+                    try {
+                        response.onResponse(code, data);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -61,7 +73,7 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
         UUID service = (UUID) args.getSerializable(EXTRA_SERVICE_UUID);
         UUID character = (UUID) args.getSerializable(EXTRA_CHARACTER_UUID);
         byte[] value = args.getByteArray(EXTRA_BYTE_VALUE);
-        BluetoothResponse response = (BluetoothResponse) msg.obj;
+        BleGeneralResponse response = (BleGeneralResponse) msg.obj;
 
         switch (msg.what) {
             case CODE_CONNECT:

@@ -4,13 +4,14 @@ import android.bluetooth.BluetoothGatt;
 
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 public class BleConnectRequest extends BleRequest implements ServiceDiscoverListener {
 
     private BleConnectOption mOptions;
 
-    public BleConnectRequest(String mac, BleConnectOption options, BluetoothResponse response) {
+    public BleConnectRequest(String mac, BleConnectOption options, BleGeneralResponse response) {
         super(mac, response);
         mOptions = options;
     }

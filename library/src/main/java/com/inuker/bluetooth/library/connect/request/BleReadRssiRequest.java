@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 
 import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 /**
@@ -10,7 +11,7 @@ import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
  */
 public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
-    public BleReadRssiRequest(String mac, BluetoothResponse response) {
+    public BleReadRssiRequest(String mac, BleGeneralResponse response) {
         super(mac, response);
     }
 

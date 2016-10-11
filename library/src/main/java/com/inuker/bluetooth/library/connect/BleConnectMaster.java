@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
@@ -43,7 +44,7 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
-    public void connect(BleConnectOption options, BluetoothResponse response) {
+    public void connect(BleConnectOption options, BleGeneralResponse response) {
         getConnectDispatcher().connect(options, response);
     }
 
@@ -53,32 +54,32 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
-    public void read(UUID service, UUID character, BluetoothResponse response) {
+    public void read(UUID service, UUID character, BleGeneralResponse response) {
         getConnectDispatcher().read(service, character, response);
     }
 
     @Override
-    public void write(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
+    public void write(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
         getConnectDispatcher().write(service, character, bytes, response);
     }
 
     @Override
-    public void writeNoRsp(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
+    public void writeNoRsp(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
         getConnectDispatcher().writeNoRsp(service, character, bytes, response);
     }
 
     @Override
-    public void notify(UUID service, UUID character, BluetoothResponse response) {
+    public void notify(UUID service, UUID character, BleGeneralResponse response) {
         getConnectDispatcher().notify(service, character, response);
     }
 
     @Override
-    public void unnotify(UUID service, UUID character, BluetoothResponse response) {
+    public void unnotify(UUID service, UUID character, BleGeneralResponse response) {
         getConnectDispatcher().unnotify(service, character, response);
     }
 
     @Override
-    public void readRssi(BluetoothResponse response) {
+    public void readRssi(BleGeneralResponse response) {
         getConnectDispatcher().readRssi(response);
     }
 

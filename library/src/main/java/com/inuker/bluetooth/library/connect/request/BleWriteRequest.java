@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.inuker.bluetooth.library.connect.listener.WriteCharacterListener;
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
 public class BleWriteRequest extends BleRequest implements WriteCharacterListener {
 
     public BleWriteRequest(String mac, UUID service, UUID character, byte[] bytes,
-                           BluetoothResponse response) {
+                           BleGeneralResponse response) {
         super(mac, response);
         mServiceUUID = service;
         mCharacterUUID = character;

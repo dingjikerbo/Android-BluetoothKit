@@ -13,6 +13,7 @@ import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteNoRspRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
+import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
@@ -43,7 +44,7 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
     }
 
     @Override
-    public void connect(BleConnectOption options, BluetoothResponse response) {
+    public void connect(BleConnectOption options, BleGeneralResponse response) {
         addNewRequest(new BleConnectRequest(mMac, options, response));
     }
 
@@ -53,32 +54,32 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
     }
 
     @Override
-    public void read(UUID service, UUID character, BluetoothResponse response) {
+    public void read(UUID service, UUID character, BleGeneralResponse response) {
         addNewRequest(new BleReadRequest(mMac, service, character, response));
     }
 
     @Override
-    public void write(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
+    public void write(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
         addNewRequest(new BleWriteRequest(mMac, service, character, bytes, response));
     }
 
     @Override
-    public void writeNoRsp(UUID service, UUID character, byte[] bytes, BluetoothResponse response) {
+    public void writeNoRsp(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
         addNewRequest(new BleWriteNoRspRequest(mMac, service, character, bytes, response));
     }
 
     @Override
-    public void notify(UUID service, UUID character, BluetoothResponse response) {
+    public void notify(UUID service, UUID character, BleGeneralResponse response) {
         addNewRequest(new BleNotifyRequest(mMac, service, character, response));
     }
 
     @Override
-    public void unnotify(UUID service, UUID character, BluetoothResponse response) {
+    public void unnotify(UUID service, UUID character, BleGeneralResponse response) {
         addNewRequest(new BleUnnotifyRequest(mMac, service, character, response));
     }
 
     @Override
-    public void readRssi(BluetoothResponse response) {
+    public void readRssi(BleGeneralResponse response) {
         addNewRequest(new BleReadRssiRequest(mMac, response));
     }
 
