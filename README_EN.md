@@ -1,13 +1,13 @@
 BluetoothKit---Android Bluetooth Framework
 ===========================
 
-这个库用于Android蓝牙BLE设备通信，支持常用的连接，读写，通知。在系统API基础上封装了一层异步任务队列，使所有任务串行化，并支持对每个做任务配置超时和出错重试，同时解决了BLE蓝牙通信中可能会遇到的一系列坑，使得Android蓝牙开发非常方便。
+This library allows for easy access to Bluetooth device scan and connection, support customizing scan policy and solved many android bluetooth inherent compatibility and stability problems refer to [Android 4.3 Bluetooth Low Energy unstable](http://stackoverflow.com/questions/17870189/android-4-3-bluetooth-low-energy-unstable)
 
-# **配置**
+# **Requirements**
 
- - minSdkVersion不能小于18
+ - minSdkVersion should be not less than 18
 
- - 添加蓝牙权限
+ - Permission in AndroidManifest.xml
 ```
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -17,29 +17,29 @@ BluetoothKit---Android Bluetooth Framework
     android:required="true" />
 ```
 
-# **用法**
+# **Usage**
 
-1、用Android Studio的, 在build.gradle的dependencies中添加一行:
+1、If you are building with Gradle, simply add the following line to the `dependencies` section of your `build.gradle` file:
 
 ```groovy
 compile 'com.inuker.bluetooth:library:1.0.9'
 ```
 
-2、创建一个BluetoothClient，建议作为一个单例: 
+2、Create a BluetoothClient as below: 
 
 ```Java
 BluetoothClient mClient = new BluetoothClient(context);
 ```
 
-## **设备扫描** 
+## **Scan Device** 
 
-支持经典蓝牙和BLE设备混合扫描，可自定义扫描策略:
+This library support both Bluetooth LE device scan and Classic device scan, you could customize the scan policy as below:
 
 ```Java
 SearchRequest request = new SearchRequest.Builder()
-        .searchBluetoothLeDevice(3000, 3)   // 先扫BLE设备3次，每次3s
-        .searchBluetoothClassicDevice(5000) // 再扫经典蓝牙5s
-        .searchBluetoothLeDevice(2000)      // 再扫BLE设备2s
+        .searchBluetoothLeDevice(3000, 3)   // scan Bluetooth LE device for 3000ms, 3 times
+        .searchBluetoothClassicDevice(5000) // then scan Bluetooth Classic device for 5000ms, 1 time
+        .searchBluetoothLeDevice(2000)      // at last scan Bluetooth LE device for 2000ms
         .build();
 
 mClient.search(request, new SearchResponse() {
@@ -65,17 +65,17 @@ mClient.search(request, new SearchResponse() {
 });
 ```
 
-可以随时停止扫描:
+You could stop the whole scan by just one line:
 
 ```Java
 mClient.stopSearch();
 ```
 
-## **BLE设备通信** 
+## **Bluetooth LE Connection** 
 
-### **● 连接**
+### **● Connect**
 
-连接过程包括了普通的连接(connectGatt)和发现服务(discoverServices)，这里收到回调时表明服务发现已完成。回调参数BleGattProfile包括了所有的service和characteristic的uuid。
+BleGattProfile contains all service and characteristic uuid.
 
 ```Java
 mClient.connect(MAC, new BleConnectResponse() {
@@ -88,9 +88,7 @@ mClient.connect(MAC, new BleConnectResponse() {
 });
 ```
 
-### **● 连接状态**
-
-如果要监听蓝牙连接状态可以注册回调，只有两个状态：连接和断开。
+### **● Connect Status**
 
 ```
 mClient.registerConnectStatusListener(MAC, mBleConnectStatusListener);
@@ -110,12 +108,12 @@ private final BleConnectStatusListener mBleConnectStatusListener = new BleConnec
 mClient.unregisterConnectStatusListener(MAC, mBleConnectStatusListener);
 ```
 
-### **● 断开连接**
+### **● Disconnect**
 ```Java
 mClient.disconnect(MAC);
 ```
 
-### **● 读Characteristic**
+### **● Read Characteristic**
 ```Java
 mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
     @Override
@@ -127,9 +125,9 @@ mClient.read(MAC, serviceUUID, characterUUID, new BleReadResponse() {
 });
 ```
 
-### **● 写Characteristic**
+### **● Write Characteristic**
 
-要注意这里写的byte[]不能超过20字节，如果超过了需要自己分成几次写。建议的办法是第一个byte放剩余要写的字节的长度。
+The data to write should be no more than 20 bytes.
 
 ```Java
 mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
@@ -141,7 +139,7 @@ mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
     }
 });
 
-这个写是带了WRITE_TYPE_NO_RESPONSE标志的，实践中发现比普通的write快2~3倍，建议用于固件升级。
+// with WRITE_TYPE_NO_RESPONSE
 mClient.writeNoRsp(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
     @Override
     public void onResponse(int code) {
@@ -152,9 +150,7 @@ mClient.writeNoRsp(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse(
 });
 ```
 
-### **● 打开Notify**
-
-这里有两个回调，onNotify是接收通知的。
+### **● Open Notify**
 
 ```Java
 mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
@@ -172,7 +168,7 @@ mClient.notify(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
 });
 ```
 
-### **● 关闭Notify**
+### **● Close Notify**
 ```Java
 mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
     @Override
@@ -184,7 +180,7 @@ mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
 });
 ```
 
-### **● 读Rssi**
+### **● Read Rssi**
 ```Java
 mClient.readRssi(MAC, new BleReadRssiResponse() {
     @Override
@@ -196,8 +192,15 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
 });
 ```
 
+### **● Refresh Cache**
+
+Refresh cache at the beginning of next connection.
+
+```Java
+mClient.refreshCache(MAC);
+```
 <br/>
-# **作者**
+# **Author**
  - Email: dingjikerbo@gmail.com
  - Blog: http://blog.csdn.net/dingjikerbo
- - QQ: 715876307
+ - Welcome to contact me with any suggestions or ideas.
