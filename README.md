@@ -140,8 +140,11 @@ mClient.write(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
         }
     }
 });
+```
 
 这个写是带了WRITE_TYPE_NO_RESPONSE标志的，实践中发现比普通的write快2~3倍，建议用于固件升级。
+
+```Java
 mClient.writeNoRsp(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse() {
     @Override
     public void onResponse(int code) {
