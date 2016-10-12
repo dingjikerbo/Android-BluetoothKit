@@ -19,7 +19,7 @@ BluetoothKit---Android Bluetooth Framework
 
 # **用法**
 
-1、用Android Studio的, 在build.gradle的dependencies中添加一行:
+1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
 compile 'com.inuker.bluetooth:library:1.0.9'
