@@ -18,3 +18,18 @@
  - 异步任务队列单独抽象出来，可参考RxAndroid
  - 支持新版Android提供的蓝牙接口
  - 新增蓝牙长连接
+ 
+ 
+java.lang.NullPointerException: Attempt to read from field 'long android.os.Parcel.mNativePtr' on a null object reference
+at android.os.Parcel.readException(Parcel.java:1626)
+at android.os.Parcel.readException(Parcel.java:1573)
+at com.inuker.bluetooth.library.IBluetoothService$Stub$Proxy.callBluetoothApi(IBluetoothService.java:104)
+at com.inuker.bluetooth.library.BluetoothClientImpl.safeCallBluetoothApi(BluetoothClientImpl.java:371)
+at com.inuker.bluetooth.library.BluetoothClientImpl.connect(BluetoothClientImpl.java:140)
+at java.lang.reflect.Method.invoke(Native Method)
+at com.inuker.bluetooth.library.utils.proxy.ProxyBulk.safeInvoke(ProxyBulk.java:25)
+at com.inuker.bluetooth.library.utils.proxy.ProxyBulk.safeInvoke(ProxyBulk.java:33)
+at com.inuker.bluetooth.library.BluetoothClientImpl.handleMessage(BluetoothClientImpl.java:406)
+at android.os.Handler.dispatchMessage(Handler.java:98)
+at android.os.Looper.loop(Looper.java:148)
+at android.os.HandlerThread.run(HandlerThread.java:61)

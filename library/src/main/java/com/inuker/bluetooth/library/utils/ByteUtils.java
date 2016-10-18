@@ -9,6 +9,8 @@ public class ByteUtils {
 
     public static final byte[] EMPTY_BYTES = new byte[]{};
 
+    public static final int BYTE_MAX = 0xff;
+
     public static byte[] getNonEmptyByte(byte[] bytes) {
         return bytes != null ? bytes : EMPTY_BYTES;
     }
@@ -75,6 +77,26 @@ public class ByteUtils {
         return true;
     }
 
+    public static byte[] fillBeforeBytes(byte[] bytes, int len, byte fill) {
+
+        byte[] result = bytes;
+        int oldLen = (bytes != null ? bytes.length : 0);
+
+        if (oldLen < len) {
+            result = new byte[len];
+
+            for (int i = len - 1, j = oldLen - 1; i >= 0; i--, j--) {
+                if (j >= 0) {
+                    result[i] = bytes[j];
+                } else {
+                    result[i] = fill;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public static byte[] cutBeforeBytes(byte[] bytes, byte cut) {
         if (ByteUtils.isEmpty(bytes)) {
             return bytes;
@@ -127,5 +149,39 @@ public class ByteUtils {
         }
 
         return newBytes;
+    }
+
+    public static int ubyteToInt(byte b) {
+        return (int) b & 0xFF;
+    }
+
+    public static boolean isAllFF(byte[] bytes) {
+        int len = (bytes != null ? bytes.length : 0);
+
+        for (int i = 0; i < len; i++) {
+            if (ubyteToInt(bytes[i]) != BYTE_MAX) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static byte[] fromLong(long n) {
+        byte[] bytes = new byte[8];
+
+        for (int i = 0; i < 8; i++) {
+            bytes[i] = (byte) (n >>> (i * 8));
+        }
+
+        return bytes;
+    }
+
+    public static void copy(byte[] lbytes, byte[] rbytes, int lstart, int rstart) {
+        if (lbytes != null && rbytes != null && lstart >= 0) {
+            for (int i = lstart, j = rstart; j < rbytes.length && i < lbytes.length; i++, j++) {
+                lbytes[i] = rbytes[j];
+            }
+        }
     }
 }
