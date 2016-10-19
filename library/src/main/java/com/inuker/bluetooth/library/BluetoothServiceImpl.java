@@ -99,6 +99,7 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
             case CODE_WRITE_NORSP:
                 BleConnectManager.writeNoRsp(mac, service, character, value, response);
+                break;
 
             case CODE_NOTIFY:
                 BleConnectManager.notify(mac, service, character, response);
