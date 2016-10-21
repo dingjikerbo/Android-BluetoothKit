@@ -7,21 +7,18 @@ import android.os.Message;
 import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.BleConnectManager;
-import com.inuker.bluetooth.library.connect.IBluetoothApi;
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearchManager;
 import com.inuker.bluetooth.library.search.SearchRequest;
-import com.inuker.bluetooth.library.search.SearchResult;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
+import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
 
 /**
  * Created by dingjikerbo on 2015/10/29.
  */
-public class BluetoothServiceImpl extends IBluetoothService.Stub implements Handler.Callback, IBluetoothApi {
+public class BluetoothServiceImpl extends IBluetoothService.Stub implements Handler.Callback {
 
     private static BluetoothServiceImpl sInstance;
 

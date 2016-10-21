@@ -1,5 +1,7 @@
 package com.inuker.bluetooth.library.connect.request;
 
+import static com.inuker.bluetooth.library.Constants.*;
+
 /**
  * Created by dingjikerbo on 2016/8/28.
  */

@@ -5,12 +5,12 @@ import android.os.Message;
 import com.inuker.bluetooth.BluetoothConstants;
 import com.inuker.bluetooth.ClientManager;
 import com.inuker.bluetooth.MD5;
-import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.xiaomi.smarthome.device.bluetooth.security.BLECipher;
+import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
 
@@ -99,7 +99,7 @@ public class BleRegisterConnector extends BleSecurityConnector {
                     processStep4();
                 } else {
                     BluetoothLog.w("token not match");
-                    dispatchResult(IBluetoothBase.REQUEST_FAILED);
+                    dispatchResult(REQUEST_FAILED);
                 }
             }
         }
@@ -159,7 +159,7 @@ public class BleRegisterConnector extends BleSecurityConnector {
         switch (msg.what) {
             case MSG_NOTIFY_TIMEOUT:
                 BluetoothLog.w("notify timeout");
-                dispatchResult(IBluetoothBase.REQUEST_FAILED);
+                dispatchResult(REQUEST_FAILED);
                 break;
         }
     }

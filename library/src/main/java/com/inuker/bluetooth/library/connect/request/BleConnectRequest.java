@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothGatt;
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import static com.inuker.bluetooth.library.Constants.*;
 
 public class BleConnectRequest extends BleRequest implements ServiceDiscoverListener {
 

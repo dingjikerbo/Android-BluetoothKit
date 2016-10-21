@@ -34,6 +34,7 @@ import com.inuker.bluetooth.library.utils.ListUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
+import static com.inuker.bluetooth.library.Constants.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -472,7 +473,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                     dispatchCharacterNotify(mac, service, character, value);
                 }
             } else if (ACTION_CONNECT_STATUS_CHANGED.equals(action)) {
-                int status = intent.getIntExtra(IBluetoothBase.EXTRA_STATUS, 0);
+                int status = intent.getIntExtra(EXTRA_STATUS, 0);
 
                 mWorkerHandler.obtainMessage(MSG_DISPATCH_CONNECT_STATUS, status, 0, mac).sendToTarget();
 

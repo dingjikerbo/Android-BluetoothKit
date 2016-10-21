@@ -14,9 +14,9 @@ import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteNoRspRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
+import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;

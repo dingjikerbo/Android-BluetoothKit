@@ -32,6 +32,7 @@ import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
+import static com.inuker.bluetooth.library.Constants.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

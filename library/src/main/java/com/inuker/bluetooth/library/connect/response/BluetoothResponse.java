@@ -2,7 +2,6 @@ package com.inuker.bluetooth.library.connect.response;
 
 import android.os.Bundle;
 
-import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.IResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -10,7 +9,7 @@ import com.inuker.bluetooth.library.utils.BluetoothUtils;
 /**
  * Created by dingjikerbo on 2015/12/31.
  */
-public abstract class BluetoothResponse extends IResponse.Stub implements IBluetoothBase {
+public abstract class BluetoothResponse extends IResponse.Stub {
 
     public void onSafeResponse(int code, Bundle data) {
         try {

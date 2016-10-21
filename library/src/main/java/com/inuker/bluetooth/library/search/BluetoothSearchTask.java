@@ -3,11 +3,11 @@ package com.inuker.bluetooth.library.search;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import static com.inuker.bluetooth.library.Constants.*;
 
-import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
 
-public class BluetoothSearchTask implements IBluetoothBase, Handler.Callback {
+public class BluetoothSearchTask implements Handler.Callback {
 
 	private static final int MSG_SEARCH_TIMEOUT = 0x22;
 

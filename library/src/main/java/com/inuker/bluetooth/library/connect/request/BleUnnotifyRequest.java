@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 
 import com.inuker.bluetooth.library.connect.listener.WriteDescriptorListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
 

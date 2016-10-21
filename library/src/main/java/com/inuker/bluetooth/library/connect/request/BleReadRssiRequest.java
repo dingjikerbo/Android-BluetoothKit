@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGatt;
 
 import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
+import static com.inuker.bluetooth.library.Constants.*;
 
 /**
  * Created by dingjikerbo on 2015/12/23.

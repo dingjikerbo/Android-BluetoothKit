@@ -52,13 +52,7 @@ public class MainActivity extends Activity {
 
         });
 
-//        searchDevice();
-        ClientManager.getClient().connect(MAC, new BleConnectResponse() {
-            @Override
-            public void onResponse(int code, BleGattProfile data) {
-                BluetoothLog.v(String.format("activity onResponse %d, profile = %s", code, data));
-            }
-        });
+        searchDevice();
     }
 
     private void searchDevice() {

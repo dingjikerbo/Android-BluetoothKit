@@ -2,12 +2,12 @@ package com.inuker.bluetooth.library.search;
 
 import android.bluetooth.BluetoothAdapter;
 
-import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.search.classic.BluetoothClassicSearcher;
 import com.inuker.bluetooth.library.search.le.BluetoothLESearcher;
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
+import static com.inuker.bluetooth.library.Constants.*;
 
-public class BluetoothSearcher implements IBluetoothBase {
+public class BluetoothSearcher {
 
 	protected BluetoothAdapter mBluetoothAdapter;
 	protected BluetoothSearchResponse mSearchResponse;

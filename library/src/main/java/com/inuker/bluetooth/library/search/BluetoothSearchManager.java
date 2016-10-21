@@ -2,16 +2,14 @@ package com.inuker.bluetooth.library.search;
 
 import android.os.Bundle;
 
-import com.inuker.bluetooth.library.IBluetoothBase;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
+import static com.inuker.bluetooth.library.Constants.*;
 
 /**
  * Created by dingjikerbo on 2016/8/28.
  */
-public class BluetoothSearchManager implements IBluetoothBase {
+public class BluetoothSearchManager {
 
     public static void search(SearchRequest request, final BleGeneralResponse response) {
         BluetoothSearchRequest requestWrapper = new BluetoothSearchRequest(request);

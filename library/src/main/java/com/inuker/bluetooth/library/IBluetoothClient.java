@@ -1,6 +1,5 @@
 package com.inuker.bluetooth.library;
 
-import com.inuker.bluetooth.library.connect.IBluetoothApi;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
@@ -17,7 +16,7 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 2016/8/25.
  */
-public interface IBluetoothClient extends IBluetoothApi {
+public interface IBluetoothClient {
 
     void connect(String mac, BleConnectOption options, BleConnectResponse response);
 

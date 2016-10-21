@@ -1,6 +1,6 @@
 package com.inuker.bluetooth.library.connect.request;
 
-
+import static com.inuker.bluetooth.library.Constants.*;
 import com.inuker.bluetooth.library.connect.listener.DisconnectListener;
 
 public class BleDisconnectRequest extends BleRequest implements DisconnectListener {
