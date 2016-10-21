@@ -11,6 +11,8 @@ This library allows for easy access to Bluetooth device scan and connection, sup
 ```
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
 <uses-feature
     android:name="android.hardware.bluetooth_le"
