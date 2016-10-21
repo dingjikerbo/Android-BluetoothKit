@@ -58,10 +58,9 @@ mClient.stopSearch();
 ```
 
 ## **BLE设备通信** 
-
 ### **● 连接**
 
-连接过程包括了普通的连接(connectGatt)和发现服务(discoverServices)，这里收到回调时表明服务发现已完成。回调参数BleGattProfile包括了所有的service和characteristic的uuid。
+连接过程包括了普通的连接(connectGatt)和发现服务(discoverServices)，这里收到回调时表明服务发现已完成。回调参数BleGattProfile包括了所有的service和characteristic的uuid。返回的code表示操作状态，包括成功，失败或超时等，所有常量都在Constants类中。
 
 ```Java
 mClient.connect(MAC, new BleConnectResponse() {
