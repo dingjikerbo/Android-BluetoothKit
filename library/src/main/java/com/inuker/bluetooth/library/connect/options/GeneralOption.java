@@ -12,6 +12,11 @@ public class GeneralOption implements Parcelable {
 
     private int timeoutInMillis;
 
+    public GeneralOption(int maxRetry, int timeoutInMillis) {
+        this.maxRetry = maxRetry;
+        this.timeoutInMillis = timeoutInMillis;
+    }
+
     public int getMaxRetry() {
         return maxRetry;
     }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchRequest;
@@ -50,6 +51,13 @@ public class MainActivity extends Activity {
                 searchDevice();
             }
 
+        });
+
+        ClientManager.getClient().connect("", new BleConnectOption(), new BleConnectResponse() {
+            @Override
+            public void onResponse(int code, BleGattProfile data) {
+
+            }
         });
 
         searchDevice();

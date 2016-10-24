@@ -19,7 +19,7 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
     @Override
     protected int getDefaultRetryLimit() {
         // TODO Auto-generated method stub
-        return mOptions != null ? mOptions.getMaxRetry() : 1;
+        return mOptions != null ? mOptions.getMaxRetry() : 0;
     }
 
     @Override

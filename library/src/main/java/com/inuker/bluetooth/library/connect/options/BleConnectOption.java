@@ -7,7 +7,11 @@ import android.os.Parcel;
  */
 public class BleConnectOption extends GeneralOption {
 
-    protected BleConnectOption(Parcel in) {
+    public BleConnectOption(int maxRetry, int timeoutInMillis) {
+        super(maxRetry, timeoutInMillis);
+    }
+
+    public BleConnectOption(Parcel in) {
         super(in);
     }
 
