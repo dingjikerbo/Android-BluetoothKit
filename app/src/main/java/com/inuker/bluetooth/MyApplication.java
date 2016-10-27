@@ -2,6 +2,8 @@ package com.inuker.bluetooth;
 
 import android.app.Application;
 
+import com.inuker.bluetooth.library.BluetoothContext;
+
 /**
  * Created by dingjikerbo on 2016/8/27.
  */
@@ -17,5 +19,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        BluetoothContext.setContext(this);
     }
 }

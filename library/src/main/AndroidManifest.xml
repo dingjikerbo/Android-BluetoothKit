@@ -16,8 +16,7 @@
         android:supportsRtl="true">
 
         <service
-            android:name=".BluetoothService"
-            android:process=":bluetooth" />
+            android:name=".BluetoothService" />
     </application>
 
 </manifest>

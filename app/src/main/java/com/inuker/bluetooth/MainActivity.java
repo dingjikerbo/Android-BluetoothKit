@@ -53,13 +53,6 @@ public class MainActivity extends Activity {
 
         });
 
-        ClientManager.getClient().connect("", new BleConnectOption(), new BleConnectResponse() {
-            @Override
-            public void onResponse(int code, BleGattProfile data) {
-
-            }
-        });
-
         searchDevice();
     }
 

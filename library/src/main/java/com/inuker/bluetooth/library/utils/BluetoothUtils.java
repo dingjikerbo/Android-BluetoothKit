@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
+import com.inuker.bluetooth.library.BluetoothContext;
 import com.inuker.bluetooth.library.BluetoothService;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class BluetoothUtils {
     private static Handler mHandler;
 
     public static Context getContext() {
-        return BluetoothService.getContext();
+        return BluetoothContext.getContext();
     }
 
     private static Handler getHandler() {

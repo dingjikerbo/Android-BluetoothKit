@@ -92,8 +92,6 @@ public class DeviceDetailActivity extends Activity {
     }
 
     private void connectDevice() {
-        BluetoothLog.v("connectDevice");
-
         mTvTitle.setText(String.format("%s%s", getString(R.string.connecting), mDevice.getAddress()));
         mPbar.setVisibility(View.VISIBLE);
         mListView.setVisibility(View.GONE);
@@ -109,7 +107,7 @@ public class DeviceDetailActivity extends Activity {
 
 
                 if (code == REQUEST_SUCCESS) {
-//                    BluetoothLog.v(String.format("Profiles: \n%s", profile));
+                    BluetoothLog.v(String.format("Profiles: \n%s", profile));
                     mAdapter.setGattProfile(profile);
                 }
             }

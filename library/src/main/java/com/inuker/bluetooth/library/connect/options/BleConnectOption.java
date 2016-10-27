@@ -7,12 +7,16 @@ import android.os.Parcel;
  */
 public class BleConnectOption extends GeneralOption {
 
-    public BleConnectOption(int maxRetry, int timeoutInMillis) {
+    private int mServiceDiscoverTimeout;
+
+    public BleConnectOption(int maxRetry, int timeoutInMillis, int serviceDiscoverTimeout) {
         super(maxRetry, timeoutInMillis);
+        mServiceDiscoverTimeout = serviceDiscoverTimeout;
     }
 
     public BleConnectOption(Parcel in) {
         super(in);
+        mServiceDiscoverTimeout = in.readInt();
     }
 
     public static final Creator<BleConnectOption> CREATOR = new Creator<BleConnectOption>() {
@@ -34,5 +38,7 @@ public class BleConnectOption extends GeneralOption {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeInt(mServiceDiscoverTimeout);
     }
 }

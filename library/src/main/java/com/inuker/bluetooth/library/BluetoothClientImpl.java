@@ -459,7 +459,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
             String action = intent.getAction();
 
-            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
+//            BluetoothLog.v(String.format("BluetoothClient onReceive: mac = (%s), action = %s", mac, action));
 
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);

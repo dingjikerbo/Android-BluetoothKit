@@ -10,21 +10,16 @@
         android:text="connect"/>
 
     <Button
-        android:id="@+id/btn3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="disconnect"/>
-
-    <Button
         android:id="@+id/btn2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="connect"/>
+        android:text="disconnect"/>
 
     <Button
-        android:id="@+id/btn4"
+        android:id="@+id/btn3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="disconnect"/>
+        android:text="closeGatt"/>
+
 </LinearLayout>

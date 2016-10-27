@@ -96,7 +96,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
         for (BluetoothGattService service : services) {
 
-//            BluetoothLog.v("Service: " + service.getUuid());
+            BluetoothLog.v("Service: " + service.getUuid());
 
             Map<UUID, BluetoothGattCharacteristic> map = new HashMap<UUID, BluetoothGattCharacteristic>();
             newProfiles.put(service.getUuid(), map);
@@ -105,8 +105,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
                     .getCharacteristics();
 
             for (BluetoothGattCharacteristic character : characters) {
-//                BluetoothLog.v("character: uuid = "
-//                        + character.getUuid());
+                BluetoothLog.v("character: uuid = "
+                        + character.getUuid());
 
                 map.put(character.getUuid(), character);
             }
@@ -162,52 +162,116 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     @Override
     public boolean readCharacteristic(UUID service, UUID character) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character);
-        return isCharacteristicReadable(characteristic) ? mBluetoothGatt.readCharacteristic(characteristic): false;
+
+        if (characteristic == null) {
+            BluetoothLog.w(String.format(">>> characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicReadable(characteristic)) {
+            BluetoothLog.w(String.format(">>> characteristic not readable!"));
+            return false;
+        }
+
+        boolean flag = mBluetoothGatt.readCharacteristic(characteristic);
+        if (!flag) {
+            BluetoothLog.w(String.format("readCharacteristic failed!"));
+        }
+
+        return flag;
     }
 
     @Override
     public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
-        if (isCharacteristicWritable(characteristic)) {
-            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        } else {
+
+        if (characteristic == null) {
+            BluetoothLog.w(String.format(">>> characteristic not exist!"));
             return false;
         }
-        return mBluetoothGatt.writeCharacteristic(characteristic);
+
+        if (!isCharacteristicWritable(characteristic)) {
+            BluetoothLog.w(String.format(">>> characteristic not writable!"));
+            return false;
+        }
+
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+
+        boolean flag = mBluetoothGatt.writeCharacteristic(characteristic);
+        if (!flag) {
+            BluetoothLog.w(String.format("writeCharacteristic failed!"));
+        }
+
+        return flag;
     }
 
     @Override
     public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
-        if (isCharacteristicNoRspWritable(characteristic)) {
-            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-        } else {
+
+        if (characteristic == null) {
+            BluetoothLog.w(String.format(">>> characteristic not exist!"));
             return false;
         }
-        return mBluetoothGatt.writeCharacteristic(characteristic);
+
+        if (!isCharacteristicNoRspWritable(characteristic)) {
+            BluetoothLog.w(String.format(">>> characteristic not norsp writable!"));
+            return false;
+        }
+
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+
+        boolean flag = mBluetoothGatt.writeCharacteristic(characteristic);
+        if (!flag) {
+            BluetoothLog.w(String.format("writeCharacteristic failed!"));
+        }
+
+        return flag;
     }
 
     @Override
     public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
+        BluetoothLog.v(String.format("setCharacteristicNotification service = %s, character = %s, enable = %b",
+                service, character, enable));
+
         BluetoothGattCharacteristic characteristic = getCharacter(service, character);
 
+        if (characteristic == null) {
+            BluetoothLog.w(String.format(">>> characteristic not exist!"));
+            return false;
+        }
+
         if (!isCharacteristicNotifyable(characteristic)) {
+            BluetoothLog.w(String.format(">>> characteristic not notifyable!"));
             return false;
         }
 
         if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+            BluetoothLog.w(String.format(">>> setCharacteristicNotification failed!"));
             return false;
         }
 
         BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
 
-        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-
-        if (descriptor == null || !descriptor.setValue(value)) {
+        if (descriptor == null) {
+            BluetoothLog.w(String.format(">>> getDescriptor for notify null!"));
             return false;
         }
 
-        return mBluetoothGatt.writeDescriptor(descriptor);
+        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+
+        if (!descriptor.setValue(value)) {
+            BluetoothLog.w(String.format(">>> setValue for notify Descriptor failed!"));
+            return false;
+        }
+
+        boolean flag = mBluetoothGatt.writeDescriptor(descriptor);
+
+        if (!flag) {
+            BluetoothLog.w(String.format(">>> writeDescriptor for notify failed!"));
+        }
+
+        return flag;
     }
 
     @Override
@@ -433,6 +497,8 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
     @Override
     public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
+        BluetoothLog.v(String.format("onDescriptorWrite status = %d", status));
+
         WriteDescriptorListener listener = getGattResponseListener(GATT_RESP_DESCRIPTOR_WRITE);
         if (listener != null) {
             listener.onDescriptorWrite(status, descriptor);

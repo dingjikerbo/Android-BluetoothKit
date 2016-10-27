@@ -114,12 +114,21 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
         return mResponse;
     }
 
+    private String getConnectStatusText(int status) {
+        switch (status) {
+            case STATUS_DEVICE_CONNECTED: return "STATUS_DEVICE_CONNECTED";
+            case STATUS_DEVICE_DISCONNECTED: return "STATUS_DEVICE_DISCONNECTED";
+            case STATUS_DEVICE_SERVICE_READY: return "STATUS_DEVICE_SERVICE_READY";
+            default: return String.format("Unknown %d", status);
+        }
+    }
+
     @Override
     final public void process(IBleRequestProcessor processor) {
         mProcessor = processor;
 
-//        BluetoothLog.v(String.format("%s.process, connectStatus = %s",
-//                getClass().getSimpleName(), getConnectStatusText(getConnectStatus())));
+        BluetoothLog.v(String.format("%s.process, connectStatus = %s",
+                getClass().getSimpleName(), getConnectStatusText(getConnectStatus())));
 
         Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
         mHandler.sendMessageDelayed(msg, getTimeoutLimit());

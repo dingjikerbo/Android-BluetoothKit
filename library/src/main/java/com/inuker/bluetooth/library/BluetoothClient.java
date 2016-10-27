@@ -60,8 +60,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void read(String mac, UUID service, UUID character, BleReadResponse response) {
-        BluetoothLog.v(String.format("Read %s: service = %d, character = %d", mac,
-                UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
+        BluetoothLog.v(String.format("Read %s: service = %s, character = %s", mac, service, character));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.read(mac, service, character, response);
@@ -69,8 +68,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void write(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response) {
-        BluetoothLog.v(String.format("write %s: service = %d, character = %d, value = %s", mac,
-                UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
+        BluetoothLog.v(String.format("write %s: service = %s, character = %s, value = %s", mac, service, character, ByteUtils.byteToString(value)));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.write(mac, service, character, value, response);
@@ -78,8 +76,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void writeNoRsp(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response) {
-        BluetoothLog.v(String.format("writeNoRsp %s: service = %d, character = %d, value = %s", mac,
-                UUIDUtils.getValue(service), UUIDUtils.getValue(character), ByteUtils.byteToString(value)));
+        BluetoothLog.v(String.format("writeNoRsp %s: service = %s, character = %s, value = %s", mac, service, character, ByteUtils.byteToString(value)));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.writeNoRsp(mac, service, character, value, response);
@@ -87,8 +84,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
-        BluetoothLog.v(String.format("notify %s: service = %d, character = %d", mac,
-                UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
+        BluetoothLog.v(String.format("notify %s: service = %s, character = %s", mac));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.notify(mac, service, character, response);
@@ -96,8 +92,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void unnotify(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
-        BluetoothLog.v(String.format("unnotify %s: service = %d, character = %d", mac,
-                UUIDUtils.getValue(service), UUIDUtils.getValue(character)));
+        BluetoothLog.v(String.format("unnotify %s: service = %s, character = %s", mac, service, character));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.unnotify(mac, service, character, response);
