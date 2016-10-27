@@ -84,7 +84,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void notify(String mac, UUID service, UUID character, BleNotifyResponse response) {
-        BluetoothLog.v(String.format("notify %s: service = %s, character = %s", mac));
+        BluetoothLog.v(String.format("notify %s: service = %s, character = %s", mac, service, character));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.notify(mac, service, character, response);
