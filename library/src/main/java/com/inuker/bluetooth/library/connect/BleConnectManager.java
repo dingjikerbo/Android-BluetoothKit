@@ -80,4 +80,8 @@ public class BleConnectManager {
     public static void readRssi(String mac, BleGeneralResponse response) {
         getBleConnectMaster(mac).readRssi(response);
     }
+
+    public static void indicate(String mac, UUID service, UUID character, BleGeneralResponse response) {
+        getBleConnectMaster(mac).indicate(service, character, response);
+    }
 }

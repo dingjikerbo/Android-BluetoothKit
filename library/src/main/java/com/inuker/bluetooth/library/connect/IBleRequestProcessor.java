@@ -40,6 +40,8 @@ public interface IBleRequestProcessor {
 
     boolean setCharacteristicNotification(UUID service, UUID character, boolean enable);
 
+    boolean setCharacteristicIndication(UUID service, UUID character, boolean enable);
+
     boolean readRemoteRssi();
 
     void refreshCache();

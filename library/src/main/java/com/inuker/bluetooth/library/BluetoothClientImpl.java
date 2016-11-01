@@ -301,6 +301,30 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     @Override
+    public void indicate(final String mac, final UUID service, final UUID character, final BleNotifyResponse response) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
+        safeCallBluetoothApi(CODE_INDICATE, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    if (code == REQUEST_SUCCESS) {
+                        saveNotifyListener(mac, service, character, response);
+                    }
+                    response.onResponse(code);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
+       unnotify(mac, service, character, response);
+    }
+
+    @Override
     public void readRssi(String mac, final BleReadRssiResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);

@@ -118,6 +118,10 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
             case CODE_STOP_SESARCH:
                 BluetoothSearchManager.stopSearch();
                 break;
+
+            case CODE_INDICATE:
+                BleConnectManager.indicate(mac, service, character, response);
+                break;
         }
         return true;
     }

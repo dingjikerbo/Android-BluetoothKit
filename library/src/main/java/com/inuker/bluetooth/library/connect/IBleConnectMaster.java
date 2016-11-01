@@ -27,4 +27,6 @@ public interface IBleConnectMaster {
     void readRssi(BleGeneralResponse response);
 
     void refresh();
+
+    void indicate(UUID service, UUID character, BleGeneralResponse response);
 }

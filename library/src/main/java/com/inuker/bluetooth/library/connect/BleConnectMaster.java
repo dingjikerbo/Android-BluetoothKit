@@ -89,6 +89,11 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
+    public void indicate(UUID service, UUID character, BleGeneralResponse response) {
+        getConnectDispatcher().indicate(service, character, response);
+    }
+
+    @Override
     public boolean onIntercept(Object object, Method method, Object[] args) {
         mHandler.obtainMessage(0, new ProxyBulk(object, method, args)).sendToTarget();
         return true;

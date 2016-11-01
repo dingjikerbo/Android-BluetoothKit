@@ -69,10 +69,10 @@ public class TestActivity extends Activity implements View.OnClickListener {
 
                         BluetoothLog.v(String.format("onConnectionStateChange: status = %d, newState = %d", status, newState));
 
-                        if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
-                            BluetoothLog.v(String.format("discoverServices"));
-                            gatt.discoverServices();
-                        }
+//                        if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
+//                            BluetoothLog.v(String.format("discoverServices"));
+//                            gatt.discoverServices();
+//                        }
                     }
 
                     @Override
@@ -81,7 +81,7 @@ public class TestActivity extends Activity implements View.OnClickListener {
                         BluetoothLog.v(String.format("onServicesDiscovered, status = %d", status));
                     }
                 });
-                refreshDeviceCache(mGatt);
+//                refreshDeviceCache(mGatt);
                 break;
 
             case R.id.btn2:

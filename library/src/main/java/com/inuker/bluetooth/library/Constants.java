@@ -65,7 +65,7 @@ public class Constants {
     public static final int CODE_UNNOTIFY = 7;
     public static final int CODE_READ_RSSI = 8;
     public static final int CODE_REFRESH = 9;
-
-    public static final int CODE_SEARCH = 10;
-    public static final int CODE_STOP_SESARCH = 11;
+    public static final int CODE_INDICATE = 10;
+    public static final int CODE_SEARCH = 11;
+    public static final int CODE_STOP_SESARCH = 12;
 }

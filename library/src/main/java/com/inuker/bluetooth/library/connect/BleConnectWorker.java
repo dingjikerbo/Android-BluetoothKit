@@ -159,6 +159,10 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
                 & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0;
     }
 
+    private boolean isCharacteristicIndicatable(BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && (characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0;
+    }
+
     @Override
     public boolean readCharacteristic(UUID service, UUID character) {
         BluetoothGattCharacteristic characteristic = getCharacter(service, character);
@@ -269,6 +273,51 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
         if (!flag) {
             BluetoothLog.w(String.format(">>> writeDescriptor for notify failed!"));
+        }
+
+        return flag;
+    }
+
+    @Override
+    public boolean setCharacteristicIndication(UUID service, UUID character, boolean enable) {
+        BluetoothLog.v(String.format("setCharacteristicIndication service = %s, character = %s, enable = %b",
+                service, character, enable));
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.w(String.format(">>> characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicIndicatable(characteristic)) {
+            BluetoothLog.w(String.format(">>> characteristic not indicatable!"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+            BluetoothLog.w(String.format(">>> setCharacteristicIndication failed!"));
+            return false;
+        }
+
+        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
+
+        if (descriptor == null) {
+            BluetoothLog.w(String.format(">>> getDescriptor for indicate null!"));
+            return false;
+        }
+
+        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+
+        if (!descriptor.setValue(value)) {
+            BluetoothLog.w(String.format(">>> setValue for indicate Descriptor failed!"));
+            return false;
+        }
+
+        boolean flag = mBluetoothGatt.writeDescriptor(descriptor);
+
+        if (!flag) {
+            BluetoothLog.w(String.format(">>> writeDescriptor for indicate failed!"));
         }
 
         return flag;

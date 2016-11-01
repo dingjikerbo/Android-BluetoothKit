@@ -99,6 +99,19 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
+    public void indicate(String mac, UUID service, UUID character, BleNotifyResponse response) {
+        BluetoothLog.v(String.format("indicate %s: service = %s, character = %s", mac, service, character));
+
+        response = ProxyUtils.getUIProxy(response);
+        mClient.indicate(mac, service, character, response);
+    }
+
+    @Override
+    public void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
+        unnotify(mac, service, character, response);
+    }
+
+    @Override
     public void readRssi(String mac, BleReadRssiResponse response) {
         BluetoothLog.v(String.format("readRssi %s", mac));
 

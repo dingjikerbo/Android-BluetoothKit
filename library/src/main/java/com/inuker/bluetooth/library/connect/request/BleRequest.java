@@ -216,6 +216,11 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
     }
 
     @Override
+    public boolean setCharacteristicIndication(UUID service, UUID character, boolean enable) {
+        return mProcessor.setCharacteristicIndication(service, character, enable);
+    }
+
+    @Override
     public boolean readRemoteRssi() {
         return mProcessor.readRemoteRssi();
     }

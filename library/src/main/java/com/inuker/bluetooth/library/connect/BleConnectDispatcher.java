@@ -5,6 +5,7 @@ import android.os.Handler;
 import com.inuker.bluetooth.library.connect.options.BleConnectOption;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
+import com.inuker.bluetooth.library.connect.request.BleIndicateRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
@@ -86,6 +87,11 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
     @Override
     public void refresh() {
         addNewRequest(new BleRefreshCacheRequest(mMac));
+    }
+
+    @Override
+    public void indicate(UUID service, UUID character, BleGeneralResponse response) {
+        addNewRequest(new BleIndicateRequest(mMac, service, character, response));
     }
 
     private void addNewRequest(BleRequest request) {
