@@ -172,6 +172,39 @@ mClient.unnotify(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
 });
 ```
 
+### **● 打开Indicate**
+
+和Notify类似，
+
+```Java
+mClient.indicate(MAC, serviceUUID, characterUUID, new BleNotifyResponse() {
+    @Override
+    public void onNotify(UUID service, UUID character, byte[] value) {
+        
+    }
+
+    @Override
+    public void onResponse(int code) {
+        if (code == REQUEST_SUCCESS) {
+
+        }
+    }
+});
+```
+
+### **● 关闭Indicate**
+
+```Java
+mClient.unindicate(MAC, serviceUUID, characterUUID, new BleUnnotifyResponse() {
+    @Override
+    public void onResponse(int code) {
+        if (code == REQUEST_SUCCESS) {
+
+        }
+    }
+});
+```
+
 ### **● 读Rssi**
 ```Java
 mClient.readRssi(MAC, new BleReadRssiResponse() {
