@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library.connect;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
@@ -29,6 +30,7 @@ import com.inuker.bluetooth.library.model.BleGattService;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
+import com.inuker.bluetooth.library.utils.Version;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
@@ -423,13 +425,19 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
 
         if (mBluetoothGatt == null) {
             BluetoothLog.v(String.format("openBluetoothGatt for %s", mBluetoothDevice.getAddress()));
-            mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false,
-                    new BluetoothGattResponse(mBluetoothGattResponse));
 
-            if (mPendingRefreshCache) {
-                mPendingRefreshCache = false;
-                doRefreshCache();
+            BluetoothGattCallback callback = new BluetoothGattResponse(mBluetoothGattResponse);
+
+            if (Version.isMarshmallow()) {
+                mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false, callback, BluetoothDevice.TRANSPORT_LE);
+            } else {
+                mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false, callback);
             }
+        }
+
+        if (mBluetoothGatt != null && mPendingRefreshCache) {
+            mPendingRefreshCache = false;
+            doRefreshCache();
         }
 
         return mBluetoothGatt != null;
