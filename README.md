@@ -73,6 +73,18 @@ mClient.connect(MAC, new BleConnectResponse() {
 });
 ```
 
+可以指定连接超时(单位ms)和连接失败后的重试次数，
+
+```
+BleConnectOption option = new BleConnectOption(1, 30000, 0);
+mClient.connect(MAC, option, new BleConnectResponse() {
+    @Override
+    public void onResponse(int code, BleGattProfile data) {
+
+    }
+});
+```
+
 ### **● 连接状态**
 
 如果要监听蓝牙连接状态可以注册回调，只有两个状态：连接和断开。
