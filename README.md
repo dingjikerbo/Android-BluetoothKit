@@ -233,4 +233,4 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
 # **作者**
  - Email: dingjikerbo@gmail.com
  - Blog: http://blog.csdn.net/dingjikerbo
- - QQ: 715876307
+ - QQ群: 112408886
