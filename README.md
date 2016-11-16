@@ -8,7 +8,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.1.8'
+compile 'com.inuker.bluetooth:library:1.1.9'
 ```
 
 2、创建一个BluetoothClient，建议作为一个单例: 
@@ -73,11 +73,17 @@ mClient.connect(MAC, new BleConnectResponse() {
 });
 ```
 
-可以指定连接超时(单位ms)和连接失败后的重试次数，
+可以配置连接参数如下，
 
 ```
-BleConnectOption option = new BleConnectOption(1, 30000, 0);
-mClient.connect(MAC, option, new BleConnectResponse() {
+BleConnectOptions options = new BleConnectOptions.Builder()
+        .setConnectRetry(3)   // 连接如果失败重试3次
+        .setConnectTimeout(30000)   // 连接超时30s
+        .setServiceDiscoverRetry(3)  // 发现服务如果失败重试3次
+        .setServiceDiscoverTimeout(20000)  // 发现服务超时20s
+        .build();
+
+mClient.connect(MAC, options, new BleConnectResponse() {
     @Override
     public void onResponse(int code, BleGattProfile data) {
 
