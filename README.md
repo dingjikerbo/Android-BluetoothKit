@@ -36,7 +36,8 @@ mClient.search(request, new SearchResponse() {
 
     @Override
     public void onDeviceFounded(SearchResult device) {
-
+        Beacon beacon = new Beacon(device.scanRecord);
+        BluetoothLog.v(String.format("beacon for %s\n%s", device.getAddress(), beacon.toString()));
     }
 
     @Override
@@ -55,6 +56,55 @@ mClient.search(request, new SearchResponse() {
 
 ```Java
 mClient.stopSearch();
+```
+
+## **Beacon解析**
+
+可以在广播中携带设备的自定义数据，用于设备识别，数据广播，事件通知等，这样手机端无需连接设备就可以获取设备推送的数据。
+
+扫描到的beacon数据为byte[]，在SearchResult的scanRecord中，按如下形式生成Beacon对象，将beacon按type分解成一个个BeaconItem，
+
+```
+Beacon beacon = new Beacon(device.scanRecord);
+```
+
+```
+public class Beacon {
+
+    public byte[] mBytes;
+
+    public List<BeaconItem> mItems;
+}
+
+public class BeaconItem {
+    /**
+     * 广播中声明的长度
+     */
+    public int len;
+
+    /**
+     * 广播中声明的type
+     */
+    public int type;
+
+    /**
+     * 广播中的数据部分
+     */
+    public byte[] bytes;
+}
+```
+
+然后根据自定义的协议，解析对应的BeaconItem中的bytes。
+
+```
+BeaconItem beaconItem; // 设置成beacon中对应的item
+BeaconParser beaconParser = new BeaconParser(beaconItem);
+int firstByte = beaconParser.readByte(); // 读取第1个字节
+int secondByte = beaconParser.readByte(); // 读取第2个字节
+int productId = beaconParser.readShort(); // 读取第3,4个字节
+boolean bit1 = beaconParser.getBit(firstByte, 0); // 获取第1字节的第1bit
+boolean bit2 = beaconParser.getBit(firstByte, 1); // 获取第1字节的第2bit
+beaconParser.setPosition(0); // 将读取起点设置到第1字节处
 ```
 
 ## **BLE设备通信** 
