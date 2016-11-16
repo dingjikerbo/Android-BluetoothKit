@@ -8,9 +8,21 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
@@ -29,7 +41,6 @@ public class TestActivity extends Activity implements View.OnClickListener {
     private Button mBtn1;
     private Button mBtn2;
     private Button mBtn3;
-    private Button mBtn4;
 
     private BluetoothManager mBluetoothManager;
     private  BluetoothAdapter  mBluetoothLeAdapter;
@@ -41,6 +52,29 @@ public class TestActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_activity);
+
+        TextView tv = (TextView) findViewById(R.id.text);
+        String text = "你是好人啊我知道";
+
+        SpannableString sb1 = new SpannableString(text);
+        sb1.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setColor(Color.GREEN);
+                ds.setUnderlineText(true);
+            }
+
+            @Override
+            public void onClick(View widget) {
+                Toast.makeText(TestActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+            }
+        }, text.length() - 4, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tv.setHighlightColor(Color.TRANSPARENT);
+
+        tv.setText(sb1);
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         mBluetoothManager = (android.bluetooth.BluetoothManager)
                 getSystemService(Context.BLUETOOTH_SERVICE);
@@ -92,11 +126,12 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 break;
 
             case R.id.btn3:
-                BluetoothLog.v(String.format("close"));
-                if (mGatt != null) {
-                    mGatt.close();
-                    mGatt = null;
-                }
+//                BluetoothLog.v(String.format("close"));
+//                if (mGatt != null) {
+//                    mGatt.close();
+//                    mGatt = null;
+//                }
+
                 break;
         }
     }

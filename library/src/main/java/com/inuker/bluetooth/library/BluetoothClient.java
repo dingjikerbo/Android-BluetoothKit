@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library;
 import android.content.Context;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -14,7 +14,6 @@ import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.inuker.bluetooth.library.utils.UUIDUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.util.UUID;
@@ -35,7 +34,7 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
-    public void connect(String mac, BleConnectOption options, BleConnectResponse response) {
+    public void connect(String mac, BleConnectOptions options, BleConnectResponse response) {
         BluetoothLog.v(String.format("Connect %s", mac));
 
         response = ProxyUtils.getUIProxy(response);
@@ -108,7 +107,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
-        unnotify(mac, service, character, response);
+        unindicate(mac, service, character, response);
     }
 
     @Override
@@ -123,12 +122,6 @@ public class BluetoothClient implements IBluetoothClient {
     public void search(SearchRequest request, SearchResponse response) {
         response = ProxyUtils.getUIProxy(response);
         mClient.search(request, response);
-    }
-
-    @Override
-    public void refreshCache(String mac) {
-        BluetoothLog.v(String.format("refreshCache %s", mac));
-        mClient.refreshCache(mac);
     }
 
     @Override

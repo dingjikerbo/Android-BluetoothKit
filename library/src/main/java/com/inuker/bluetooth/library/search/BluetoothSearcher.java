@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothAdapter;
 import com.inuker.bluetooth.library.search.classic.BluetoothClassicSearcher;
 import com.inuker.bluetooth.library.search.le.BluetoothLESearcher;
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
-import static com.inuker.bluetooth.library.Constants.*;
+
+import static com.inuker.bluetooth.library.Constants.SEARCH_TYPE_BLE;
+import static com.inuker.bluetooth.library.Constants.SEARCH_TYPE_CLASSIC;
 
 public class BluetoothSearcher {
 

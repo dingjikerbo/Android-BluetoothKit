@@ -3,63 +3,62 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.listener.WriteCharacterListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
 
 public class BleWriteRequest extends BleRequest implements WriteCharacterListener {
 
-    public BleWriteRequest(String mac, UUID service, UUID character, byte[] bytes,
-                           BleGeneralResponse response) {
-        super(mac, response);
+    public BleWriteRequest(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
+        super(response);
         mServiceUUID = service;
         mCharacterUUID = character;
         mBytes = bytes;
     }
 
     @Override
-    void processRequest() {
-        switch (getConnectStatus()) {
-            case STATUS_DEVICE_SERVICE_READY:
-                if (write(mServiceUUID, mCharacterUUID, mBytes)) {
-                    registerGattResponseListener(this);
-                } else {
-                    onRequestFinished(REQUEST_FAILED);
-                }
+    public void processRequest() {
+        switch (getCurrentStatus()) {
+            case Constants.STATUS_DEVICE_DISCONNECTED:
+                onRequestCompleted(Code.REQUEST_FAILED);
+                break;
+
+            case Constants.STATUS_DEVICE_CONNECTED:
+                startWrite();
+                break;
+
+            case Constants.STATUS_DEVICE_SERVICE_READY:
+                startWrite();
                 break;
 
             default:
-                onRequestFinished(REQUEST_FAILED);
+                onRequestCompleted(Code.REQUEST_FAILED);
                 break;
         }
     }
 
-    @Override
-    int getGattResponseListenerId() {
-        return GATT_RESP_CHARACTER_WRITE;
+    private void startWrite() {
+        if (!writeCharacteristic(mServiceUUID, mCharacterUUID, mBytes)) {
+            onRequestCompleted(Code.REQUEST_FAILED);
+        }
     }
 
     @Override
-    public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status) {
-        if (!checkCharacteristic(characteristic)) {
-            return;
-        }
-
+    public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            onRequestFinished(REQUEST_SUCCESS);
+            onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
-            onRequestFinished(REQUEST_FAILED);
+            onRequestCompleted(Code.REQUEST_FAILED);
         }
     }
 
-    boolean write(UUID service, UUID character, byte[] value) {
-        return writeCharacteristic(service, character, value);
-    }
-
-    private boolean checkCharacteristic(BluetoothGattCharacteristic characteristic) {
-        return characteristic != null && mCharacterUUID.equals(characteristic.getUuid())
-                && characteristic.getService() != null && mServiceUUID.equals(characteristic.getService().getUuid());
+    @Override
+    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
+        if (!connectedOrDisconnected) {
+            onRequestCompleted(Code.REQUEST_FAILED);
+        }
     }
 }

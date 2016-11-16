@@ -14,7 +14,7 @@ public interface IBluetoothGattResponse {
 
     void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status, byte[] value);
 
-    void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status);
+    void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status, byte[] value);
 
     void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value);
 

@@ -7,5 +7,5 @@ import android.bluetooth.BluetoothGattDescriptor;
  */
 public interface WriteDescriptorListener extends GattResponseListener {
 
-    void onDescriptorWrite(int status, BluetoothGattDescriptor descriptor);
+    void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status);
 }

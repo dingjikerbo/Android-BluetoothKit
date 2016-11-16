@@ -4,7 +4,12 @@ import android.os.Bundle;
 
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
-import static com.inuker.bluetooth.library.Constants.*;
+
+import static com.inuker.bluetooth.library.Constants.DEVICE_FOUND;
+import static com.inuker.bluetooth.library.Constants.EXTRA_SEARCH_RESULT;
+import static com.inuker.bluetooth.library.Constants.SEARCH_CANCEL;
+import static com.inuker.bluetooth.library.Constants.SEARCH_START;
+import static com.inuker.bluetooth.library.Constants.SEARCH_STOP;
 
 /**
  * Created by dingjikerbo on 2016/8/28.

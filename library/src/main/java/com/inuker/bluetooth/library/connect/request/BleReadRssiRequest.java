@@ -2,48 +2,61 @@ package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
 
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import static com.inuker.bluetooth.library.Constants.*;
 
 /**
  * Created by dingjikerbo on 2015/12/23.
  */
 public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
 
-    public BleReadRssiRequest(String mac, BleGeneralResponse response) {
-        super(mac, response);
+    public BleReadRssiRequest(BleGeneralResponse response) {
+        super(response);
     }
 
     @Override
-    int getGattResponseListenerId() {
-        return GATT_RESP_READ_RSSI;
-    }
+    public void processRequest() {
+        switch (getCurrentStatus()) {
+            case Constants.STATUS_DEVICE_DISCONNECTED:
+                onRequestCompleted(Code.REQUEST_FAILED);
+                break;
 
-    @Override
-    void processRequest() {
-        switch (getConnectStatus()) {
-            case STATUS_DEVICE_SERVICE_READY:
-                if (readRemoteRssi()) {
-                    registerGattResponseListener(this);
-                } else {
-                    onRequestFinished(REQUEST_FAILED);
-                }
+            case Constants.STATUS_DEVICE_CONNECTED:
+                startReadRssi();
+                break;
+
+            case Constants.STATUS_DEVICE_SERVICE_READY:
+                startReadRssi();
                 break;
 
             default:
-                onRequestFinished(REQUEST_FAILED);
+                onRequestCompleted(Code.REQUEST_FAILED);
                 break;
+        }
+    }
+
+    private void startReadRssi() {
+        if (!readRemoteRssi()) {
+            onRequestCompleted(Code.REQUEST_FAILED);
+        }
+    }
+
+    @Override
+    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
+        if (!connectedOrDisconnected) {
+            onRequestCompleted(Code.REQUEST_FAILED);
         }
     }
 
     @Override
     public void onReadRemoteRssi(int rssi, int status) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            putIntExtra(EXTRA_RSSI, rssi);
-            onRequestFinished(REQUEST_SUCCESS);
+            putIntExtra(Constants.EXTRA_RSSI, rssi);
+            onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
-            onRequestFinished(REQUEST_FAILED);
+            onRequestCompleted(Code.REQUEST_FAILED);
         }
     }
 }

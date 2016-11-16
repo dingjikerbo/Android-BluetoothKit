@@ -15,7 +15,6 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.BluetoothContext;
-import com.inuker.bluetooth.library.BluetoothService;
 
 import java.util.ArrayList;
 import java.util.List;

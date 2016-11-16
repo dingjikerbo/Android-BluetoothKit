@@ -3,9 +3,11 @@ package com.inuker.bluetooth.library.search;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import static com.inuker.bluetooth.library.Constants.*;
 
 import com.inuker.bluetooth.library.search.response.BluetoothSearchResponse;
+
+import static com.inuker.bluetooth.library.Constants.SEARCH_TYPE_BLE;
+import static com.inuker.bluetooth.library.Constants.SEARCH_TYPE_CLASSIC;
 
 public class BluetoothSearchTask implements Handler.Callback {
 

@@ -1,9 +1,11 @@
 package com.inuker.bluetooth.library;
 
+import android.bluetooth.BluetoothProfile;
+
 import java.util.UUID;
 
 /**
- * Created by liwentian on 2016/10/21.
+ * Created by dingjikerbo on 2016/10/21.
  */
 
 public class Constants {
@@ -64,8 +66,24 @@ public class Constants {
     public static final int CODE_NOTIFY = 6;
     public static final int CODE_UNNOTIFY = 7;
     public static final int CODE_READ_RSSI = 8;
-    public static final int CODE_REFRESH = 9;
     public static final int CODE_INDICATE = 10;
     public static final int CODE_SEARCH = 11;
     public static final int CODE_STOP_SESARCH = 12;
+
+    public static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
+    public static final int STATUS_DEVICE_CONNECTING = BluetoothProfile.STATE_CONNECTING;
+    public static final int STATUS_DEVICE_DISCONNECTING = BluetoothProfile.STATE_DISCONNECTING;
+    public static final int STATUS_DEVICE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
+    public static final int STATUS_DEVICE_SERVICE_READY = 0x13;
+
+    public static String getStatusText(int status) {
+        switch (status) {
+            case Constants.STATUS_DEVICE_CONNECTED: return "Connected";
+            case Constants.STATUS_DEVICE_CONNECTING: return "Connecting";
+            case Constants.STATUS_DEVICE_DISCONNECTING: return "Disconnecting";
+            case Constants.STATUS_DEVICE_DISCONNECTED: return "Disconnected";
+            case Constants.STATUS_DEVICE_SERVICE_READY: return "Service Ready";
+            default: return String.format("Unknown %d", status);
+        }
+    }
 }

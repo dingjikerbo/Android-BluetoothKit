@@ -4,243 +4,86 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.text.TextUtils;
+import android.os.Parcelable;
 
-import com.inuker.bluetooth.library.connect.IBleRequestProcessor;
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.Constants;
+import com.inuker.bluetooth.library.RuntimeChecker;
+import com.inuker.bluetooth.library.connect.IBleConnectDispatcher;
+import com.inuker.bluetooth.library.connect.IBleConnectWorker;
 import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import static com.inuker.bluetooth.library.Constants.*;
-import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.UUID;
 
-public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, Handler.Callback {
-
-    private static final int MSG_REQUEST_TIMEOUT = 0x22;
-    private static final int MSG_REQUEST_FINISHED = 0x32;
-
-    private static final int DEFAULT_RETRY_LIMIT = 0;
-    private static final int DEFAULT_TIMEOUT_LIMIT = 10000;
+public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Handler.Callback, GattResponseListener, RuntimeChecker {
 
     protected UUID mServiceUUID;
     protected UUID mCharacterUUID;
 
     protected byte[] mBytes;
 
-    protected String mMac;
-
     protected BleGeneralResponse mResponse;
-
-    protected int mRetryLimit;
-    protected int mRetryCount;
-
-    protected int mTimeoutLimit;
 
     protected Bundle mExtra;
 
-    protected Handler mHandler;
+    protected String mAddress;
 
-    protected IBleRequestProcessor mProcessor;
+    protected IBleConnectDispatcher mDispatcher;
 
-    public BleRequest(String mac, BleGeneralResponse response) {
-        mMac = mac;
+    protected IBleConnectWorker mWorker;
+
+    protected Handler mHandler, mResponseHandler;
+
+    private RuntimeChecker mRuntimeChecker;
+
+    private boolean mFinished;
+
+    public BleRequest(BleGeneralResponse response) {
+        mResponse = response;
         mExtra = new Bundle();
-        mResponse = response;
-        mRetryLimit = getDefaultRetryLimit();
-        mTimeoutLimit = DEFAULT_TIMEOUT_LIMIT;
         mHandler = new Handler(Looper.myLooper(), this);
+        mResponseHandler = new Handler(Looper.getMainLooper());
     }
 
-    int getTimeoutLimit() {
-        return mTimeoutLimit;
+    public String getAddress() {
+        return mAddress;
     }
 
-    void setResponse(BleGeneralResponse response) {
-        mResponse = response;
+    public void setAddress(String address) {
+        this.mAddress = address;
     }
 
-    public void onResponse() {
+    public void setWorker(IBleConnectWorker worker) {
+        mWorker = worker;
+    }
+
+    /**
+     * 请求完成回调，要避免多次回调
+     * @param code
+     */
+    public void onResponse(final int code) {
         // TODO Auto-generated method stub
-        if (mResponse != null) {
-            try {
-                mResponse.onResponse(getRequestCode(), mExtra);
-            } catch (Throwable e) {
-                e.printStackTrace();
+        if (mFinished) {
+            return;
+        } else {
+            mFinished = true;
+        }
+
+        mResponseHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    if (mResponse != null) {
+                        mResponse.onResponse(code, mExtra);
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
-        }
-    }
-
-    public boolean canRetry() {
-        return mRetryCount < mRetryLimit;
-    }
-
-    void putByteArrayExtra(String key, byte[] bytes) {
-        if (!TextUtils.isEmpty(key)) {
-            mExtra.putByteArray(key, bytes);
-        }
-    }
-
-    void putIntExtra(String key, int value) {
-        if (!TextUtils.isEmpty(key)) {
-            mExtra.putInt(key, value);
-        }
-    }
-
-    int getIntExtra(String key, int defaultValue) {
-        if (!TextUtils.isEmpty(key)) {
-            return mExtra.getInt(key, defaultValue);
-        }
-        return defaultValue;
-    }
-
-    public void setRequestCode(int code) {
-        putIntExtra(EXTRA_CODE, code);
-    }
-
-    int getRequestCode() {
-        return getIntExtra(EXTRA_CODE, REQUEST_FAILED);
-    }
-
-    public void retry() {
-        mRetryCount++;
-    }
-
-    int getDefaultRetryLimit() {
-        return DEFAULT_RETRY_LIMIT;
-    }
-
-    BleGeneralResponse getResponse() {
-        return mResponse;
-    }
-
-    private String getConnectStatusText(int status) {
-        switch (status) {
-            case STATUS_DEVICE_CONNECTED: return "STATUS_DEVICE_CONNECTED";
-            case STATUS_DEVICE_DISCONNECTED: return "STATUS_DEVICE_DISCONNECTED";
-            case STATUS_DEVICE_SERVICE_READY: return "STATUS_DEVICE_SERVICE_READY";
-            default: return String.format("Unknown %d", status);
-        }
-    }
-
-    @Override
-    final public void process(IBleRequestProcessor processor) {
-        mProcessor = processor;
-
-        BluetoothLog.v(String.format("%s.process, connectStatus = %s",
-                getClass().getSimpleName(), getConnectStatusText(getConnectStatus())));
-
-        Message msg = mHandler.obtainMessage(MSG_REQUEST_TIMEOUT);
-        mHandler.sendMessageDelayed(msg, getTimeoutLimit());
-
-        try {
-            processRequest();
-        } catch (Throwable e) {
-            BluetoothLog.e(e);
-            onRequestFinished(REQUEST_EXCEPTION);
-        }
-    }
-
-    abstract void processRequest();
-
-    @Override
-    public void registerGattResponseListener(int responseId, GattResponseListener listener) {
-//        BluetoothLog.v(String.format("registerGattResponseListener responseId = %d", responseId));
-        mProcessor.registerGattResponseListener(responseId, listener);
-    }
-
-    protected void registerGattResponseListener(GattResponseListener listener) {
-        mProcessor.registerGattResponseListener(getGattResponseListenerId(), listener);
-    }
-
-    @Override
-    public void unregisterGattResponseListener(int responseId) {
-//        BluetoothLog.v(String.format("unregisterGattResponseListener %d", responseId));
-        mProcessor.unregisterGattResponseListener(responseId);
-    }
-
-    @Override
-    public int getConnectStatus() {
-        return mProcessor.getConnectStatus();
-    }
-
-    void onRequestFinished(int code) {
-        onRequestFinished(code, 0);
-    }
-
-    void onRequestFinished(int code, long delayInMillis) {
-        BluetoothLog.v(String.format("%s.onRequestFinished for %s, code = %d",
-                getClass().getSimpleName(), mMac, code));
-
-        setRequestCode(code);
-
-        mHandler.removeMessages(MSG_REQUEST_TIMEOUT);
-
-        unregisterGattResponseListener(getGattResponseListenerId());
-
-        mHandler.sendEmptyMessageDelayed(MSG_REQUEST_FINISHED, delayInMillis);
-    }
-
-    @Override
-    public boolean openBluetoothGatt() {
-        return mProcessor.openBluetoothGatt();
-    }
-
-    @Override
-    public void closeBluetoothGatt() {
-        mProcessor.closeBluetoothGatt();
-    }
-
-    @Override
-    public boolean readCharacteristic(UUID service, UUID character) {
-        return mProcessor.readCharacteristic(service, character);
-    }
-
-    int getGattResponseListenerId() {
-        return 0;
-    }
-
-    @Override
-    public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
-        return mProcessor.writeCharacteristic(service, character, value);
-    }
-
-    @Override
-    public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
-        return mProcessor.writeCharacteristicWithNoRsp(service, character, value);
-    }
-
-    @Override
-    public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
-        return mProcessor.setCharacteristicNotification(service, character, enable);
-    }
-
-    @Override
-    public boolean setCharacteristicIndication(UUID service, UUID character, boolean enable) {
-        return mProcessor.setCharacteristicIndication(service, character, enable);
-    }
-
-    @Override
-    public boolean readRemoteRssi() {
-        return mProcessor.readRemoteRssi();
-    }
-
-    @Override
-    public void refreshCache() {
-        mProcessor.refreshCache();
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case MSG_REQUEST_TIMEOUT:
-                onRequestFinished(REQUEST_TIMEDOUT);
-                break;
-            case MSG_REQUEST_FINISHED:
-                mProcessor.notifyRequestResult();
-                break;
-        }
-        return true;
+        });
     }
 
     @Override
@@ -251,23 +94,155 @@ public abstract class BleRequest implements IBleRequest, IBleRequestProcessor, H
         return sb.toString();
     }
 
-    public boolean isSuccess() {
-        return getRequestCode() == REQUEST_SUCCESS;
+    public void putIntExtra(String key, int value) {
+        mExtra.putInt(key, value);
+    }
+
+    public int getIntExtra(String key, int defaultValue) {
+        return mExtra.getInt(key, defaultValue);
+    }
+
+    public void putByteArray(String key, byte[] bytes) {
+        mExtra.putByteArray(key, bytes);
+    }
+
+    public void putParcelable(String key, Parcelable object) {
+        mExtra.putParcelable(key, object);
+    }
+
+    public Bundle getExtra() {
+        return mExtra;
+    }
+
+    protected String getStatusText() {
+        return Constants.getStatusText(getCurrentStatus());
+    }
+
+    public abstract void processRequest();
+
+    @Override
+    public boolean openGatt() {
+        return mWorker.openGatt();
     }
 
     @Override
-    final public void notifyRequestResult() {
-        throw new IllegalStateException("should not call this method in request");
+    public boolean discoverService() {
+        return mWorker.discoverService();
     }
 
     @Override
-    public BleGattProfile getGattProfile() {
-        return mProcessor.getGattProfile();
+    public int getCurrentStatus() {
+        return mWorker.getCurrentStatus();
     }
 
     @Override
-    public void disconnect() {
-        mProcessor.disconnect();
+    final public void process(IBleConnectDispatcher dispatcher) {
+        checkRuntime();
+
+        mDispatcher = dispatcher;
+
+        BluetoothLog.w(String.format("Process %s, status = %s", getClass().getSimpleName(), getStatusText()));
+
+        try {
+            registerGattResponseListener(this);
+            processRequest();
+        } catch (Throwable e) {
+            BluetoothLog.e(e);
+            onRequestCompleted(Code.REQUEST_EXCEPTION);
+        }
     }
+
+    protected void onRequestCompleted(int code) {
+        log(String.format("request complete: code = %d", code));
+
+        mHandler.removeCallbacksAndMessages(null);
+        clearGattResponseListener(this);
+
+        onResponse(code);
+
+        mDispatcher.onRequestCompleted(this);
+    }
+
+    @Override
+    public void closeGatt() {
+        log(String.format("close gatt"));
+        mWorker.closeGatt();
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        return true;
+    }
+
+    @Override
+    public void registerGattResponseListener(GattResponseListener listener) {
+        mWorker.registerGattResponseListener(listener);
+    }
+
+    @Override
+    public void clearGattResponseListener(GattResponseListener listener) {
+        mWorker.clearGattResponseListener(listener);
+    }
+
+    @Override
+    public boolean refreshDeviceCache() {
+        return mWorker.refreshDeviceCache();
+    }
+
+    @Override
+    public boolean readCharacteristic(UUID service, UUID characteristic) {
+        return mWorker.readCharacteristic(service, characteristic);
+    }
+
+    @Override
+    public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
+        return mWorker.writeCharacteristic(service, character, value);
+    }
+
+    @Override
+    public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
+        return mWorker.writeCharacteristicWithNoRsp(service, character, value);
+    }
+
+    @Override
+    public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
+        return mWorker.setCharacteristicNotification(service, character, enable);
+    }
+
+    @Override
+    public boolean setCharacteristicIndication(UUID service, UUID character, boolean enable) {
+        return mWorker.setCharacteristicIndication(service, character, enable);
+    }
+
+    @Override
+    public boolean readRemoteRssi() {
+        return mWorker.readRemoteRssi();
+    }
+
+    protected void log(String msg) {
+        BluetoothLog.v(String.format("%s %s >>> %s", getClass().getSimpleName(), getAddress(), msg));
+    }
+
+    public void setRuntimeChecker(RuntimeChecker checker) {
+        mRuntimeChecker = checker;
+    }
+
+    @Override
+    public void checkRuntime() {
+        mRuntimeChecker.checkRuntime();
+    }
+
+    @Override
+    public void cancel() {
+        checkRuntime();
+
+        log(String.format("request canceled"));
+
+        mHandler.removeCallbacksAndMessages(null);
+        clearGattResponseListener(this);
+
+        onResponse(Code.REQUEST_CANCELED);
+    }
+
 }
 

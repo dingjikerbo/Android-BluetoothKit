@@ -3,10 +3,11 @@ package com.inuker.bluetooth.library.search;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import static com.inuker.bluetooth.library.Constants.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.inuker.bluetooth.library.Constants.SEARCH_TYPE_BLE;
+import static com.inuker.bluetooth.library.Constants.SEARCH_TYPE_CLASSIC;
 
 /**
  * Created by dingjikerbo on 2016/8/28.

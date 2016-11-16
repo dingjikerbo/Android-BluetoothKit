@@ -5,7 +5,7 @@ import com.inuker.bluetooth.library.utils.StringUtils;
 import java.lang.reflect.Field;
 
 /**
- * Created by liwentian on 2016/9/26.
+ * Created by dingjikerbo on 2016/9/26.
  */
 public class FieldUtils {
 

@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library.model;
 
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Parcel;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
@@ -8,7 +9,9 @@ import com.inuker.bluetooth.library.utils.ListUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -18,8 +21,24 @@ public class BleGattProfile implements Parcelable {
 
     private List<BleGattService> services;
 
-    public BleGattProfile() {
+    public BleGattProfile(Map< UUID, Map<UUID, BluetoothGattCharacteristic >> map) {
+        Iterator itor = map.entrySet().iterator();
 
+        List<BleGattService> serviceList = new ArrayList<BleGattService>();
+
+        while (itor.hasNext()) {
+            Map.Entry entry = (Map.Entry) itor.next();
+            UUID serviceUUID = (UUID) entry.getKey();
+            Map<UUID, BluetoothGattCharacteristic> characters = (Map<UUID, BluetoothGattCharacteristic>) entry.getValue();
+
+            BleGattService service = new BleGattService(serviceUUID);
+            if (!serviceList.contains(service)) {
+                serviceList.add(service);
+                service.addCharacters(characters.keySet());
+            }
+        }
+
+        addServices(serviceList);
     }
 
     public BleGattProfile(Parcel in) {

@@ -54,6 +54,14 @@ public class MainActivity extends Activity {
         });
 
         searchDevice();
+
+        BleConnectOption option = new BleConnectOption(1, 30000, 0);
+        ClientManager.getClient().connect(MAC, option, new BleConnectResponse() {
+            @Override
+            public void onResponse(int code, BleGattProfile data) {
+
+            }
+        });
     }
 
     private void searchDevice() {

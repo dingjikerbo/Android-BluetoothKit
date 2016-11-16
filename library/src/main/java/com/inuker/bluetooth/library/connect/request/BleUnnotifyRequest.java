@@ -3,9 +3,10 @@ package com.inuker.bluetooth.library.connect.request;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattDescriptor;
 
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.listener.WriteDescriptorListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
 
@@ -14,40 +15,52 @@ import java.util.UUID;
  */
 public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorListener {
 
-    public BleUnnotifyRequest(String mac, UUID service, UUID character, BleGeneralResponse response) {
-        super(mac, response);
+    public BleUnnotifyRequest(UUID service, UUID character, BleGeneralResponse response) {
+        super(response);
         mServiceUUID = service;
         mCharacterUUID = character;
     }
 
     @Override
-    void processRequest() {
-        switch (getConnectStatus()) {
-            case STATUS_DEVICE_SERVICE_READY:
-                if (setCharacteristicNotification(mServiceUUID, mCharacterUUID, false)) {
-                    registerGattResponseListener(this);
-                } else {
-                    onRequestFinished(REQUEST_FAILED);
-                }
+    public void processRequest() {
+        switch (getCurrentStatus()) {
+            case Constants.STATUS_DEVICE_DISCONNECTED:
+                onRequestCompleted(Code.REQUEST_FAILED);
+                break;
+
+            case Constants.STATUS_DEVICE_CONNECTED:
+                closeNotify();
+                break;
+
+            case Constants.STATUS_DEVICE_SERVICE_READY:
+                closeNotify();
                 break;
 
             default:
-                onRequestFinished(REQUEST_FAILED);
+                onRequestCompleted(Code.REQUEST_FAILED);
                 break;
         }
     }
 
-    @Override
-    int getGattResponseListenerId() {
-        return GATT_RESP_DESCRIPTOR_WRITE;
+    private void closeNotify() {
+        if (!setCharacteristicNotification(mServiceUUID, mCharacterUUID, false)) {
+            onRequestCompleted(Code.REQUEST_FAILED);
+        }
     }
 
     @Override
-    public void onDescriptorWrite(int status, BluetoothGattDescriptor descriptor) {
+    public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            onRequestFinished(REQUEST_SUCCESS);
+            onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
-            onRequestFinished(REQUEST_FAILED);
+            onRequestCompleted(Code.REQUEST_FAILED);
+        }
+    }
+
+    @Override
+    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
+        if (!connectedOrDisconnected) {
+            onRequestCompleted(Code.REQUEST_FAILED);
         }
     }
 }

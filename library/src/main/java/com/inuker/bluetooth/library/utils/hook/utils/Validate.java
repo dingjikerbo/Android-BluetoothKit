@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.utils.hook.utils;
 
 /**
- * Created by liwentian on 2016/9/26.
+ * Created by dingjikerbo on 2016/9/26.
  */
 public class Validate {
     public static void isTrue(final boolean expression, final String message, final Object... values) {

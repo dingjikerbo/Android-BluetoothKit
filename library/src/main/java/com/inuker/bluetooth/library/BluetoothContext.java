@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library;
 import android.content.Context;
 
 /**
- * Created by liwentian on 2016/10/26.
+ * Created by dingjikerbo on 2016/10/26.
  */
 
 public class BluetoothContext {

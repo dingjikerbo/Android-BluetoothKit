@@ -16,4 +16,6 @@ public interface GattResponseListener {
     int GATT_RESP_READ_RSSI = 5;
 
     int GATT_RESP_DISCONNECT = 6;
+
+    void onConnectStatusChanged(boolean connectedOrDisconnected);
 }

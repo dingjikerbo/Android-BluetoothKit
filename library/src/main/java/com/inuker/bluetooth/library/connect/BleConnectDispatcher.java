@@ -1,119 +1,139 @@
 package com.inuker.bluetooth.library.connect;
 
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.RuntimeChecker;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
-import com.inuker.bluetooth.library.connect.request.BleDisconnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleIndicateRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
-import com.inuker.bluetooth.library.connect.request.BleRefreshCacheRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteNoRspRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.utils.BluetoothUtils;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ListUtils;
-import static com.inuker.bluetooth.library.Constants.*;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectMaster {
+public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeChecker, Handler.Callback {
 
     private static final int MAX_REQUEST_COUNT = 100;
-
-    private Handler mWorkerHandler;
+    private static final int MSG_SCHEDULE_NEXT = 0x12;
 
     private List<BleRequest> mBleWorkList;
     private BleRequest mCurrentRequest;
 
-    private String mMac;
+    private IBleConnectWorker mWorker;
+
+    private String mAddress;
+
+    private Handler mHandler;
 
     public static BleConnectDispatcher newInstance(String mac) {
         return new BleConnectDispatcher(mac);
     }
 
     private BleConnectDispatcher(String mac) {
-        mMac = mac;
-        BleConnectWorker.attach(mac, this);
-        mBleWorkList = new ArrayList<BleRequest>();
+        mAddress = mac;
+        mBleWorkList = new LinkedList<BleRequest>();
+        mWorker = new BleConnectWorker(mac, this);
+        mHandler = new Handler(Looper.myLooper(), this);
     }
 
-    @Override
-    public void connect(BleConnectOption options, BleGeneralResponse response) {
-        addNewRequest(new BleConnectRequest(mMac, options, response));
+    public void connect(BleConnectOptions options, BleGeneralResponse response) {
+        addNewRequest(new BleConnectRequest(options, response));
     }
 
-    @Override
     public void disconnect() {
-        addNewRequest(new BleDisconnectRequest(mMac));
+        checkRuntime();
+
+        BluetoothLog.w(String.format("start process disconnect"));
+
+        if (mCurrentRequest != null) {
+            mCurrentRequest.cancel();
+            mCurrentRequest = null;
+        }
+
+        for (BleRequest request : mBleWorkList) {
+            request.cancel();
+        }
+
+        mBleWorkList.clear();
+
+        mWorker.closeGatt();
     }
 
-    @Override
     public void read(UUID service, UUID character, BleGeneralResponse response) {
-        addNewRequest(new BleReadRequest(mMac, service, character, response));
+        addNewRequest(new BleReadRequest(service, character, response));
     }
 
-    @Override
     public void write(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
-        addNewRequest(new BleWriteRequest(mMac, service, character, bytes, response));
+        addNewRequest(new BleWriteRequest(service, character, bytes, response));
     }
 
-    @Override
     public void writeNoRsp(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
-        addNewRequest(new BleWriteNoRspRequest(mMac, service, character, bytes, response));
+        addNewRequest(new BleWriteNoRspRequest(service, character, bytes, response));
     }
 
-    @Override
     public void notify(UUID service, UUID character, BleGeneralResponse response) {
-        addNewRequest(new BleNotifyRequest(mMac, service, character, response));
+        addNewRequest(new BleNotifyRequest(service, character, response));
     }
 
-    @Override
     public void unnotify(UUID service, UUID character, BleGeneralResponse response) {
-        addNewRequest(new BleUnnotifyRequest(mMac, service, character, response));
+        addNewRequest(new BleUnnotifyRequest(service, character, response));
     }
 
-    @Override
-    public void readRssi(BleGeneralResponse response) {
-        addNewRequest(new BleReadRssiRequest(mMac, response));
-    }
-
-    @Override
-    public void refresh() {
-        addNewRequest(new BleRefreshCacheRequest(mMac));
-    }
-
-    @Override
     public void indicate(UUID service, UUID character, BleGeneralResponse response) {
-        addNewRequest(new BleIndicateRequest(mMac, service, character, response));
+        addNewRequest(new BleIndicateRequest(service, character, response));
+    }
+
+    public void unindicate(UUID service, UUID character, BleGeneralResponse response) {
+        addNewRequest(new BleUnnotifyRequest(service, character, response));
+    }
+
+    public void readRemoteRssi(BleGeneralResponse response) {
+        addNewRequest(new BleReadRssiRequest(response));
     }
 
     private void addNewRequest(BleRequest request) {
-        if (!isRequestExceedLimit()) {
+        checkRuntime();
+
+        if (mBleWorkList.size() < MAX_REQUEST_COUNT) {
+            request.setRuntimeChecker(this);
+            request.setAddress(mAddress);
+            request.setWorker(mWorker);
             mBleWorkList.add(request);
-            scheduleNextRequest();
         } else {
-            notifyRequestExceedLimit(request);
+            request.onResponse(Code.REQUEST_OVERFLOW);
         }
+
+        scheduleNextRequest(100);
     }
 
-    private boolean isRequestExceedLimit() {
-        return mBleWorkList.size() >= MAX_REQUEST_COUNT;
+    @Override
+    public void onRequestCompleted(BleRequest request) {
+        checkRuntime();
+
+        if (request != mCurrentRequest) {
+            throw new IllegalStateException("request not match");
+        }
+
+        mCurrentRequest = null;
+
+        scheduleNextRequest(100);
     }
 
-    private void addPrioRequest(BleRequest request) {
-        mBleWorkList.add(0, request);
-        scheduleNextRequest();
-    }
-
-    private void callWorkerForNewRequest(BleRequest request) {
-        mWorkerHandler.obtainMessage(BleConnectWorker.MSG_SCHEDULE_NEXT, request).sendToTarget();
+    private void scheduleNextRequest(long delayInMillis) {
+        mHandler.sendEmptyMessageDelayed(MSG_SCHEDULE_NEXT, delayInMillis);
     }
 
     private void scheduleNextRequest() {
@@ -123,56 +143,24 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, IBleConnectM
 
         if (!ListUtils.isEmpty(mBleWorkList)) {
             mCurrentRequest = mBleWorkList.remove(0);
-
-            if (!BluetoothUtils.isBleSupported()) {
-                mCurrentRequest.setRequestCode(BLE_NOT_SUPPORTED);
-                dispatchRequestResult();
-            } else if (!BluetoothUtils.isBluetoothEnabled()) {
-                mCurrentRequest.setRequestCode(BLUETOOTH_DISABLED);
-                dispatchRequestResult();
-            } else {
-                callWorkerForNewRequest(mCurrentRequest);
-            }
+            mCurrentRequest.process(this);
         }
-    }
-
-    private void retryCurrentRequest() {
-        BleRequest request = mCurrentRequest;
-        mCurrentRequest.retry();
-        mCurrentRequest = null;
-        addPrioRequest(request);
-    }
-
-    private void notifyRequestExceedLimit(BleRequest request) {
-        request.setRequestCode(REQUEST_OVERFLOW);
-        mWorkerHandler.obtainMessage(0, request).sendToTarget();
     }
 
     @Override
-    public void notifyWorkerResult(BleRequest request) {
-        if (request == null || request != mCurrentRequest) {
-            return;
+    public void checkRuntime() {
+        if (Thread.currentThread() != mHandler.getLooper().getThread()) {
+            throw new IllegalStateException("Thread Context Illegal");
         }
-
-        if (request.isSuccess() || !mCurrentRequest.canRetry()) {
-            dispatchRequestResult();
-        } else {
-            retryCurrentRequest();
-        }
-    }
-
-    private void dispatchRequestResult() {
-        if (mCurrentRequest != null) {
-            mCurrentRequest.onResponse();
-        }
-
-        mCurrentRequest = null;
-        scheduleNextRequest();
     }
 
     @Override
-    public void notifyHandlerReady(Handler handler) {
-        // TODO Auto-generated method stub
-        mWorkerHandler = handler;
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_SCHEDULE_NEXT:
+                scheduleNextRequest();
+                break;
+        }
+        return true;
     }
 }

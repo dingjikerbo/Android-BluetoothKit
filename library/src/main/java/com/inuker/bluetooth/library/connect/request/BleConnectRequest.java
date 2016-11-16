@@ -1,71 +1,199 @@
 package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
+import android.os.Message;
 
+import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import static com.inuker.bluetooth.library.Constants.*;
+import com.inuker.bluetooth.library.model.BleGattProfile;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 public class BleConnectRequest extends BleRequest implements ServiceDiscoverListener {
 
-    private BleConnectOption mOptions;
+    private static final int MSG_CONNECT = 1;
+    private static final int MSG_DISCOVER_SERVICE = 2;
+    private static final int MSG_CONNECT_TIMEOUT = 3;
+    private static final int MSG_DISCOVER_SERVICE_TIMEOUT = 4;
+    private static final int MSG_RETRY_DISCOVER_SERVICE = 5;
 
-    public BleConnectRequest(String mac, BleConnectOption options, BleGeneralResponse response) {
-        super(mac, response);
-        mOptions = options;
-    }
+    private BleConnectOptions mConnectOptions;
 
-    @Override
-    protected int getDefaultRetryLimit() {
-        // TODO Auto-generated method stub
-        return mOptions != null ? mOptions.getMaxRetry() : 0;
-    }
+    private int mConnectCount;
 
-    @Override
-    public int getTimeoutLimit() {
-        return mOptions != null ? mOptions.getTimeoutInMillis() : 60000;
+    private int mServiceDiscoverCount;
+
+    public BleConnectRequest(BleConnectOptions options, BleGeneralResponse response) {
+        super(response);
+        this.mConnectOptions = options != null ? options : new BleConnectOptions.Builder().build();
     }
 
     @Override
     public void processRequest() {
-        switch (getConnectStatus()) {
-            case STATUS_DEVICE_CONNECTED:
-                throw new IllegalStateException("status impossible");
+        processConnect();
+    }
 
-            case STATUS_DEVICE_SERVICE_READY:
-                onRequestFinished(REQUEST_SUCCESS);
+    private void processConnect() {
+        mHandler.removeCallbacksAndMessages(null);
+        mServiceDiscoverCount = 0;
+
+        switch (getCurrentStatus()) {
+            case Constants.STATUS_DEVICE_CONNECTED:
+                processDiscoverService();
                 break;
 
-            default:
-                if (openBluetoothGatt()) {
-                    registerGattResponseListener(this);
+            case Constants.STATUS_DEVICE_DISCONNECTED:
+                if (!doOpenNewGatt()) {
+                    closeGatt();
                 } else {
-                    onRequestFinished(REQUEST_FAILED);
+                    mHandler.sendEmptyMessageDelayed(MSG_CONNECT_TIMEOUT, mConnectOptions.getConnectTimeout());
                 }
                 break;
+
+            case Constants.STATUS_DEVICE_SERVICE_READY:
+                onRequestCompleted(Code.REQUEST_SUCCESS);
+                break;
         }
     }
 
-    @Override
-    int getGattResponseListenerId() {
-        return GATT_RESP_SERVICE_DISCOVER;
+    private boolean doOpenNewGatt() {
+        mConnectCount++;
+        return openGatt();
     }
 
-    @Override
-    public void onServicesDiscovered(int status) {
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            onRequestFinished(REQUEST_SUCCESS);
+    private boolean doDiscoverService() {
+        mServiceDiscoverCount++;
+        return discoverService();
+    }
+
+    private void retryConnectIfNeeded() {
+        if (mConnectCount < mConnectOptions.getConnectRetry() + 1) {
+            retryConnectLater();
         } else {
-            onRequestFinished(REQUEST_FAILED);
+            onRequestCompleted(Code.REQUEST_FAILED);
+        }
+    }
+
+    private void retryDiscoverServiceIfNeeded() {
+        if (mServiceDiscoverCount < mConnectOptions.getServiceDiscoverRetry() + 1) {
+            retryDiscoverServiceLater();
+        } else {
+            closeGatt();
+        }
+    }
+
+    private void onServiceDiscoverFailed() {
+        BluetoothLog.v(String.format("onServiceDiscoverFailed"));
+        refreshDeviceCache();
+        mHandler.sendEmptyMessage(MSG_RETRY_DISCOVER_SERVICE);
+    }
+
+    private void processDiscoverService() {
+        BluetoothLog.v(String.format("processDiscoverService, status = %s", getStatusText()));
+
+        switch (getCurrentStatus()) {
+            case Constants.STATUS_DEVICE_CONNECTED:
+                if (!doDiscoverService()) {
+                    onServiceDiscoverFailed();
+                } else {
+                    mHandler.sendEmptyMessageDelayed(MSG_DISCOVER_SERVICE_TIMEOUT, mConnectOptions.getServiceDiscoverTimeout());
+                }
+                break;
+
+            case Constants.STATUS_DEVICE_DISCONNECTED:
+                retryConnectIfNeeded();
+                break;
+
+            case Constants.STATUS_DEVICE_SERVICE_READY:
+                onRequestCompleted(Code.REQUEST_SUCCESS);
+                break;
+        }
+    }
+
+    private void retryConnectLater() {
+        log(String.format("retry connect later"));
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.sendEmptyMessageDelayed(MSG_CONNECT, 1000);
+    }
+
+    private void retryDiscoverServiceLater() {
+        log(String.format("retry discover service later"));
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.sendEmptyMessageDelayed(MSG_DISCOVER_SERVICE, 1000);
+    }
+
+    private void processConnectTimeout() {
+        log(String.format("connect timeout"));
+        mHandler.removeCallbacksAndMessages(null);
+        closeGatt();
+    }
+
+    private void processDiscoverServiceTimeout() {
+        log(String.format("service discover timeout"));
+        mHandler.removeCallbacksAndMessages(null);
+        closeGatt();
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_CONNECT:
+                processConnect();
+                break;
+
+            case MSG_DISCOVER_SERVICE:
+                processDiscoverService();
+                break;
+
+            case MSG_RETRY_DISCOVER_SERVICE:
+                retryDiscoverServiceIfNeeded();
+                break;
+
+            case MSG_CONNECT_TIMEOUT:
+                processConnectTimeout();
+                break;
+
+            case MSG_DISCOVER_SERVICE_TIMEOUT:
+                processDiscoverServiceTimeout();
+                break;
+        }
+        return super.handleMessage(msg);
+    }
+
+    @Override
+    public String toString() {
+        return "BleConnectRequest{" +
+                "options=" + mConnectOptions +
+                '}';
+    }
+
+    @Override
+    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
+        checkRuntime();
+
+        mHandler.removeMessages(MSG_CONNECT_TIMEOUT);
+
+        if (connectedOrDisconnected) {
+            mHandler.sendEmptyMessageDelayed(MSG_DISCOVER_SERVICE, 300);
+        } else {
+            mHandler.removeCallbacksAndMessages(null);
+            retryConnectIfNeeded();
         }
     }
 
     @Override
-    void onRequestFinished(int code) {
-        if (code == REQUEST_SUCCESS) {
-            mExtra.putParcelable(EXTRA_GATT_PROFILE, getGattProfile());
+    public void onServicesDiscovered(int status, BleGattProfile profile) {
+        checkRuntime();
+
+        mHandler.removeMessages(MSG_DISCOVER_SERVICE_TIMEOUT);
+
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            putParcelable(Constants.EXTRA_GATT_PROFILE, profile);
+            onRequestCompleted(Code.REQUEST_SUCCESS);
+        } else {
+            onServiceDiscoverFailed();
         }
-        super.onRequestFinished(code);
     }
 }

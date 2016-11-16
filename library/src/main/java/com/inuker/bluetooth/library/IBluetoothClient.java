@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public interface IBluetoothClient {
 
-    void connect(String mac, BleConnectOption options, BleConnectResponse response);
+    void connect(String mac, BleConnectOptions options, BleConnectResponse response);
 
     void disconnect(String mac);
 
@@ -43,8 +43,6 @@ public interface IBluetoothClient {
     void readRssi(String mac, BleReadRssiResponse response);
 
     void search(SearchRequest request, SearchResponse response);
-
-    void refreshCache(String mac);
 
     void stopSearch();
 }

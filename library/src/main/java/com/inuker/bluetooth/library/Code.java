@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library;
 
 /**
- * Created by liwentian on 2016/10/10.
+ * Created by dingjikerbo on 2016/10/10.
  */
 public class Code {
 

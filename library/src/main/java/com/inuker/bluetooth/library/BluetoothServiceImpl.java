@@ -7,13 +7,30 @@ import android.os.Message;
 import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.BleConnectManager;
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearchManager;
 import com.inuker.bluetooth.library.search.SearchRequest;
-import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
+
+import static com.inuker.bluetooth.library.Constants.CODE_CONNECT;
+import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
+import static com.inuker.bluetooth.library.Constants.CODE_INDICATE;
+import static com.inuker.bluetooth.library.Constants.CODE_NOTIFY;
+import static com.inuker.bluetooth.library.Constants.CODE_READ;
+import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
+import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
+import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
+import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
+import static com.inuker.bluetooth.library.Constants.CODE_WRITE;
+import static com.inuker.bluetooth.library.Constants.CODE_WRITE_NORSP;
+import static com.inuker.bluetooth.library.Constants.EXTRA_BYTE_VALUE;
+import static com.inuker.bluetooth.library.Constants.EXTRA_CHARACTER_UUID;
+import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
+import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
+import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
+import static com.inuker.bluetooth.library.Constants.EXTRA_SERVICE_UUID;
 
 /**
  * Created by dingjikerbo on 2015/10/29.
@@ -74,16 +91,12 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
         switch (msg.what) {
             case CODE_CONNECT:
-                BleConnectOption options = args.getParcelable(EXTRA_OPTIONS);
+                BleConnectOptions options = args.getParcelable(EXTRA_OPTIONS);
                 BleConnectManager.connect(mac, options, response);
                 break;
 
             case CODE_DISCONNECT:
                 BleConnectManager.disconnect(mac);
-                break;
-
-            case CODE_REFRESH:
-                BleConnectManager.refresh(mac);
                 break;
 
             case CODE_READ:

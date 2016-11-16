@@ -3,9 +3,8 @@ package com.inuker.bluetooth.library.connect;
 import android.os.HandlerThread;
 import android.os.Looper;
 
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
-import com.inuker.bluetooth.library.connect.response.BluetoothResponse;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -45,16 +44,12 @@ public class BleConnectManager {
         return master;
     }
 
-    public static void connect(String mac, BleConnectOption options, BleGeneralResponse response) {
+    public static void connect(String mac, BleConnectOptions options, BleGeneralResponse response) {
         getBleConnectMaster(mac).connect(options, response);
     }
 
     public static void disconnect(String mac) {
         getBleConnectMaster(mac).disconnect();
-    }
-
-    public static void refresh(String mac) {
-        getBleConnectMaster(mac).refresh();
     }
 
     public static void read(String mac, UUID service, UUID character, BleGeneralResponse response) {

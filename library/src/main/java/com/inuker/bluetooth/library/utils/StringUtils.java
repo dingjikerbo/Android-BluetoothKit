@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.utils;
 
 /**
- * Created by liwentian on 2016/9/26.
+ * Created by dingjikerbo on 2016/9/26.
  */
 public class StringUtils {
     public static boolean isNotBlank(final CharSequence cs) {

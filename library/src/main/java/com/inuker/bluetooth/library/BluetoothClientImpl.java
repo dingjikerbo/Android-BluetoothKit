@@ -17,7 +17,7 @@ import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListenerWrapper;
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
@@ -34,7 +34,6 @@ import com.inuker.bluetooth.library.utils.ListUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
-import static com.inuker.bluetooth.library.Constants.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,6 +41,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+
+import static com.inuker.bluetooth.library.Constants.ACTION_CHARACTER_CHANGED;
+import static com.inuker.bluetooth.library.Constants.ACTION_CONNECT_STATUS_CHANGED;
+import static com.inuker.bluetooth.library.Constants.CODE_CONNECT;
+import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
+import static com.inuker.bluetooth.library.Constants.CODE_INDICATE;
+import static com.inuker.bluetooth.library.Constants.CODE_NOTIFY;
+import static com.inuker.bluetooth.library.Constants.CODE_READ;
+import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
+import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
+import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
+import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
+import static com.inuker.bluetooth.library.Constants.CODE_WRITE;
+import static com.inuker.bluetooth.library.Constants.CODE_WRITE_NORSP;
+import static com.inuker.bluetooth.library.Constants.DEVICE_FOUND;
+import static com.inuker.bluetooth.library.Constants.EXTRA_BYTE_VALUE;
+import static com.inuker.bluetooth.library.Constants.EXTRA_CHARACTER_UUID;
+import static com.inuker.bluetooth.library.Constants.EXTRA_GATT_PROFILE;
+import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
+import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
+import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
+import static com.inuker.bluetooth.library.Constants.EXTRA_RSSI;
+import static com.inuker.bluetooth.library.Constants.EXTRA_SEARCH_RESULT;
+import static com.inuker.bluetooth.library.Constants.EXTRA_SERVICE_UUID;
+import static com.inuker.bluetooth.library.Constants.EXTRA_STATUS;
+import static com.inuker.bluetooth.library.Constants.REQUEST_SUCCESS;
+import static com.inuker.bluetooth.library.Constants.SEARCH_CANCEL;
+import static com.inuker.bluetooth.library.Constants.SEARCH_START;
+import static com.inuker.bluetooth.library.Constants.SEARCH_STOP;
+import static com.inuker.bluetooth.library.Constants.SERVICE_UNREADY;
+import static com.inuker.bluetooth.library.Constants.STATUS_DISCONNECTED;
 
 /**
  * Created by dingjikerbo on 16/4/8.
@@ -134,7 +164,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
 
     @Override
-    public void connect(String mac, BleConnectOption options, final BleConnectResponse response) {
+    public void connect(String mac, BleConnectOptions options, final BleConnectResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
         args.putParcelable(EXTRA_OPTIONS, options);
@@ -374,13 +404,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                 }
             }
         });
-    }
-
-    @Override
-    public void refreshCache(String mac) {
-        Bundle args = new Bundle();
-        args.putString(EXTRA_MAC, mac);
-        safeCallBluetoothApi(CODE_REFRESH, args, null);
     }
 
     @Override

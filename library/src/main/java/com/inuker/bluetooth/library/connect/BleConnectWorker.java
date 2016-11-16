@@ -13,9 +13,9 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.SparseArray;
 
-import com.inuker.bluetooth.library.connect.listener.DisconnectListener;
+import com.inuker.bluetooth.library.Constants;
+import com.inuker.bluetooth.library.RuntimeChecker;
 import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.listener.IBluetoothGattResponse;
 import com.inuker.bluetooth.library.connect.listener.ReadCharacterListener;
@@ -23,10 +23,8 @@ import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.listener.WriteCharacterListener;
 import com.inuker.bluetooth.library.connect.listener.WriteDescriptorListener;
-import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.response.BluetoothGattResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
-import com.inuker.bluetooth.library.model.BleGattService;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -34,12 +32,9 @@ import com.inuker.bluetooth.library.utils.Version;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
-import static com.inuker.bluetooth.library.Constants.*;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,82 +43,71 @@ import java.util.UUID;
 /**
  * Created by dingjikerbo on 16/4/8.
  */
-public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor, IBluetoothGattResponse, ProxyInterceptor, GattResponseListener {
+public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IBluetoothGattResponse, ProxyInterceptor, RuntimeChecker {
 
-    public static final int MSG_SCHEDULE_NEXT = 0x160;
-    public static final int MSG_GATT_RESPONSE = 0x180;
+    private static final int MSG_GATT_RESPONSE = 0x120;
 
     private BluetoothGatt mBluetoothGatt;
     private BluetoothDevice mBluetoothDevice;
 
-    private IBleConnectDispatcher mBleConnectDispatcher;
-
-    private BleRequest mCurrentRequest;
+    private GattResponseListener mGattResponseListener;
 
     private Handler mWorkerHandler;
 
     private volatile int mConnectStatus;
 
-    private SparseArray<GattResponseListener> mGattResponseListeners;
+    private BleGattProfile mBleGattProfile;
+    private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
 
     private IBluetoothGattResponse mBluetoothGattResponse;
 
-    private Map<UUID, Map<UUID, BluetoothGattCharacteristic>> mDeviceProfile;
+    private RuntimeChecker mRuntimeChecker;
 
-    private volatile boolean mPendingRefreshCache;
-
-    public static BleConnectWorker attach(String mac, IBleConnectDispatcher dispatcher) {
-        return new BleConnectWorker(mac, dispatcher);
-    }
-
-    private BleConnectWorker(String mac, IBleConnectDispatcher dispatcher) {
-        mBleConnectDispatcher = dispatcher;
-
+    public BleConnectWorker(String mac, RuntimeChecker runtimeChecker) {
         BluetoothAdapter adapter = BluetoothUtils.getBluetoothLeAdapter();
-        mBluetoothDevice = adapter.getRemoteDevice(mac);
+        if (adapter != null) {
+            mBluetoothDevice = adapter.getRemoteDevice(mac);
+        } else {
+            throw new IllegalStateException("ble adapter null");
+        }
 
+        mRuntimeChecker = runtimeChecker;
         mWorkerHandler = new Handler(Looper.myLooper(), this);
-        mBleConnectDispatcher.notifyHandlerReady(mWorkerHandler);
-
-        mGattResponseListeners = new SparseArray<GattResponseListener>();
-        mBluetoothGattResponse = ProxyUtils.getProxy(this, IBluetoothGattResponse.class, this);
-
         mDeviceProfile = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
+        mBluetoothGattResponse = ProxyUtils.getProxy(this, IBluetoothGattResponse.class, this);
     }
 
     private void refreshServiceProfile() {
+        BluetoothLog.v(String.format("refreshServiceProfile for %s", mBluetoothDevice.getAddress()));
+
         List<BluetoothGattService> services = mBluetoothGatt.getServices();
 
         Map<UUID, Map<UUID, BluetoothGattCharacteristic>> newProfiles = new HashMap<UUID, Map<UUID, BluetoothGattCharacteristic>>();
 
         for (BluetoothGattService service : services) {
+            UUID serviceUUID = service.getUuid();
 
-            BluetoothLog.v("Service: " + service.getUuid());
+            Map<UUID, BluetoothGattCharacteristic> map = newProfiles.get(serviceUUID);
 
-            Map<UUID, BluetoothGattCharacteristic> map = new HashMap<UUID, BluetoothGattCharacteristic>();
-            newProfiles.put(service.getUuid(), map);
+            if (map == null) {
+                BluetoothLog.v("Service: " + serviceUUID);
+                map = new HashMap<UUID, BluetoothGattCharacteristic>();
+                newProfiles.put(service.getUuid(), map);
+            }
 
             List<BluetoothGattCharacteristic> characters = service
                     .getCharacteristics();
 
             for (BluetoothGattCharacteristic character : characters) {
-                BluetoothLog.v("character: uuid = "
-                        + character.getUuid());
-
+                UUID characterUUID = character.getUuid();
+                BluetoothLog.v("character: uuid = " + characterUUID);
                 map.put(character.getUuid(), character);
             }
         }
 
         mDeviceProfile.clear();
         mDeviceProfile.putAll(newProfiles);
-    }
-
-    private BluetoothGattCharacteristic getCharacter(UUID service, UUID character, byte[] value) {
-        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
-        if (characteristic != null) {
-            characteristic.setValue(value);
-        }
-        return characteristic;
+        mBleGattProfile = new BleGattProfile(mDeviceProfile);
     }
 
     private BluetoothGattCharacteristic getCharacter(UUID service, UUID character) {
@@ -136,12 +120,503 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
             }
         }
 
+        if (characteristic == null) {
+            if (mBluetoothGatt != null) {
+                BluetoothGattService gattService = mBluetoothGatt.getService(service);
+                if (gattService != null) {
+                    characteristic = gattService.getCharacteristic(character);
+                }
+            }
+        }
+
         return characteristic;
     }
 
-    private void processRequest(BleRequest request) {
-        mCurrentRequest = request;
-        mCurrentRequest.process(this);
+    private void setConnectStatus(int status) {
+        BluetoothLog.v(String.format("setConnectStatus status = %s", Constants.getStatusText(status)));
+        mConnectStatus = status;
+    }
+
+    @Override
+    public void onConnectionStateChange(int status, int newState) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onConnectionStateChange for %s: status = %d, newState = %d",
+                mBluetoothDevice.getAddress(), status, newState));
+
+        if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
+            setConnectStatus(Constants.STATUS_DEVICE_CONNECTED);
+
+            if (mGattResponseListener != null) {
+                mGattResponseListener.onConnectStatusChanged(true);
+            }
+        } else {
+            closeGatt();
+        }
+    }
+
+    @Override
+    public void onServicesDiscovered(int status) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onServicesDiscovered for %s: status = %d",
+                mBluetoothDevice.getAddress(), status));
+
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            setConnectStatus(Constants.STATUS_DEVICE_SERVICE_READY);
+            broadcastConnectStatus(Constants.STATUS_CONNECTED);
+            refreshServiceProfile();
+        }
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof ServiceDiscoverListener) {
+            ((ServiceDiscoverListener) mGattResponseListener).onServicesDiscovered(status, mBleGattProfile);
+        }
+    }
+
+    @Override
+    public void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format(
+                "onCharacteristicRead for %s: status = %d, service = 0x%s, character = 0x%s, value = %s",
+                mBluetoothDevice.getAddress(),
+                status,
+                characteristic.getService().getUuid(),
+                characteristic.getUuid(),
+                ByteUtils.byteToString(value)));
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof ReadCharacterListener) {
+            ((ReadCharacterListener) mGattResponseListener).onCharacteristicRead(characteristic, status, value);
+        }
+    }
+
+    @Override
+    public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format(
+                "onCharacteristicWrite for %s: status = %d, service = 0x%s, character = 0x%s, value = %s",
+                mBluetoothDevice.getAddress(),
+                status,
+                characteristic.getService().getUuid(),
+                characteristic.getUuid(),
+                ByteUtils.byteToString(value)));
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof WriteCharacterListener) {
+            ((WriteCharacterListener) mGattResponseListener).onCharacteristicWrite(characteristic, status, value);
+        }
+    }
+
+    @Override
+    public void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onCharacteristicChanged for %s: value = %s, service = 0x%s, character = 0x%s",
+                mBluetoothDevice.getAddress(),
+                ByteUtils.byteToString(value),
+                characteristic.getService().getUuid(),
+                characteristic.getUuid()));
+
+        broadcastCharacterChanged(characteristic.getService().getUuid(), characteristic.getUuid(), value);
+    }
+
+    @Override
+    public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onDescriptorWrite for %s: status = %d, service = 0x%s, character = 0x%s, descriptor = 0x%s",
+                mBluetoothDevice.getAddress(),
+                status,
+                descriptor.getCharacteristic().getService().getUuid(),
+                descriptor.getCharacteristic().getUuid(),
+                descriptor.getUuid()));
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof WriteDescriptorListener) {
+            ((WriteDescriptorListener) mGattResponseListener).onDescriptorWrite(descriptor, status);
+        }
+    }
+
+    @Override
+    public void onReadRemoteRssi(int rssi, int status) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onReadRemoteRssi for %s, rssi = %d, status = %d",
+                mBluetoothDevice.getAddress(), rssi, status));
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof ReadRssiListener) {
+            ((ReadRssiListener) mGattResponseListener).onReadRemoteRssi(rssi, status);
+        }
+    }
+
+    private void broadcastConnectStatus(int status) {
+        Intent intent = new Intent(Constants.ACTION_CONNECT_STATUS_CHANGED);
+        intent.putExtra(Constants.EXTRA_MAC, mBluetoothDevice.getAddress());
+        intent.putExtra(Constants.EXTRA_STATUS, status);
+        BluetoothUtils.sendBroadcast(intent);
+    }
+
+    private void broadcastCharacterChanged(UUID service, UUID character,
+    byte[] value) {
+        Intent intent = new Intent(
+                Constants.ACTION_CHARACTER_CHANGED);
+        intent.putExtra(Constants.EXTRA_MAC,
+                mBluetoothDevice.getAddress());
+        intent.putExtra(Constants.EXTRA_SERVICE_UUID, service);
+        intent.putExtra(Constants.EXTRA_CHARACTER_UUID, character);
+        intent.putExtra(Constants.EXTRA_BYTE_VALUE, value);
+        BluetoothUtils.sendBroadcast(intent);
+    }
+
+    @Override
+    public boolean openGatt() {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("openGatt for %s", getAddress()));
+
+        if (mBluetoothGatt != null) {
+            BluetoothLog.e(String.format("Previous gatt not closed"));
+            return true;
+        }
+
+        Context context = BluetoothUtils.getContext();
+        BluetoothGattCallback callback = new BluetoothGattResponse(mBluetoothGattResponse);
+
+        if (Version.isMarshmallow()) {
+            mBluetoothGatt = mBluetoothDevice.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE);
+        } else {
+            mBluetoothGatt = mBluetoothDevice.connectGatt(context, false, callback);
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("openGatt failed: connectGatt return null!"));
+            return false;
+        }
+
+        return true;
+    }
+
+    private String getAddress() {
+        return mBluetoothDevice.getAddress();
+    }
+
+    @Override
+    public void closeGatt() {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("closeGatt for %s", getAddress()));
+
+        if (mBluetoothGatt != null) {
+            mBluetoothGatt.close();
+            mBluetoothGatt = null;
+        }
+
+        if (mGattResponseListener != null) {
+            mGattResponseListener.onConnectStatusChanged(false);
+        }
+
+        setConnectStatus(Constants.STATUS_DEVICE_DISCONNECTED);
+        broadcastConnectStatus(Constants.STATUS_DISCONNECTED);
+    }
+
+    @Override
+    public boolean discoverService() {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("discoverService for %s", getAddress()));
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("discoverService but gatt is null!"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.discoverServices()) {
+            BluetoothLog.e(String.format("discoverServices failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int getCurrentStatus() {
+        checkRuntime();
+        return mConnectStatus;
+    }
+
+    @Override
+    public void registerGattResponseListener(GattResponseListener listener) {
+        checkRuntime();
+        mGattResponseListener = listener;
+    }
+
+    @Override
+    public void clearGattResponseListener(GattResponseListener listener) {
+        checkRuntime();
+
+        if (mGattResponseListener == listener) {
+            mGattResponseListener = null;
+        }
+    }
+
+    @Override
+    public boolean refreshDeviceCache() {
+        BluetoothLog.v(String.format("refreshDeviceCache for %s", getAddress()));
+
+        checkRuntime();
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!refreshGattCache(mBluetoothGatt)) {
+            BluetoothLog.e(String.format("refreshDeviceCache failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean refreshGattCache(BluetoothGatt gatt) {
+        boolean result = false;
+        try {
+            if (gatt != null) {
+                Method refresh = BluetoothGatt.class.getMethod("refresh");
+                if (refresh != null) {
+                    refresh.setAccessible(true);
+                    result = (boolean) refresh.invoke(gatt, new Object[0]);
+                }
+            }
+        } catch (Exception e) {
+            BluetoothLog.e(e);
+        }
+
+        BluetoothLog.v(String.format("refreshDeviceCache return %b", result));
+
+        return result;
+    }
+
+    @Override
+    public boolean readCharacteristic(UUID service, UUID character) {
+        BluetoothLog.v(String.format("readCharacteristic for %s: service = 0x%s, character = 0x%s",
+                mBluetoothDevice.getAddress(), service, character));
+
+        checkRuntime();
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicReadable(characteristic)) {
+            BluetoothLog.e(String.format("characteristic not readable!"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.readCharacteristic(characteristic)) {
+            BluetoothLog.e(String.format("readCharacteristic failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
+        BluetoothLog.v(String.format("writeCharacteristic for %s: service = 0x%s, character = 0x%s, value = 0x%s",
+                mBluetoothDevice.getAddress(), service, character, ByteUtils.byteToString(value)));
+
+        checkRuntime();
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicWritable(characteristic)) {
+            BluetoothLog.e(String.format("characteristic not writable!"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        characteristic.setValue(value != null ? value : ByteUtils.EMPTY_BYTES);
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+
+        if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
+            BluetoothLog.e(String.format("writeCharacteristic failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
+        BluetoothLog.v(String.format("writeCharacteristicWithNoRsp for %s: service = 0x%s, character = 0x%s, value = 0x%s",
+                mBluetoothDevice.getAddress(), service, character, ByteUtils.byteToString(value)));
+
+        checkRuntime();
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicNoRspWritable(characteristic)) {
+            BluetoothLog.e(String.format("characteristic not norsp writable!"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        characteristic.setValue(value != null ? value : ByteUtils.EMPTY_BYTES);
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+
+        if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
+            BluetoothLog.e(String.format("writeCharacteristic failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("setCharacteristicNotification for %s, service = %s, character = %s, enable = %b",
+                getAddress(), service, character, enable));
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicNotifyable(characteristic)) {
+            BluetoothLog.e(String.format("characteristic not notifyable!"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+            BluetoothLog.e(String.format("setCharacteristicNotification failed"));
+            return false;
+        }
+
+        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG);
+
+        if (descriptor == null) {
+            BluetoothLog.e(String.format("getDescriptor for notify null!"));
+            return false;
+        }
+
+        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+
+        if (!descriptor.setValue(value)) {
+            BluetoothLog.e(String.format("setValue for notify descriptor failed!"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.writeDescriptor(descriptor)) {
+            BluetoothLog.e(String.format("writeDescriptor for notify failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean setCharacteristicIndication(UUID service, UUID character, boolean enable) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("setCharacteristicIndication for %s, service = %s, character = %s, enable = %b",
+                getAddress(), service, character, enable));
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        if (!isCharacteristicIndicatable(characteristic)) {
+            BluetoothLog.e(String.format("characteristic not indicatable!"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+            BluetoothLog.e(String.format("setCharacteristicIndication failed"));
+            return false;
+        }
+
+        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG);
+
+        if (descriptor == null) {
+            BluetoothLog.e(String.format("getDescriptor for indicate null!"));
+            return false;
+        }
+
+        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+
+        if (!descriptor.setValue(value)) {
+            BluetoothLog.e(String.format("setValue for indicate descriptor failed!"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.writeDescriptor(descriptor)) {
+            BluetoothLog.e(String.format("writeDescriptor for indicate failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean readRemoteRssi() {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("readRemoteRssi for %s", getAddress()));
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.readRemoteRssi()) {
+            BluetoothLog.e(String.format("readRemoteRssi failed"));
+            return false;
+        }
+
+        return true;
     }
 
     private boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {
@@ -166,408 +641,13 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public boolean readCharacteristic(UUID service, UUID character) {
-        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
-
-        if (characteristic == null) {
-            BluetoothLog.w(String.format(">>> characteristic not exist!"));
-            return false;
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_GATT_RESPONSE:
+                ProxyBulk.safeInvoke(msg.obj);
+                break;
         }
-
-        if (!isCharacteristicReadable(characteristic)) {
-            BluetoothLog.w(String.format(">>> characteristic not readable!"));
-            return false;
-        }
-
-        boolean flag = mBluetoothGatt.readCharacteristic(characteristic);
-        if (!flag) {
-            BluetoothLog.w(String.format("readCharacteristic failed!"));
-        }
-
-        return flag;
-    }
-
-    @Override
-    public boolean writeCharacteristic(UUID service, UUID character, byte[] value) {
-        BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
-
-        if (characteristic == null) {
-            BluetoothLog.w(String.format(">>> characteristic not exist!"));
-            return false;
-        }
-
-        if (!isCharacteristicWritable(characteristic)) {
-            BluetoothLog.w(String.format(">>> characteristic not writable!"));
-            return false;
-        }
-
-        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-
-        boolean flag = mBluetoothGatt.writeCharacteristic(characteristic);
-        if (!flag) {
-            BluetoothLog.w(String.format("writeCharacteristic failed!"));
-        }
-
-        return flag;
-    }
-
-    @Override
-    public boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value) {
-        BluetoothGattCharacteristic characteristic = getCharacter(service, character, value);
-
-        if (characteristic == null) {
-            BluetoothLog.w(String.format(">>> characteristic not exist!"));
-            return false;
-        }
-
-        if (!isCharacteristicNoRspWritable(characteristic)) {
-            BluetoothLog.w(String.format(">>> characteristic not norsp writable!"));
-            return false;
-        }
-
-        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-
-        boolean flag = mBluetoothGatt.writeCharacteristic(characteristic);
-        if (!flag) {
-            BluetoothLog.w(String.format("writeCharacteristic failed!"));
-        }
-
-        return flag;
-    }
-
-    @Override
-    public boolean setCharacteristicNotification(UUID service, UUID character, boolean enable) {
-        BluetoothLog.v(String.format("setCharacteristicNotification service = %s, character = %s, enable = %b",
-                service, character, enable));
-
-        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
-
-        if (characteristic == null) {
-            BluetoothLog.w(String.format(">>> characteristic not exist!"));
-            return false;
-        }
-
-        if (!isCharacteristicNotifyable(characteristic)) {
-            BluetoothLog.w(String.format(">>> characteristic not notifyable!"));
-            return false;
-        }
-
-        if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
-            BluetoothLog.w(String.format(">>> setCharacteristicNotification failed!"));
-            return false;
-        }
-
-        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
-
-        if (descriptor == null) {
-            BluetoothLog.w(String.format(">>> getDescriptor for notify null!"));
-            return false;
-        }
-
-        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-
-        if (!descriptor.setValue(value)) {
-            BluetoothLog.w(String.format(">>> setValue for notify Descriptor failed!"));
-            return false;
-        }
-
-        boolean flag = mBluetoothGatt.writeDescriptor(descriptor);
-
-        if (!flag) {
-            BluetoothLog.w(String.format(">>> writeDescriptor for notify failed!"));
-        }
-
-        return flag;
-    }
-
-    @Override
-    public boolean setCharacteristicIndication(UUID service, UUID character, boolean enable) {
-        BluetoothLog.v(String.format("setCharacteristicIndication service = %s, character = %s, enable = %b",
-                service, character, enable));
-
-        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
-
-        if (characteristic == null) {
-            BluetoothLog.w(String.format(">>> characteristic not exist!"));
-            return false;
-        }
-
-        if (!isCharacteristicIndicatable(characteristic)) {
-            BluetoothLog.w(String.format(">>> characteristic not indicatable!"));
-            return false;
-        }
-
-        if (!mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
-            BluetoothLog.w(String.format(">>> setCharacteristicIndication failed!"));
-            return false;
-        }
-
-        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
-
-        if (descriptor == null) {
-            BluetoothLog.w(String.format(">>> getDescriptor for indicate null!"));
-            return false;
-        }
-
-        byte[] value = (enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-
-        if (!descriptor.setValue(value)) {
-            BluetoothLog.w(String.format(">>> setValue for indicate Descriptor failed!"));
-            return false;
-        }
-
-        boolean flag = mBluetoothGatt.writeDescriptor(descriptor);
-
-        if (!flag) {
-            BluetoothLog.w(String.format(">>> writeDescriptor for indicate failed!"));
-        }
-
-        return flag;
-    }
-
-    @Override
-    public boolean readRemoteRssi() {
-        return mBluetoothGatt.readRemoteRssi();
-    }
-
-    @Override
-    public void refreshCache() {
-        mPendingRefreshCache = true;
-    }
-
-    private void doRefreshCache() {
-        try {
-            if (mBluetoothGatt != null) {
-                Method refresh = BluetoothGatt.class.getMethod("refresh");
-                if (refresh != null) {
-                    refresh.setAccessible(true);
-                    refresh.invoke(mBluetoothGatt, new Object[0]);
-                }
-            }
-        } catch (Exception e) {
-            BluetoothLog.e(e);
-        }
-    }
-
-    private void setConnectStatus(int status) {
-        mConnectStatus = status;
-    }
-
-    private void onScheduleNext(BleRequest newRequest) {
-        if (mCurrentRequest != null) {
-            throw new IllegalStateException("previous request ongoing");
-        } else if (newRequest == null) {
-            throw new NullPointerException("new request null");
-        } else {
-            processRequest(newRequest);
-        }
-    }
-
-    @Override
-    public void registerGattResponseListener(int responseId, GattResponseListener listener) {
-        if (responseId > 0 && listener != null) {
-            mGattResponseListeners.put(responseId, listener);
-        }
-    }
-
-    @Override
-    public void unregisterGattResponseListener(int responseId) {
-        if (responseId > 0) {
-            mGattResponseListeners.remove(responseId);
-        }
-    }
-
-    @Override
-    public void notifyRequestResult() {
-        BleRequest request = mCurrentRequest;
-
-        mCurrentRequest = null;
-
-        mBleConnectDispatcher.notifyWorkerResult(request);
-    }
-
-    @Override
-    public int getConnectStatus() {
-        return mConnectStatus;
-    }
-
-    @Override
-    public BleGattProfile getGattProfile() {
-        BleGattProfile profile = new BleGattProfile();
-
-        Iterator itor = mDeviceProfile.entrySet().iterator();
-
-        List<BleGattService> services = new ArrayList<BleGattService>();
-
-        while (itor.hasNext()) {
-            Map.Entry entry = (Map.Entry) itor.next();
-
-            UUID serviceUUID = (UUID) entry.getKey();
-
-            BleGattService service = new BleGattService(serviceUUID);
-            services.add(service);
-
-            Map map = (Map) entry.getValue();
-            service.addCharacters(map.keySet());
-        }
-
-        profile.addServices(services);
-
-        return profile;
-    }
-
-    @Override
-    public boolean openBluetoothGatt() {
-        if (mBluetoothGatt != null) {
-            closeBluetoothGatt();
-            mBluetoothGatt = null;
-        }
-
-        if (mBluetoothGatt == null) {
-            BluetoothLog.v(String.format("openBluetoothGatt for %s", mBluetoothDevice.getAddress()));
-
-            BluetoothGattCallback callback = new BluetoothGattResponse(mBluetoothGattResponse);
-
-            if (Version.isMarshmallow()) {
-                mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false, callback, BluetoothDevice.TRANSPORT_LE);
-            } else {
-                mBluetoothGatt = mBluetoothDevice.connectGatt(getContext(), false, callback);
-            }
-        }
-
-        if (mBluetoothGatt != null && mPendingRefreshCache) {
-            mPendingRefreshCache = false;
-            doRefreshCache();
-        }
-
-        return mBluetoothGatt != null;
-    }
-
-    @Override
-    public void disconnect() {
-        if (mBluetoothGatt != null) {
-            mBluetoothGatt.disconnect();
-        }
-    }
-
-    @Override
-    public void closeBluetoothGatt() {
-        if (mBluetoothGatt != null) {
-            BluetoothLog.v(String.format("closeBluetoothGatt for %s", mBluetoothDevice.getAddress()));
-
-            mBluetoothGatt.close();
-
-            mBluetoothGatt = null;
-
-            mDeviceProfile.clear();
-
-            setConnectStatus(STATUS_DEVICE_DISCONNECTED);
-            broadcastConnectStatus(STATUS_DISCONNECTED);
-        }
-    }
-
-    private void broadcastConnectStatus(int status) {
-        Intent intent = new Intent(ACTION_CONNECT_STATUS_CHANGED);
-        intent.putExtra(EXTRA_MAC, mBluetoothDevice.getAddress());
-        intent.putExtra(EXTRA_STATUS, status);
-        BluetoothUtils.sendBroadcast(intent);
-    }
-
-    @Override
-    public void onConnectionStateChange(int status, int newState) {
-        BluetoothLog.v(String.format("onConnectionStateChange for %s status = %d, newState = %d",
-                mBluetoothDevice.getAddress(), status, newState));
-
-        if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
-            setConnectStatus(STATUS_DEVICE_CONNECTED);
-            BluetoothLog.v(String.format("discoverServices for %s", mBluetoothDevice.getAddress()));
-            mBluetoothGatt.discoverServices();
-        } else {
-            DisconnectListener listener = getGattResponseListener(GATT_RESP_DISCONNECT);
-
-            if (listener != null) {
-                listener.onDisconnected();
-            } else {
-                closeBluetoothGatt();
-            }
-        }
-    }
-
-    private <T> T getGattResponseListener(int id) {
-        return (T) mGattResponseListeners.get(id);
-    }
-
-    @Override
-    public void onServicesDiscovered(int status) {
-        BluetoothLog.v(String.format("onServicesDiscovered for %s status = %d",
-                mBluetoothDevice.getAddress(), status));
-
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            setConnectStatus(STATUS_DEVICE_SERVICE_READY);
-            broadcastConnectStatus(STATUS_CONNECTED);
-
-            refreshServiceProfile();
-        } else {
-            closeBluetoothGatt();
-        }
-
-        ServiceDiscoverListener listener = getGattResponseListener(GATT_RESP_SERVICE_DISCOVER);
-
-        if (listener != null) {
-            listener.onServicesDiscovered(status);
-        }
-    }
-
-    @Override
-    public void onCharacteristicRead(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
-        BluetoothLog.v(String.format("onCharacteristicRead status = %d, value = %s",
-                status, ByteUtils.byteToString(value)));
-
-        ReadCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_READ);
-        if (listener != null) {
-            listener.onCharacteristicRead(characteristic, status, value);
-        }
-    }
-
-    @Override
-    public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status) {
-        BluetoothLog.v(String.format("onCharacteristicWrite status = %d", status));
-
-        WriteCharacterListener listener = getGattResponseListener(GATT_RESP_CHARACTER_WRITE);
-        if (listener != null) {
-            listener.onCharacteristicWrite(characteristic, status);
-        }
-    }
-
-    @Override
-    public void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value) {
-        BluetoothLog.v(String.format("onCharacteristicChanged service %s, character %s, value = %s",
-                characteristic.getService().getUuid(), characteristic.getUuid(), ByteUtils.byteToString(value)));
-
-        Intent intent = new Intent(ACTION_CHARACTER_CHANGED);
-        intent.putExtra(EXTRA_MAC, mBluetoothDevice.getAddress());
-        intent.putExtra(EXTRA_SERVICE_UUID, characteristic.getService().getUuid());
-        intent.putExtra(EXTRA_CHARACTER_UUID, characteristic.getUuid());
-        intent.putExtra(EXTRA_BYTE_VALUE, value);
-        BluetoothUtils.sendBroadcast(intent);
-    }
-
-    @Override
-    public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
-        BluetoothLog.v(String.format("onDescriptorWrite status = %d", status));
-
-        WriteDescriptorListener listener = getGattResponseListener(GATT_RESP_DESCRIPTOR_WRITE);
-        if (listener != null) {
-            listener.onDescriptorWrite(status, descriptor);
-        }
-    }
-
-    @Override
-    public void onReadRemoteRssi(int rssi, int status) {
-        ReadRssiListener listener = getGattResponseListener(GATT_RESP_READ_RSSI);
-        if (listener != null) {
-            listener.onReadRemoteRssi(rssi, status);
-        }
+        return true;
     }
 
     @Override
@@ -578,21 +658,7 @@ public class BleConnectWorker implements Handler.Callback, IBleRequestProcessor,
     }
 
     @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case MSG_SCHEDULE_NEXT:
-                onScheduleNext((BleRequest) msg.obj);
-                break;
-
-            case MSG_GATT_RESPONSE:
-                ProxyBulk.safeInvoke(msg.obj);
-                break;
-        }
-
-        return true;
-    }
-
-    private Context getContext() {
-        return BluetoothUtils.getContext();
+    public void checkRuntime() {
+        mRuntimeChecker.checkRuntime();
     }
 }

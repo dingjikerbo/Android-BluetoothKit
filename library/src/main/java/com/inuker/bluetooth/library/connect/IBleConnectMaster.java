@@ -1,6 +1,6 @@
 package com.inuker.bluetooth.library.connect;
 
-import com.inuker.bluetooth.library.connect.options.BleConnectOption;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 
 import java.util.UUID;
@@ -10,7 +10,7 @@ import java.util.UUID;
  */
 public interface IBleConnectMaster {
 
-    void connect(BleConnectOption options, BleGeneralResponse response);
+    void connect(BleConnectOptions options, BleGeneralResponse response);
 
     void disconnect();
 
@@ -25,8 +25,6 @@ public interface IBleConnectMaster {
     void unnotify(UUID service, UUID character, BleGeneralResponse response);
 
     void readRssi(BleGeneralResponse response);
-
-    void refresh();
 
     void indicate(UUID service, UUID character, BleGeneralResponse response);
 }
