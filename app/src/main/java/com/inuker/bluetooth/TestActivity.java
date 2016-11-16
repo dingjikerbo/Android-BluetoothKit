@@ -53,29 +53,6 @@ public class TestActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_activity);
 
-        TextView tv = (TextView) findViewById(R.id.text);
-        String text = "你是好人啊我知道";
-
-        SpannableString sb1 = new SpannableString(text);
-        sb1.setSpan(new ClickableSpan() {
-
-            @Override
-            public void updateDrawState(TextPaint ds) {
-                super.updateDrawState(ds);
-                ds.setColor(Color.GREEN);
-                ds.setUnderlineText(true);
-            }
-
-            @Override
-            public void onClick(View widget) {
-                Toast.makeText(TestActivity.this, "clicked", Toast.LENGTH_SHORT).show();
-            }
-        }, text.length() - 4, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tv.setHighlightColor(Color.TRANSPARENT);
-
-        tv.setText(sb1);
-        tv.setMovementMethod(LinkMovementMethod.getInstance());
-
         mBluetoothManager = (android.bluetooth.BluetoothManager)
                 getSystemService(Context.BLUETOOTH_SERVICE);
 

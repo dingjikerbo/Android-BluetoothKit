@@ -11,76 +11,23 @@ import java.util.List;
  */
 public class Beacon {
 
-    private byte[] mBytes;
+    public byte[] mBytes;
 
-    private List<BeaconItem> mItems;
+    public List<BeaconItem> mItems;
 
     public Beacon(byte[] scanRecord) {
-        mItems = new ArrayList<BeaconItem>();
-
         if (!ByteUtils.isEmpty(scanRecord)) {
-            mBytes = scanRecord;
-
-            try {
-                List<BeaconItem> items = parseAdvertisement(mBytes);
-                if (!ListUtils.isEmpty(items)) {
-                    mItems.addAll(items);
-                }
-            } catch (Throwable e) {
-
-            }
+            mBytes = ByteUtils.trimLast(scanRecord);
+            mItems = BeaconParser.parseBeacon(mBytes);
         }
-    }
-
-    private List<BeaconItem> parseAdvertisement(byte[] bytes) {
-        ArrayList<BeaconItem> items = new ArrayList<BeaconItem>();
-
-        for (int i = 0; i < bytes.length; ) {
-            BeaconItem item = parse(bytes, i);
-            if (item != null) {
-                items.add(item);
-                i += item.len + 1;
-            } else {
-                break;
-            }
-        }
-
-        return items;
-    }
-
-    private BeaconItem parse(byte[] bytes, int startIndex) {
-        BeaconItem item = null;
-
-        if (bytes.length - startIndex >= 2) {
-            byte length = bytes[startIndex];
-            if (length > 0) {
-                byte type = bytes[startIndex + 1];
-                int firstIndex = startIndex + 2;
-
-                if (firstIndex < bytes.length) {
-                    item = new BeaconItem();
-
-                    int endIndex = firstIndex + length - 2;
-
-                    if (endIndex >= bytes.length) {
-                        endIndex = bytes.length - 1;
-                    }
-
-                    item.type = type & 0xff;
-                    item.len = length;
-
-                    item.bytes = ByteUtils.getBytes(bytes, firstIndex, endIndex);
-                }
-            }
-        }
-
-        return item;
     }
 
     @Override
     public String toString() {
         // TODO Auto-generated method stub
         StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("preParse: %s\npostParse:\n", ByteUtils.byteToString(mBytes)));
 
         for (int i = 0; i < mItems.size(); i++) {
             sb.append(mItems.get(i).toString());

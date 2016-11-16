@@ -22,7 +22,7 @@ public class ProxyBulk {
     public Object safeInvoke() {
         Object result = null;
         try {
-            BluetoothLog.v(String.format("safeInvoke method = %s, object = %s", method, object));
+//            BluetoothLog.v(String.format("safeInvoke method = %s, object = %s", method, object));
             result = method.invoke(object, args);
         } catch (Throwable e) {
             BluetoothLog.e(e);

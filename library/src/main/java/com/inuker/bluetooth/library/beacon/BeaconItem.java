@@ -29,7 +29,7 @@ public class BeaconItem {
         StringBuilder sb = new StringBuilder();
 
 //        sb.append(String.format("len: %02d", len));
-        sb.append(String.format("@T: 0x%02X", type));
+        sb.append(String.format("@Len = %02X, @Type = 0x%02X", len, type));
 
         switch (type) {
             case 8:

@@ -20,11 +20,21 @@ public class ByteUtils {
 
         if (!isEmpty(bytes)) {
             for (int i = 0; i < bytes.length; i++) {
-                sb.append(String.format("%02x", bytes[i]));
+                sb.append(String.format("%02X", bytes[i]));
             }
         }
 
         return sb.toString();
+    }
+
+    public static byte[] trimLast(byte[] bytes) {
+        int i = bytes.length - 1;
+        for ( ; i >= 0; i--) {
+            if (bytes[i] != 0) {
+                break;
+            }
+        }
+        return Arrays.copyOfRange(bytes, 0, i + 1);
     }
 
     public static byte[] stringToBytes(String text) {
