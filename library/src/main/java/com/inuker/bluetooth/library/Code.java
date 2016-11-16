@@ -16,6 +16,7 @@ public class Code {
     public static final int REQUEST_OVERFLOW = -8;
     public static final int REQUEST_DENIED = -9;
     public static final int REQUEST_EXCEPTION = -10;
+    public static final int REQUEST_UNKNOWN = -11;
 
     public static String toString(int code) {
         switch (code) {

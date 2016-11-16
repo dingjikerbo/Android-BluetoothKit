@@ -2,6 +2,7 @@ package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.os.Message;
 
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.Constants;
@@ -43,21 +44,18 @@ public class BleWriteRequest extends BleRequest implements WriteCharacterListene
     private void startWrite() {
         if (!writeCharacteristic(mServiceUUID, mCharacterUUID, mBytes)) {
             onRequestCompleted(Code.REQUEST_FAILED);
+        } else {
+            startRequestTiming();
         }
     }
 
     @Override
     public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
+        stopRequestTiming();
+
         if (status == BluetoothGatt.GATT_SUCCESS) {
             onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
-            onRequestCompleted(Code.REQUEST_FAILED);
-        }
-    }
-
-    @Override
-    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
-        if (!connectedOrDisconnected) {
             onRequestCompleted(Code.REQUEST_FAILED);
         }
     }

@@ -43,21 +43,18 @@ public class BleWriteNoRspRequest extends BleRequest implements WriteCharacterLi
     private void startWrite() {
         if (!writeCharacteristicWithNoRsp(mServiceUUID, mCharacterUUID, mBytes)) {
             onRequestCompleted(Code.REQUEST_FAILED);
+        } else {
+            startRequestTiming();
         }
     }
 
     @Override
     public void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, int status, byte[] value) {
+        stopRequestTiming();
+
         if (status == BluetoothGatt.GATT_SUCCESS) {
             onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
-            onRequestCompleted(Code.REQUEST_FAILED);
-        }
-    }
-
-    @Override
-    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
-        if (!connectedOrDisconnected) {
             onRequestCompleted(Code.REQUEST_FAILED);
         }
     }

@@ -40,18 +40,15 @@ public class BleReadRssiRequest extends BleRequest implements ReadRssiListener {
     private void startReadRssi() {
         if (!readRemoteRssi()) {
             onRequestCompleted(Code.REQUEST_FAILED);
-        }
-    }
-
-    @Override
-    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
-        if (!connectedOrDisconnected) {
-            onRequestCompleted(Code.REQUEST_FAILED);
+        } else {
+            startRequestTiming();
         }
     }
 
     @Override
     public void onReadRemoteRssi(int rssi, int status) {
+        stopRequestTiming();
+        
         if (status == BluetoothGatt.GATT_SUCCESS) {
             putIntExtra(Constants.EXTRA_RSSI, rssi);
             onRequestCompleted(Code.REQUEST_SUCCESS);

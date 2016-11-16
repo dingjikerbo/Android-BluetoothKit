@@ -19,6 +19,8 @@ import java.util.UUID;
 
 public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Handler.Callback, GattResponseListener, RuntimeChecker {
 
+    protected static final int MSG_REQUEST_TIMEOUT = 0x20;
+
     protected UUID mServiceUUID;
     protected UUID mCharacterUUID;
 
@@ -39,6 +41,8 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
     private RuntimeChecker mRuntimeChecker;
 
     private boolean mFinished;
+
+    protected boolean mRequestTimeout;
 
     public BleRequest(BleGeneralResponse response) {
         mResponse = response;
@@ -171,6 +175,12 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
 
     @Override
     public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_REQUEST_TIMEOUT:
+                mRequestTimeout = true;
+                closeGatt();
+                break;
+        }
         return true;
     }
 
@@ -244,5 +254,23 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
         onResponse(Code.REQUEST_CANCELED);
     }
 
+    protected long getTimeoutInMillis() {
+        return 30000;
+    }
+
+    @Override
+    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
+        if (!connectedOrDisconnected) {
+            onRequestCompleted(mRequestTimeout ? Code.REQUEST_TIMEDOUT : Code.REQUEST_FAILED);
+        }
+    }
+
+    protected void startRequestTiming() {
+        mHandler.sendEmptyMessageDelayed(MSG_REQUEST_TIMEOUT, getTimeoutInMillis());
+    }
+
+    protected void stopRequestTiming() {
+        mHandler.removeMessages(MSG_REQUEST_TIMEOUT);
+    }
 }
 

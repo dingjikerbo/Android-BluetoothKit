@@ -46,18 +46,15 @@ public class BleIndicateRequest extends BleRequest implements WriteDescriptorLis
     private void openIndicate() {
         if (!setCharacteristicIndication(mServiceUUID, mCharacterUUID, true)) {
             onRequestCompleted(Code.REQUEST_FAILED);
-        }
-    }
-
-    @Override
-    public void onConnectStatusChanged(boolean connectedOrDisconnected) {
-        if (!connectedOrDisconnected) {
-            onRequestCompleted(Code.REQUEST_FAILED);
+        } else {
+            startRequestTiming();
         }
     }
 
     @Override
     public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
+        stopRequestTiming();
+
         if (status == BluetoothGatt.GATT_SUCCESS) {
             onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
