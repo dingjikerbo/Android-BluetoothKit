@@ -76,18 +76,26 @@ mClient.stopSearch();
 
 可以在广播中携带设备的自定义数据，用于设备识别，数据广播，事件通知等，这样手机端无需连接设备就可以获取设备推送的数据。
 
-扫描到的beacon数据为byte[]，在SearchResult的scanRecord中，按如下形式生成Beacon对象，将beacon按type分解成一个个BeaconItem，
+扫描到的beacon数据为byte[]，在SearchResult的scanRecord中，按如下形式生成Beacon对象，
 
 ```
 Beacon beacon = new Beacon(device.scanRecord);
+```
 
+Beacon数据结构如下:
+
+```
 public class Beacon {
 
     public byte[] mBytes;
 
     public List<BeaconItem> mItems;
 }
+```
 
+BeaconItem是按type来区分的，
+
+```
 public class BeaconItem {
     /**
      * 广播中声明的长度
@@ -106,7 +114,9 @@ public class BeaconItem {
 }
 ```
 
-然后根据自定义的协议，解析对应的BeaconItem中的bytes。
+然后根据自定义的协议，解析对应的BeaconItem中的bytes，首先创建一个BeaconParser，传入对应的BeaconItem，然后根据协议不断读取数据，
+如果协议中某个字段占1个字节，则调用readByte，若占用两个字节则调用readShort，如果要取某个字节的某个bit则调用getBit。注意parser
+每读一次数据，指针就会相应向后移动，可以调用setPosition设置当前指针的位置。
 
 ```
 BeaconItem beaconItem; // 设置成beacon中对应的item
