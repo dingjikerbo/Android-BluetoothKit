@@ -3,6 +3,15 @@ BluetoothKit---Android Bluetooth Framework
 
 这个库用于Android蓝牙BLE设备通信，支持常用的连接，读写，通知。在系统API基础上封装了一层异步任务队列，使所有任务串行化，并支持对每个任务配置超时和出错重试，同时解决了BLE蓝牙通信中可能会遇到的一系列坑，使得Android蓝牙开发非常方便。
 
+更新日志：
+1.2.3
+- 蓝牙连接状态回调新增mac参数
+
+1.2.2
+ - 支持蓝牙连接和发现服务分开配置，包括失败重试次数及超时时间。
+ - 重构部分蓝牙通信核心代码
+ - 新增蓝牙beacon解析工具类
+
 # **用法**
 
 1、在Android Studio的build.gradle中，在dependencies里添加一行:

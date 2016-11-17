@@ -17,14 +17,14 @@ public class BleConnectStatusListenerWrapper extends BleConnectStatusListener {
     }
 
     @Override
-    public void onConnectStatusChanged(final int status) {
+    public void onConnectStatusChanged(final String mac, final int status) {
         BluetoothUtils.post(new Runnable() {
 
             @Override
             public void run() {
                 if (listener != null) {
                     try {
-                        listener.onConnectStatusChanged(status);
+                        listener.onConnectStatusChanged(mac, status);
                     } catch (Throwable e) {
                         BluetoothLog.e(e);
                     }

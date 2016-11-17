@@ -479,7 +479,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         List<BleConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
         if (!ListUtils.isEmpty(listeners)) {
             for (BleConnectStatusListener listener : listeners) {
-                listener.onConnectStatusChanged(status);
+                listener.onConnectStatusChanged(mac, status);
             }
         }
     }
