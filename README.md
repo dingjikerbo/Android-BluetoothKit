@@ -80,9 +80,7 @@ mClient.stopSearch();
 
 ```
 Beacon beacon = new Beacon(device.scanRecord);
-```
 
-```
 public class Beacon {
 
     public byte[] mBytes;
