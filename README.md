@@ -7,13 +7,15 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
-## **1.2.3 Update**
+### **Version 1.2.3**
 - 蓝牙连接状态回调新增mac参数
 
-## **1.2.2 Update**
+### **Version 1.2.2**
  - 支持蓝牙连接和发现服务分开配置，包括失败重试次数及超时时间。
  - 重构部分蓝牙通信核心代码
  - 新增蓝牙beacon解析工具类
+
+------
 
 # **用法**
 
