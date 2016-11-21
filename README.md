@@ -21,7 +21,7 @@ BluetoothKit---Android Bluetooth Framework
 
 ------
 
-# **作者**
+有问题或建议可以给我邮件，到我的博客留言，或者加QQ群
  - Email: dingjikerbo@gmail.com
  - Blog: http://blog.csdn.net/dingjikerbo
  - QQ群: 112408886
