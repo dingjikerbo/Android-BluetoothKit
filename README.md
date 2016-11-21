@@ -21,6 +21,13 @@ BluetoothKit---Android Bluetooth Framework
 
 ------
 
+# **作者**
+ - Email: dingjikerbo@gmail.com
+ - Blog: http://blog.csdn.net/dingjikerbo
+ - QQ群: 112408886
+ 
+------
+
 # **用法**
 
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
@@ -310,9 +317,3 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
     }
 });
 ```
-
-<br/>
-# **作者**
- - Email: dingjikerbo@gmail.com
- - Blog: http://blog.csdn.net/dingjikerbo
- - QQ群: 112408886
