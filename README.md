@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.2.4**
+- BleGattProfile新增Characteristic的Property属性
+
 ### **Version 1.2.3**
 - 蓝牙连接状态回调新增mac参数
 
