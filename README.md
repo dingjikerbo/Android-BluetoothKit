@@ -36,6 +36,8 @@ BluetoothKit---Android Bluetooth Framework
 compile 'com.inuker.bluetooth:library:1.2.4'
 ```
 
+如果是Eclipse，可以导入library\build\intermediates\bundles\release下的jar包
+
 2、创建一个BluetoothClient，建议作为一个单例: 
 
 ```Java
