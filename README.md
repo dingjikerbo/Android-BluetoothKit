@@ -26,7 +26,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.2.3'
+compile 'com.inuker.bluetooth:library:1.2.4'
 ```
 
 2、创建一个BluetoothClient，建议作为一个单例: 
