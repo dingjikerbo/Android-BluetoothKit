@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.inuker.bluetooth.library.model.BleGattCharacter;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.model.BleGattService;
 
@@ -46,8 +47,8 @@ public class DeviceDetailAdapter extends BaseAdapter {
 
         for (BleGattService service : services) {
             items.add(new DetailItem(DetailItem.TYPE_SERVICE, service.getUUID(), null));
-            List<ParcelUuid> characters = service.getCharacters();
-            for (ParcelUuid character : characters) {
+            List<BleGattCharacter> characters = service.getCharacters();
+            for (BleGattCharacter character : characters) {
                 items.add(new DetailItem(DetailItem.TYPE_CHARACTER, character.getUuid(), service.getUUID()));
             }
         }

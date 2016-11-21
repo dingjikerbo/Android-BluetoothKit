@@ -31,10 +31,9 @@ public class BleGattProfile implements Parcelable {
             UUID serviceUUID = (UUID) entry.getKey();
             Map<UUID, BluetoothGattCharacteristic> characters = (Map<UUID, BluetoothGattCharacteristic>) entry.getValue();
 
-            BleGattService service = new BleGattService(serviceUUID);
+            BleGattService service = new BleGattService(serviceUUID, characters);
             if (!serviceList.contains(service)) {
                 serviceList.add(service);
-                service.addCharacters(characters.keySet());
             }
         }
 
@@ -79,10 +78,10 @@ public class BleGattProfile implements Parcelable {
 
         BleGattService service = getService(serviceId);
         if (service != null) {
-            List<ParcelUuid> characters = service.getCharacters();
+            List<BleGattCharacter> characters = service.getCharacters();
             if (!ListUtils.isEmpty(characters)) {
-                for (ParcelUuid uuid : characters) {
-                    if (characterId.equals(uuid.getUuid())) {
+                for (BleGattCharacter character : characters) {
+                    if (characterId.equals(character.getUuid())) {
                         return true;
                     }
                 }

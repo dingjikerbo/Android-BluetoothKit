@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
@@ -74,7 +75,7 @@ public class DeviceDetailActivity extends Activity {
 
     private final BleConnectStatusListener mConnectStatusListener = new BleConnectStatusListener() {
         @Override
-        public void onConnectStatusChanged(int status) {
+        public void onConnectStatusChanged(String mac, int status) {
             BluetoothLog.v(String.format("DeviceDetailActivity onConnectStatusChanged %d in %s",
                     status, Thread.currentThread().getName()));
 
@@ -95,6 +96,13 @@ public class DeviceDetailActivity extends Activity {
         mTvTitle.setText(String.format("%s%s", getString(R.string.connecting), mDevice.getAddress()));
         mPbar.setVisibility(View.VISIBLE);
         mListView.setVisibility(View.GONE);
+
+        BleConnectOptions options = new BleConnectOptions.Builder()
+                .setConnectRetry(3)
+                .setConnectTimeout(15000)
+                .setServiceDiscoverRetry(3)
+                .setServiceDiscoverTimeout(10000)
+                .build();
 
         ClientManager.getClient().connect(mDevice.getAddress(), new BleConnectResponse() {
             @Override

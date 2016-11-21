@@ -1,11 +1,15 @@
 package com.inuker.bluetooth.library.model;
 
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Parcel;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,30 +20,30 @@ public class BleGattService implements Parcelable, Comparable {
 
     private UUID uuid;
 
-    private List<ParcelUuid> characters;
+    private List<BleGattCharacter> characters;
 
-    public BleGattService(UUID uuid) {
+    public BleGattService(UUID uuid, Map<UUID, BluetoothGattCharacteristic> characters) {
         this.uuid = uuid;
-    }
 
-    public void addCharacters(Set<UUID> characters) {
-        for (UUID character : characters) {
-            getCharacters().add(new ParcelUuid(character));
+        Iterator<BluetoothGattCharacteristic> itor = characters.values().iterator();
+        while (itor.hasNext()) {
+            BluetoothGattCharacteristic characteristic = itor.next();
+            getCharacters().add(new BleGattCharacter(characteristic));
         }
     }
 
     protected BleGattService(Parcel in) {
         uuid = (UUID) in.readSerializable();
-        in.readTypedList(getCharacters(), ParcelUuid.CREATOR);
+        in.readTypedList(getCharacters(), BleGattCharacter.CREATOR);
     }
 
     public UUID getUUID() {
         return uuid;
     }
 
-    public List<ParcelUuid> getCharacters() {
+    public List<BleGattCharacter> getCharacters() {
         if (characters == null) {
-            characters = new ArrayList<ParcelUuid>();
+            characters = new ArrayList<BleGattCharacter>();
         }
         return characters;
     }

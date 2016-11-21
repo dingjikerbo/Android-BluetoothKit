@@ -12,8 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="@string/app_name"
-        android:supportsRtl="true">
+        android:label="@string/app_name">
 
         <service
             android:name=".BluetoothService" />

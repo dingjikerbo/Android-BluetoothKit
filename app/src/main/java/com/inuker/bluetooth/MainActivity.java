@@ -55,25 +55,11 @@ public class MainActivity extends Activity {
         });
 
         searchDevice();
-
-        BleConnectOptions options = new BleConnectOptions.Builder()
-                .setConnectRetry(3)
-                .setConnectTimeout(30000)
-                .setServiceDiscoverRetry(3)
-                .setServiceDiscoverTimeout(20000)
-                .build();
-
-        ClientManager.getClient().connect(MAC, options, new BleConnectResponse() {
-            @Override
-            public void onResponse(int code, BleGattProfile data) {
-
-            }
-        });
     }
 
     private void searchDevice() {
         SearchRequest request = new SearchRequest.Builder()
-                .searchBluetoothLeDevice(5000).build();
+                .searchBluetoothLeDevice(4000, 3).build();
 
         ClientManager.getClient().search(request, mSearchResponse);
     }
