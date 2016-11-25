@@ -45,4 +45,8 @@ public interface IBluetoothClient {
     void search(SearchRequest request, SearchResponse response);
 
     void stopSearch();
+
+    void registerBluetoothStateListener();
+
+    void unregisterBluetoothStateListener();
 }

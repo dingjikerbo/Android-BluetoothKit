@@ -411,6 +411,16 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         safeCallBluetoothApi(CODE_STOP_SESARCH, null, null);
     }
 
+    @Override
+    public void registerBluetoothStateListener() {
+
+    }
+
+    @Override
+    public void unregisterBluetoothStateListener() {
+
+    }
+
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
         try {
             IBluetoothService service = getBluetoothService();
