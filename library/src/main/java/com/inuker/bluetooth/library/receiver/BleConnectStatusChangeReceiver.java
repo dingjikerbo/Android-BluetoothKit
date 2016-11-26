@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.inuker.bluetooth.library.Constants;
+import com.inuker.bluetooth.library.receiver.listener.BleConnectStatusChangeListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 
@@ -24,6 +25,10 @@ public class BleConnectStatusChangeReceiver extends AbsBluetoothReceiver {
         super(dispatcher);
     }
 
+    public static BleConnectStatusChangeReceiver newInstance(IReceiverDispatcher dispatcher) {
+        return new BleConnectStatusChangeReceiver(dispatcher);
+    }
+
     @Override
     List<String> getActions() {
         return Arrays.asList(ACTIONS);
@@ -40,9 +45,9 @@ public class BleConnectStatusChangeReceiver extends AbsBluetoothReceiver {
     }
 
     private void onConnectStatusChanged(String mac, int status) {
-        List<BluetoothReceiverListener> listeners = getListeners();
+        List<BluetoothReceiverListener> listeners = getListeners(BleConnectStatusChangeListener.class);
         for (BluetoothReceiverListener listener : listeners) {
-            ((BleConnectStatusChangeReceiver) listener).onConnectStatusChanged(mac, status);
+            ((BleConnectStatusChangeListener) listener).onConnectStatusChanged(mac, status);
         }
     }
 }

@@ -2,12 +2,15 @@ package com.inuker.bluetooth;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.inuker.bluetooth.library.beacon.Beacon;
+import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
@@ -54,8 +57,26 @@ public class MainActivity extends Activity {
 
         });
 
+        ClientManager.getClient().registerBluetoothStateListener(mBluetoothStateListener);
+
+        mTvTitle.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ClientManager.getClient().unregisterBluetoothStateListener(mBluetoothStateListener);
+            }
+        });
+
         searchDevice();
     }
+
+    private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
+        @Override
+        public void onBluetoothStateChanged(boolean openOrClosed) {
+            BluetoothLog.v(String.format("MainActivity onBluetoothStateChanged: %s", openOrClosed ? "open" : "close"));
+        }
+
+    };
 
     private void searchDevice() {
         SearchRequest request = new SearchRequest.Builder()

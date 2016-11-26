@@ -10,6 +10,7 @@ import android.os.Message;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
@@ -32,15 +33,17 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
     private IReceiverDispatcher mDispatcher = new IReceiverDispatcher() {
         @Override
         public List<BluetoothReceiverListener> getListeners(Class<?> clazz) {
-            return mListeners.get(clazz);
+            return mListeners.get(clazz.getSimpleName());
         }
     };
 
     private AbsBluetoothReceiver[] RECEIVERS = {
             BluetoothStateReceiver.newInstance(mDispatcher),
+            BleConnectStatusChangeReceiver.newInstance(mDispatcher),
+            BleCharacterChangeReceiver.newInstance(mDispatcher),
     };
 
-    private Map<Class<?>, List<BluetoothReceiverListener>> mListeners;
+    private Map<String, List<BluetoothReceiverListener>> mListeners;
 
     private static IBluetoothReceiver mReceiver;
 
@@ -59,7 +62,7 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
     }
 
     private BluetoothReceiver() {
-        mListeners = new HashMap<Class<?>, List<BluetoothReceiverListener>>();
+        mListeners = new HashMap<String, List<BluetoothReceiverListener>>();
         mHandler = new Handler(Looper.getMainLooper(), this);
         BluetoothUtils.registerReceiver(this, getIntentFilter());
     }
@@ -87,6 +90,8 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
             return;
         }
 
+        BluetoothLog.v(String.format("BluetoothReceiver onReceive: %s", action));
+
         for (AbsBluetoothReceiver receiver : RECEIVERS) {
             if (!receiver.containsAction(action)) {
                 continue;
@@ -101,10 +106,11 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
     @Override
     public void register(BluetoothReceiverListener listener) {
         if (listener != null) {
-            List<BluetoothReceiverListener> listeners = mListeners.get(listener.getClass());
+            List<BluetoothReceiverListener> listeners = mListeners.get(listener.getName());
             if (listeners == null) {
                 listeners = new LinkedList<BluetoothReceiverListener>();
-                mListeners.put(listener.getClass(), listeners);
+                BluetoothLog.v(String.format("register %s", listener.getName()));
+                mListeners.put(listener.getName(), listeners);
             }
             // You can register repetitive
             listeners.add(listener);
@@ -114,7 +120,7 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
     @Override
     public void unregister(BluetoothReceiverListener listener) {
         if (listener != null) {
-            List<BluetoothReceiverListener> listeners = mListeners.get(listener.getClass());
+            List<BluetoothReceiverListener> listeners = mListeners.get(listener.getName());
             if (listeners != null) {
                 listeners.remove(listener);
             }

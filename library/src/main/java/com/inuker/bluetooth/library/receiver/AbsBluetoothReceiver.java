@@ -38,8 +38,8 @@ public abstract class AbsBluetoothReceiver {
         return false;
     }
 
-    protected List<BluetoothReceiverListener> getListeners() {
-        return mDispatcher.getListeners(getClass());
+    protected List<BluetoothReceiverListener> getListeners(Class<?> clazz) {
+        return mDispatcher.getListeners(clazz);
     }
 
     abstract List<String> getActions();

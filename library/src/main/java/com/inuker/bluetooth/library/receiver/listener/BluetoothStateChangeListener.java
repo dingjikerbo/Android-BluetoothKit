@@ -4,7 +4,11 @@ package com.inuker.bluetooth.library.receiver.listener;
  * Created by liwentian on 2016/11/25.
  */
 
-public interface BluetoothStateChangeListener extends BluetoothReceiverListener {
+public abstract class BluetoothStateChangeListener implements BluetoothReceiverListener {
 
-    void onBluetoothStateChanged(int prevState, int curState);
+    public String getName() {
+        return BluetoothStateChangeListener.class.getSimpleName();
+    }
+
+    public abstract void onBluetoothStateChanged(int prevState, int curState);
 }

@@ -25,6 +25,10 @@ public class BleCharacterChangeReceiver extends AbsBluetoothReceiver {
         super(dispatcher);
     }
 
+    public static BleCharacterChangeReceiver newInstance(IReceiverDispatcher dispatcher) {
+        return new BleCharacterChangeReceiver(dispatcher);
+    }
+
     @Override
     List<String> getActions() {
         return Arrays.asList(ACTIONS);
@@ -41,7 +45,7 @@ public class BleCharacterChangeReceiver extends AbsBluetoothReceiver {
     }
 
     private void onCharacterChanged(String mac, UUID service, UUID character, byte[] value) {
-        List<BluetoothReceiverListener> listeners = getListeners();
+        List<BluetoothReceiverListener> listeners = getListeners(BleCharacterChangeListener.class);
         for (BluetoothReceiverListener listener : listeners) {
             ((BleCharacterChangeListener) listener).onCharacterChanged(mac, service, character, value);
         }

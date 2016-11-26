@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -48,7 +49,7 @@ public interface IBluetoothClient {
 
     void stopSearch();
 
-    void registerBluetoothStateListener(BluetoothStateChangeListener listener);
+    void registerBluetoothStateListener(BluetoothStateListener listener);
 
-    void unregisterBluetoothStateListener(BluetoothStateChangeListener listener);
+    void unregisterBluetoothStateListener(BluetoothStateListener listener);
 }

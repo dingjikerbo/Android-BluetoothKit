@@ -10,4 +10,5 @@ import com.inuker.bluetooth.library.connect.response.BleTResponse;
 
 public interface BluetoothReceiverListener {
 
+    String getName();
 }

@@ -47,7 +47,7 @@ public class BluetoothStateReceiver extends AbsBluetoothReceiver {
     }
 
     private void onBluetoothStateChanged(int previousState, int state) {
-        List<BluetoothReceiverListener> listeners = getListeners();
+        List<BluetoothReceiverListener> listeners = getListeners(BluetoothStateChangeListener.class);
         for (BluetoothReceiverListener listener : listeners) {
             ((BluetoothStateChangeListener) listener).onBluetoothStateChanged(previousState, state);
         }

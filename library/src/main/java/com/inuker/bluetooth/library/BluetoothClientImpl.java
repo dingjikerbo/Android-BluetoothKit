@@ -16,6 +16,7 @@ import android.os.Message;
 import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -33,6 +34,7 @@ import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
 import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
@@ -83,7 +85,6 @@ import static com.inuker.bluetooth.library.Constants.STATUS_DISCONNECTED;
 public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, Callback {
 
     private static final int MSG_INVOKE_PROXY = 1;
-    private static final int MSG_DISPATCH_CONNECT_STATUS = 4;
 
     private static final String TAG = BluetoothClientImpl.class.getSimpleName();
 
@@ -100,7 +101,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
     private HashMap<String, List<BleConnectStatusListener>> mConnectStatusListeners;
-    private List<BluetoothStateChangeListener> mBluetoothStateListener;
+    private List<BluetoothStateListener> mBluetoothStateListener;
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
@@ -112,7 +113,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
         mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
         mConnectStatusListeners = new HashMap<String, List<BleConnectStatusListener>>();
-        mBluetoothStateListener = new LinkedList<BluetoothStateChangeListener>;
+        mBluetoothStateListener = new LinkedList<BluetoothStateListener>();
 
         registerBluetoothReceiver();
 
@@ -416,14 +417,14 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     @Override
-    public void registerBluetoothStateListener(BluetoothStateChangeListener listener) {
+    public void registerBluetoothStateListener(BluetoothStateListener listener) {
         if (listener != null && !mBluetoothStateListener.contains(listener)) {
             mBluetoothStateListener.add(listener);
         }
     }
 
     @Override
-    public void unregisterBluetoothStateListener(BluetoothStateChangeListener listener) {
+    public void unregisterBluetoothStateListener(BluetoothStateListener listener) {
         if (listener != null) {
             mBluetoothStateListener.remove(listener);
         }
@@ -471,11 +472,6 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
             case MSG_INVOKE_PROXY:
                 ProxyBulk.safeInvoke(msg.obj);
                 break;
-            case MSG_DISPATCH_CONNECT_STATUS:
-                dispatchConnectionStatus((String) msg.obj, msg.arg1);
-                break;
-            default:
-                break;
         }
         return true;
     }
@@ -486,51 +482,97 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
             String key = generateCharacterKey(service, character);
             List<BleNotifyResponse> responses = notifyMap.get(key);
             if (responses != null) {
-                for (BleNotifyResponse response : responses) {
+                for (final BleNotifyResponse response : responses) {
                     response.onNotify(service, character, value);
                 }
             }
         }
     }
 
-    private void dispatchConnectionStatus(String mac, int status) {
+    private void dispatchConnectionStatus(final String mac, final int status) {
         List<BleConnectStatusListener> listeners = mConnectStatusListeners.get(mac);
         if (!ListUtils.isEmpty(listeners)) {
-            for (BleConnectStatusListener listener : listeners) {
-                listener.onConnectStatusChanged(mac, status);
+            for (final BleConnectStatusListener listener : listeners) {
+                BluetoothUtils.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        listener.onConnectStatusChanged(mac, status);
+                    }
+                });
             }
         }
     }
 
-    private void dispatchBluetoothStateChanged(int previousState, int currentState) {
-        for (BluetoothStateChangeListener listener : mBluetoothStateListener) {
-            listener.onBluetoothStateChanged(previousState, currentState);
+    private void dispatchBluetoothStateChanged(int previousState, final int currentState) {
+        if (currentState == Constants.STATE_OFF || currentState == Constants.STATE_ON) {
+            for (final BluetoothStateListener listener : mBluetoothStateListener) {
+                BluetoothUtils.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        listener.onBluetoothStateChanged(currentState == Constants.STATE_ON);
+                    }
+                });
+            }
         }
     }
 
     private void registerBluetoothReceiver() {
+        registerBluetoothStateReceiver();
+        registerBleConnectStatusReceiver();
+        registerBleCharacterChangeReceiver();
+    }
+
+    private void registerBluetoothStateReceiver() {
         BluetoothReceiver.getInstance().register(new BluetoothStateChangeListener() {
             @Override
-            public void onBluetoothStateChanged(int previousState, int currentState) {
-                dispatchBluetoothStateChanged(previousState, currentState);
+            public void onBluetoothStateChanged(final int previousState, final int currentState) {
                 if (currentState == Constants.STATE_OFF || currentState == Constants.STATE_TURNING_OFF) {
                     stopSearch();
                 }
+
+                mWorkerHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        dispatchBluetoothStateChanged(previousState, currentState);
+                    }
+                });
             }
         });
+    }
+
+    private void registerBleConnectStatusReceiver() {
         BluetoothReceiver.getInstance().register(new BleConnectStatusChangeListener() {
             @Override
-            public void onConnectStatusChanged(String mac, int status) {
-                mWorkerHandler.obtainMessage(MSG_DISPATCH_CONNECT_STATUS, status, 0, mac).sendToTarget();
+            public void onConnectStatusChanged(final String mac, final int status) {
                 if (status == Constants.STATUS_DISCONNECTED) {
                     clearNotifyListener(mac);
                 }
+
+                mWorkerHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        dispatchConnectionStatus(mac, status);
+                    }
+                });
             }
         });
+    }
+
+    private void registerBleCharacterChangeReceiver() {
         BluetoothReceiver.getInstance().register(new BleCharacterChangeListener() {
             @Override
-            public void onCharacterChanged(String mac, UUID service, UUID character, byte[] value) {
-                dispatchCharacterNotify(mac, service, character, value);
+            public void onCharacterChanged(final String mac, final UUID service, final UUID character, final byte[] value) {
+                mWorkerHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        dispatchCharacterNotify(mac, service, character, value);
+                    }
+                });
             }
         });
     }

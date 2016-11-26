@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library;
 import android.content.Context;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -10,6 +11,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
@@ -107,6 +109,9 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
+        BluetoothLog.v(String.format("indicate %s: service = %s, character = %s", mac, service, character));
+
+        response = ProxyUtils.getUIProxy(response);
         unindicate(mac, service, character, response);
     }
 
@@ -120,12 +125,25 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void search(SearchRequest request, SearchResponse response) {
+        BluetoothLog.v(String.format("search %s", request));
+
         response = ProxyUtils.getUIProxy(response);
         mClient.search(request, response);
     }
 
     @Override
     public void stopSearch() {
+        BluetoothLog.v(String.format("stopSearch"));
         mClient.stopSearch();
+    }
+
+    @Override
+    public void registerBluetoothStateListener(BluetoothStateListener listener) {
+        mClient.registerBluetoothStateListener(listener);
+    }
+
+    @Override
+    public void unregisterBluetoothStateListener(BluetoothStateListener listener) {
+        mClient.unregisterBluetoothStateListener(listener);
     }
 }
