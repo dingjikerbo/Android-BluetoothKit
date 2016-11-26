@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.2.5**
+- 新增监听蓝牙开关状态
+
 ### **Version 1.2.4**
 - BleGattProfile新增Characteristic的Property属性
 
@@ -33,7 +36,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.2.4'
+compile 'com.inuker.bluetooth:library:1.2.5'
 ```
 
 如果是Eclipse，可以导入library\build\intermediates\bundles\release下的jar包
@@ -83,6 +86,24 @@ mClient.search(request, new SearchResponse() {
 
 ```Java
 mClient.stopSearch();
+```
+
+## **监听蓝牙开关状态**
+
+回调的参数如果是true表示蓝牙打开，false表示蓝牙关闭
+
+```
+mClient.registerBluetoothStateListener(mBluetoothStateListener);
+
+private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
+    @Override
+    public void onBluetoothStateChanged(boolean openOrClosed) {
+        
+    }
+
+};
+
+mClient.unregisterBluetoothStateListener(mBluetoothStateListener);
 ```
 
 ## **Beacon解析**
