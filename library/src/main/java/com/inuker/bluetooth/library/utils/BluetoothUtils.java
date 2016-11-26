@@ -171,4 +171,8 @@ public class BluetoothUtils {
         }
         return false;
     }
+
+    public static boolean checkMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
 }

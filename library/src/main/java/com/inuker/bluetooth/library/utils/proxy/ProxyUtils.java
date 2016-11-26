@@ -25,6 +25,18 @@ public class ProxyUtils {
     }
 
     public static <T> T getUIProxy(Object object) {
-        return (T) getProxy(object, object.getClass().getInterfaces(), null, false, true);
+        return (T) getUIProxy(object, object.getClass().getInterfaces(), null);
+    }
+
+    public static <T> T getUIProxy(Object object, Class<?> clazz) {
+        return (T) getUIProxy(object, new Class<?>[] { clazz }, null);
+    }
+
+    public static <T> T getUIProxy(Object object, Class<?> clazz, ProxyInterceptor interceptor) {
+        return (T) getUIProxy(object, new Class<?>[] { clazz }, interceptor);
+    }
+
+    public static <T> T getUIProxy(Object object, Class<?>[] intfs, ProxyInterceptor interceptor) {
+        return (T) getProxy(object, intfs, interceptor, false, true);
     }
 }

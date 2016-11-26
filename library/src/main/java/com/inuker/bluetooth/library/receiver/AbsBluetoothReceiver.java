@@ -1,44 +1,48 @@
 package com.inuker.bluetooth.library.receiver;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.BluetoothContext;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
+import com.inuker.bluetooth.library.utils.ListUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by liwentian on 2016/11/25.
  */
 
-public abstract class AbsBluetoothReceiver implements IBluetoothReceiver {
-
-    protected List<String> mReceiverActions;
+public abstract class AbsBluetoothReceiver {
 
     protected Context mContext;
 
     protected Handler mHandler;
 
-    protected AbsBluetoothReceiver() {
-        mReceiverActions = new ArrayList<String>();
+    protected IReceiverDispatcher mDispatcher;
+
+    protected AbsBluetoothReceiver(IReceiverDispatcher dispatcher) {
+        mDispatcher = dispatcher;
         mContext = BluetoothContext.getContext();
         mHandler = new Handler(Looper.getMainLooper());
     }
 
-    protected void registerReceiverActions(String[] actions) {
-        if (mReceiverActions == null) {
-            mReceiverActions = new ArrayList<String>();
+    boolean containsAction(String action) {
+        List<String> actions = getActions();
+        if (!ListUtils.isEmpty(actions) && !TextUtils.isEmpty(action)) {
+            return actions.contains(action);
         }
-        if (actions != null && actions.length > 0) {
-            mReceiverActions.addAll(Arrays.asList(actions));
-        }
+        return false;
     }
 
-    @Override
-    public List<String> getActions() {
-        return mReceiverActions;
+    protected List<BluetoothReceiverListener> getListeners() {
+        return mDispatcher.getListeners(getClass());
     }
+
+    abstract List<String> getActions();
+
+    abstract boolean onReceive(Context context, Intent intent);
 }

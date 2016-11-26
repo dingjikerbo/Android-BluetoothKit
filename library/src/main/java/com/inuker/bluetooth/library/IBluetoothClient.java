@@ -1,6 +1,5 @@
 package com.inuker.bluetooth.library;
 
-import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -8,6 +7,8 @@ import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
+import com.inuker.bluetooth.library.receiver.listener.BleConnectStatusChangeListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 
@@ -22,9 +23,9 @@ public interface IBluetoothClient {
 
     void disconnect(String mac);
 
-    void registerConnectStatusListener(String mac, BleConnectStatusListener listener);
+    void registerConnectStatusListener(String mac, BleConnectStatusChangeListener listener);
 
-    void unregisterConnectStatusListener(String mac, BleConnectStatusListener listener);
+    void unregisterConnectStatusListener(String mac, BleConnectStatusChangeListener listener);
 
     void read(String mac, UUID service, UUID character, BleReadResponse response);
 
@@ -46,7 +47,7 @@ public interface IBluetoothClient {
 
     void stopSearch();
 
-    void registerBluetoothStateListener();
+    void registerBluetoothStateListener(BluetoothStateChangeListener listener);
 
-    void unregisterBluetoothStateListener();
+    void unregisterBluetoothStateListener(BluetoothStateChangeListener listener);
 }

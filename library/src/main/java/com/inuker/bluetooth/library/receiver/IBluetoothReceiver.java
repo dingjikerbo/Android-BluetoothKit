@@ -1,9 +1,6 @@
 package com.inuker.bluetooth.library.receiver;
 
-import android.content.Context;
-import android.content.Intent;
-
-import java.util.List;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 
 /**
  * Created by liwentian on 2016/11/25.
@@ -11,7 +8,7 @@ import java.util.List;
 
 public interface IBluetoothReceiver {
 
-    boolean onReceive(Context context, Intent intent);
+    void register(BluetoothReceiverListener listener);
 
-    List<String> getActions();
+    void unregister(BluetoothReceiverListener listener);
 }

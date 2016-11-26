@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 
 import java.util.UUID;
@@ -75,6 +76,11 @@ public class Constants {
     public static final int STATUS_DEVICE_DISCONNECTING = BluetoothProfile.STATE_DISCONNECTING;
     public static final int STATUS_DEVICE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
     public static final int STATUS_DEVICE_SERVICE_READY = 0x13;
+
+    public static final int STATE_OFF = BluetoothAdapter.STATE_OFF;
+    public static final int STATE_TURNING_OFF = BluetoothAdapter.STATE_TURNING_OFF;
+    public static final int STATE_ON = BluetoothAdapter.STATE_ON;
+    public static final int STATE_TURNING_ON = BluetoothAdapter.STATE_TURNING_ON;
 
     public static String getStatusText(int status) {
         switch (status) {
