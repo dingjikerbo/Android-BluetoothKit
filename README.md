@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.2.7 - 2016/11/28**
+- 支持descriptor读写
+
 ### **Version 1.2.6 - 2016/11/28**
 - 修复若干bug
 
@@ -263,6 +266,28 @@ mClient.writeNoRsp(MAC, serviceUUID, characterUUID, bytes, new BleWriteResponse(
         if (code == REQUEST_SUCCESS) {
 
         }
+    }
+});
+```
+
+### **● 读Descriptor**
+
+```Java
+mClient.readDescriptor(MAC, serviceUUID, characterUUID, descriptorUUID, new BleReadResponse() {
+    @Override
+    public void onResponse(int code, byte[] data) {
+
+    }
+});
+```
+
+### **● 写Descriptor**
+
+```Java
+mClient.writeDescriptor(MAC, serviceUUID, characterUUID, descriptorUUID, bytes, new BleWriteResponse() {
+    @Override
+    public void onResponse(int code) {
+
     }
 });
 ```
