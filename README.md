@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.2.6 - 2016/11/28**
+- 修复若干bug
+
 ### **Version 1.2.5**
 - 新增监听蓝牙开关状态
 
@@ -36,7 +39,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.2.5'
+compile 'com.inuker.bluetooth:library:1.2.6'
 ```
 
 如果是Eclipse，可以导入library\build\intermediates\bundles\release下的jar包
