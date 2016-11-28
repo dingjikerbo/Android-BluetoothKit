@@ -37,7 +37,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void connect(String mac, BleConnectOptions options, BleConnectResponse response) {
-        BluetoothLog.v(String.format("Connect %s", mac));
+        BluetoothLog.v(String.format("connect %s", mac));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.connect(mac, options, response);
@@ -45,7 +45,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void disconnect(String mac) {
-        BluetoothLog.v(String.format("Disconnect %s", mac));
+        BluetoothLog.v(String.format("disconnect %s", mac));
         mClient.disconnect(mac);
     }
 
@@ -61,7 +61,7 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void read(String mac, UUID service, UUID character, BleReadResponse response) {
-        BluetoothLog.v(String.format("Read %s: service = %s, character = %s", mac, service, character));
+        BluetoothLog.v(String.format("read character for %s: service = %s, character = %s", mac, service, character));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.read(mac, service, character, response);
@@ -69,10 +69,25 @@ public class BluetoothClient implements IBluetoothClient {
 
     @Override
     public void write(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response) {
-        BluetoothLog.v(String.format("write %s: service = %s, character = %s, value = %s", mac, service, character, ByteUtils.byteToString(value)));
+        BluetoothLog.v(String.format("write character for %s: service = %s, character = %s, value = %s",
+                mac, service, character, ByteUtils.byteToString(value)));
 
         response = ProxyUtils.getUIProxy(response);
         mClient.write(mac, service, character, value, response);
+    }
+
+    @Override
+    public void readDescriptor(String mac, UUID service, UUID character, UUID descriptor, BleReadResponse response) {
+        BluetoothLog.v(String.format("readDescriptor for %s: service = %s, character = %s", mac, service, character));
+        response = ProxyUtils.getUIProxy(response);
+        mClient.readDescriptor(mac, service, character, descriptor, response);
+    }
+
+    @Override
+    public void writeDescriptor(String mac, UUID service, UUID character, UUID descriptor, byte[] value, BleWriteResponse response) {
+        BluetoothLog.v(String.format("writeDescriptor for %s: service = %s, character = %s", mac, service, character));
+        response = ProxyUtils.getUIProxy(response);
+        mClient.writeDescriptor(mac, service, character, descriptor, value, response);
     }
 
     @Override

@@ -13,7 +13,7 @@ import com.inuker.bluetooth.library.utils.ListUtils;
 import java.util.List;
 
 /**
- * Created by liwentian on 2016/11/25.
+ * Created by dingjikerbo on 2016/11/25.
  */
 
 public abstract class AbsBluetoothReceiver {

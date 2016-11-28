@@ -1,27 +1,31 @@
 package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.Constants;
-import com.inuker.bluetooth.library.connect.listener.WriteDescriptorListener;
+import com.inuker.bluetooth.library.connect.listener.ReadDescriptorListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 
 import java.util.UUID;
 
 /**
- * Created by dingjikerbo on 2015/11/10.
+ * Created by dingjikerbo on 2016/11/28.
  */
-public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorListener {
+
+public class BleReadDescriptorRequest extends BleRequest implements ReadDescriptorListener {
 
     private UUID mServiceUUID;
     private UUID mCharacterUUID;
+    private UUID mDescriptorUUID;
 
-    public BleUnnotifyRequest(UUID service, UUID character, BleGeneralResponse response) {
+    public BleReadDescriptorRequest(UUID service, UUID character, UUID descriptor, BleGeneralResponse response) {
         super(response);
         mServiceUUID = service;
         mCharacterUUID = character;
+        mDescriptorUUID = descriptor;
     }
 
     @Override
@@ -32,11 +36,11 @@ public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorLis
                 break;
 
             case Constants.STATUS_DEVICE_CONNECTED:
-                closeNotify();
+                startRead();
                 break;
 
             case Constants.STATUS_DEVICE_SERVICE_READY:
-                closeNotify();
+                startRead();
                 break;
 
             default:
@@ -45,8 +49,8 @@ public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorLis
         }
     }
 
-    private void closeNotify() {
-        if (!setCharacteristicNotification(mServiceUUID, mCharacterUUID, false)) {
+    private void startRead() {
+        if (!readDescriptor(mServiceUUID, mCharacterUUID, mDescriptorUUID)) {
             onRequestCompleted(Code.REQUEST_FAILED);
         } else {
             startRequestTiming();
@@ -54,10 +58,11 @@ public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorLis
     }
 
     @Override
-    public void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status) {
+    public void onDescriptorRead(BluetoothGattDescriptor descriptor, int status, byte[] value) {
         stopRequestTiming();
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
+            putByteArray(Constants.EXTRA_BYTE_VALUE, value);
             onRequestCompleted(Code.REQUEST_SUCCESS);
         } else {
             onRequestCompleted(Code.REQUEST_FAILED);

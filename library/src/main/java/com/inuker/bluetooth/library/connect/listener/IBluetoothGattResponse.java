@@ -18,6 +18,8 @@ public interface IBluetoothGattResponse {
 
     void onCharacteristicChanged(BluetoothGattCharacteristic characteristic, byte[] value);
 
+    void onDescriptorRead(BluetoothGattDescriptor descriptor, int status, byte[] value);
+
     void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status);
 
     void onReadRemoteRssi(int rssi, int status);

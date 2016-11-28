@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by liwentian on 2016/11/25.
+ * Created by dingjikerbo on 2016/11/25.
  */
 
 public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothReceiver, Handler.Callback, ProxyInterceptor {

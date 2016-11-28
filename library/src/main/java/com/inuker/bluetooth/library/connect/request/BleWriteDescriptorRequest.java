@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 
 import com.inuker.bluetooth.library.Code;
@@ -11,17 +12,22 @@ import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import java.util.UUID;
 
 /**
- * Created by dingjikerbo on 2015/11/10.
+ * Created by dingjikerbo on 2016/11/28.
  */
-public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorListener {
+
+public class BleWriteDescriptorRequest extends BleRequest implements WriteDescriptorListener {
 
     private UUID mServiceUUID;
     private UUID mCharacterUUID;
+    private UUID mDescriptorUUID;
+    private byte[] mBytes;
 
-    public BleUnnotifyRequest(UUID service, UUID character, BleGeneralResponse response) {
+    public BleWriteDescriptorRequest(UUID service, UUID character, UUID descriptor, byte[] bytes, BleGeneralResponse response) {
         super(response);
         mServiceUUID = service;
         mCharacterUUID = character;
+        mDescriptorUUID = descriptor;
+        mBytes = bytes;
     }
 
     @Override
@@ -32,11 +38,11 @@ public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorLis
                 break;
 
             case Constants.STATUS_DEVICE_CONNECTED:
-                closeNotify();
+                startWrite();
                 break;
 
             case Constants.STATUS_DEVICE_SERVICE_READY:
-                closeNotify();
+                startWrite();
                 break;
 
             default:
@@ -45,8 +51,8 @@ public class BleUnnotifyRequest extends BleRequest implements WriteDescriptorLis
         }
     }
 
-    private void closeNotify() {
-        if (!setCharacteristicNotification(mServiceUUID, mCharacterUUID, false)) {
+    private void startWrite() {
+        if (!writeDescriptor(mServiceUUID, mCharacterUUID, mDescriptorUUID, mBytes)) {
             onRequestCompleted(Code.REQUEST_FAILED);
         } else {
             startRequestTiming();

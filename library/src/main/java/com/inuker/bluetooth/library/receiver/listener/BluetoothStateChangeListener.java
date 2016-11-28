@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.receiver.listener;
 
 /**
- * Created by liwentian on 2016/11/25.
+ * Created by dingjikerbo on 2016/11/25.
  */
 
 public abstract class BluetoothStateChangeListener implements BluetoothReceiverListener {

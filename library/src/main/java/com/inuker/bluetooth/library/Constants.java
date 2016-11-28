@@ -14,6 +14,7 @@ public class Constants {
     public static final String EXTRA_MAC = "extra.mac";
     public static final String EXTRA_SERVICE_UUID = "extra.service.uuid";
     public static final String EXTRA_CHARACTER_UUID = "extra.character.uuid";
+    public static final String EXTRA_DESCRIPTOR_UUID = "extra.descriptor.uuid";
     public static final String EXTRA_BYTE_VALUE = "extra.byte.value";
     public static final String EXTRA_CODE = "extra.code";
     public static final String EXTRA_STATUS = "extra.status";
@@ -70,6 +71,8 @@ public class Constants {
     public static final int CODE_INDICATE = 10;
     public static final int CODE_SEARCH = 11;
     public static final int CODE_STOP_SESARCH = 12;
+    public static final int CODE_READ_DESCRIPTOR = 13;
+    public static final int CODE_WRITE_DESCRIPTOR = 14;
 
     public static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
     public static final int STATUS_DEVICE_CONNECTING = BluetoothProfile.STATE_CONNECTING;

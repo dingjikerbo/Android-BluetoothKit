@@ -28,6 +28,10 @@ public interface IBleConnectWorker {
 
     boolean writeCharacteristic(UUID service, UUID character, byte[] value);
 
+    boolean readDescriptor(UUID service, UUID characteristic, UUID descriptor);
+
+    boolean writeDescriptor(UUID service, UUID characteristic, UUID descriptor, byte[] value);
+
     boolean writeCharacteristicWithNoRsp(UUID service, UUID character, byte[] value);
 
     boolean setCharacteristicNotification(UUID service, UUID character, boolean enable);

@@ -13,6 +13,9 @@ import java.util.UUID;
 
 public class BleReadRequest extends BleRequest implements ReadCharacterListener {
 
+    private UUID mServiceUUID;
+    private UUID mCharacterUUID;
+
     public BleReadRequest(UUID service, UUID character, BleGeneralResponse response) {
         super(response);
         mServiceUUID = service;

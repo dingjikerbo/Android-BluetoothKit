@@ -10,10 +10,12 @@ import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleIndicateRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
+import com.inuker.bluetooth.library.connect.request.BleReadDescriptorRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
+import com.inuker.bluetooth.library.connect.request.BleWriteDescriptorRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteNoRspRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteRequest;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
@@ -82,6 +84,14 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
 
     public void writeNoRsp(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
         addNewRequest(new BleWriteNoRspRequest(service, character, bytes, response));
+    }
+
+    public void readDescriptor(UUID service, UUID character, UUID descriptor, BleGeneralResponse response) {
+        addNewRequest(new BleReadDescriptorRequest(service, character, descriptor, response));
+    }
+
+    public void writeDescriptor(UUID service, UUID character, UUID descriptor, byte[] bytes, BleGeneralResponse response) {
+        addNewRequest(new BleWriteDescriptorRequest(service, character, descriptor, bytes, response));
     }
 
     public void notify(UUID service, UUID character, BleGeneralResponse response) {

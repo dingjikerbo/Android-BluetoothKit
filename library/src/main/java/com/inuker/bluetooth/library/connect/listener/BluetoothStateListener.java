@@ -1,7 +1,7 @@
 package com.inuker.bluetooth.library.connect.listener;
 
 /**
- * Created by liwentian on 2016/11/26.
+ * Created by dingjikerbo on 2016/11/26.
  */
 
 public interface BluetoothStateListener {

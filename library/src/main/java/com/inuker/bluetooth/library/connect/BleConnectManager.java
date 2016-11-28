@@ -64,6 +64,14 @@ public class BleConnectManager {
         getBleConnectMaster(mac).writeNoRsp(service, character, value, response);
     }
 
+    public static void readDescriptor(String mac, UUID service, UUID character, UUID descriptor, BleGeneralResponse response) {
+        getBleConnectMaster(mac).readDescriptor(service, character, descriptor, response);
+    }
+
+    public static void writeDescriptor(String mac, UUID service, UUID character, UUID descriptor, byte[] value, BleGeneralResponse response) {
+        getBleConnectMaster(mac).writeDescriptor(service, character, descriptor, value, response);
+    }
+
     public static void notify(String mac, UUID service, UUID character, BleGeneralResponse response) {
         getBleConnectMaster(mac).notify(service, character, response);
     }

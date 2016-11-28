@@ -2,6 +2,8 @@ package com.inuker.bluetooth.library.connect;
 
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
+import com.inuker.bluetooth.library.connect.response.BleReadResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 
 import java.util.UUID;
 
@@ -19,6 +21,10 @@ public interface IBleConnectMaster {
     void write(UUID service, UUID character, byte[] bytes, BleGeneralResponse response);
 
     void writeNoRsp(UUID service, UUID character, byte[] bytes, BleGeneralResponse response);
+
+    void readDescriptor(UUID service, UUID character, UUID descriptor, BleGeneralResponse response);
+
+    void writeDescriptor(UUID service, UUID character, UUID descriptor, byte[] value, BleGeneralResponse response);
 
     void notify(UUID service, UUID character, BleGeneralResponse response);
 

@@ -55,15 +55,18 @@ import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_INDICATE;
 import static com.inuker.bluetooth.library.Constants.CODE_NOTIFY;
 import static com.inuker.bluetooth.library.Constants.CODE_READ;
+import static com.inuker.bluetooth.library.Constants.CODE_READ_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
 import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
 import static com.inuker.bluetooth.library.Constants.CODE_WRITE;
+import static com.inuker.bluetooth.library.Constants.CODE_WRITE_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_WRITE_NORSP;
 import static com.inuker.bluetooth.library.Constants.DEVICE_FOUND;
 import static com.inuker.bluetooth.library.Constants.EXTRA_BYTE_VALUE;
 import static com.inuker.bluetooth.library.Constants.EXTRA_CHARACTER_UUID;
+import static com.inuker.bluetooth.library.Constants.EXTRA_DESCRIPTOR_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_GATT_PROFILE;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
 import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
@@ -238,6 +241,41 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         args.putSerializable(EXTRA_CHARACTER_UUID, character);
         args.putByteArray(EXTRA_BYTE_VALUE, value);
         safeCallBluetoothApi(CODE_WRITE, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void readDescriptor(String mac, UUID service, UUID character, UUID descriptor, final BleReadResponse response) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
+        args.putSerializable(EXTRA_DESCRIPTOR_UUID, descriptor);
+        safeCallBluetoothApi(CODE_READ_DESCRIPTOR, args, new BluetoothResponse() {
+            @Override
+            public void onResponse(int code, Bundle data) throws RemoteException {
+                if (response != null) {
+                    response.onResponse(code, data.getByteArray(EXTRA_BYTE_VALUE));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void writeDescriptor(String mac, UUID service, UUID character, UUID descriptor, byte[] value, final BleWriteResponse response) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putSerializable(EXTRA_SERVICE_UUID, service);
+        args.putSerializable(EXTRA_CHARACTER_UUID, character);
+        args.putSerializable(EXTRA_DESCRIPTOR_UUID, descriptor);
+        args.putByteArray(EXTRA_BYTE_VALUE, value);
+        safeCallBluetoothApi(CODE_WRITE_DESCRIPTOR, args, new BluetoothResponse() {
             @Override
             public void onResponse(int code, Bundle data) throws RemoteException {
                 if (response != null) {

@@ -68,6 +68,16 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
+    public void readDescriptor(UUID service, UUID character, UUID descriptor, BleGeneralResponse response) {
+        getConnectDispatcher().readDescriptor(service, character, descriptor, response);
+    }
+
+    @Override
+    public void writeDescriptor(UUID service, UUID character, UUID descriptor, byte[] value, BleGeneralResponse response) {
+        getConnectDispatcher().writeDescriptor(service, character, descriptor, value, response);
+    }
+
+    @Override
     public void notify(UUID service, UUID character, BleGeneralResponse response) {
         getConnectDispatcher().notify(service, character, response);
     }

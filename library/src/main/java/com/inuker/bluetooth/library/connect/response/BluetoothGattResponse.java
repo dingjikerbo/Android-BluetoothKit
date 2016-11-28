@@ -49,6 +49,11 @@ public class BluetoothGattResponse extends BluetoothGattCallback {
     }
 
     @Override
+    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        response.onDescriptorRead(descriptor, status, descriptor.getValue());
+    }
+
+    @Override
     public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
         response.onReadRemoteRssi(rssi, status);
     }

@@ -19,14 +19,17 @@ import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_INDICATE;
 import static com.inuker.bluetooth.library.Constants.CODE_NOTIFY;
 import static com.inuker.bluetooth.library.Constants.CODE_READ;
+import static com.inuker.bluetooth.library.Constants.CODE_READ_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
 import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
 import static com.inuker.bluetooth.library.Constants.CODE_WRITE;
+import static com.inuker.bluetooth.library.Constants.CODE_WRITE_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_WRITE_NORSP;
 import static com.inuker.bluetooth.library.Constants.EXTRA_BYTE_VALUE;
 import static com.inuker.bluetooth.library.Constants.EXTRA_CHARACTER_UUID;
+import static com.inuker.bluetooth.library.Constants.EXTRA_DESCRIPTOR_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
 import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
 import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
@@ -86,6 +89,7 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
         String mac = args.getString(EXTRA_MAC);
         UUID service = (UUID) args.getSerializable(EXTRA_SERVICE_UUID);
         UUID character = (UUID) args.getSerializable(EXTRA_CHARACTER_UUID);
+        UUID descriptor = (UUID) args.getSerializable(EXTRA_DESCRIPTOR_UUID);
         byte[] value = args.getByteArray(EXTRA_BYTE_VALUE);
         BleGeneralResponse response = (BleGeneralResponse) msg.obj;
 
@@ -109,6 +113,14 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
             case CODE_WRITE_NORSP:
                 BleConnectManager.writeNoRsp(mac, service, character, value, response);
+                break;
+
+            case CODE_READ_DESCRIPTOR:
+                BleConnectManager.readDescriptor(mac, service, character, descriptor, response);
+                break;
+
+            case CODE_WRITE_DESCRIPTOR:
+                BleConnectManager.writeDescriptor(mac, service, character, descriptor, value, response);
                 break;
 
             case CODE_NOTIFY:

@@ -33,6 +33,10 @@ public interface IBluetoothClient {
 
     void write(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response);
 
+    void readDescriptor(String mac, UUID service, UUID character, UUID descriptor, BleReadResponse response);
+
+    void writeDescriptor(String mac, UUID service, UUID character, UUID descriptor, byte[] value, BleWriteResponse response);
+
     void writeNoRsp(String mac, UUID service, UUID character, byte[] value, BleWriteResponse response);
 
     void notify(String mac, UUID service, UUID character, BleNotifyResponse response);

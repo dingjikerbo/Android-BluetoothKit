@@ -19,6 +19,7 @@ import com.inuker.bluetooth.library.RuntimeChecker;
 import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.listener.IBluetoothGattResponse;
 import com.inuker.bluetooth.library.connect.listener.ReadCharacterListener;
+import com.inuker.bluetooth.library.connect.listener.ReadDescriptorListener;
 import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.listener.WriteCharacterListener;
@@ -218,6 +219,22 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
                 characteristic.getUuid()));
 
         broadcastCharacterChanged(characteristic.getService().getUuid(), characteristic.getUuid(), value);
+    }
+
+    @Override
+    public void onDescriptorRead(BluetoothGattDescriptor descriptor, int status, byte[] value) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onDescriptorRead for %s: status = %d, service = 0x%s, character = 0x%s, descriptor = 0x%s",
+                mBluetoothDevice.getAddress(),
+                status,
+                descriptor.getCharacteristic().getService().getUuid(),
+                descriptor.getCharacteristic().getUuid(),
+                descriptor.getUuid()));
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof ReadDescriptorListener) {
+            ((ReadDescriptorListener) mGattResponseListener).onDescriptorRead(descriptor, status, value);
+        }
     }
 
     @Override
@@ -457,6 +474,74 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
 
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
             BluetoothLog.e(String.format("writeCharacteristic failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean readDescriptor(UUID service, UUID character, UUID descriptor) {
+        BluetoothLog.v(String.format("readDescriptor for %s: service = 0x%s, character = 0x%s, descriptor = 0x%s",
+                mBluetoothDevice.getAddress(), service, character, descriptor));
+
+        checkRuntime();
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        BluetoothGattDescriptor gattDescriptor = characteristic.getDescriptor(descriptor);
+        if (gattDescriptor == null) {
+            BluetoothLog.e(String.format("descriptor not exist"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.readDescriptor(gattDescriptor)) {
+            BluetoothLog.e(String.format("readDescriptor failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean writeDescriptor(UUID service, UUID character, UUID descriptor, byte[] value) {
+        BluetoothLog.v(String.format("writeDescriptor for %s: service = 0x%s, character = 0x%s, descriptor = 0x%s, value = 0x%s",
+                mBluetoothDevice.getAddress(), service, character, descriptor, ByteUtils.byteToString(value)));
+
+        checkRuntime();
+
+        BluetoothGattCharacteristic characteristic = getCharacter(service, character);
+
+        if (characteristic == null) {
+            BluetoothLog.e(String.format("characteristic not exist!"));
+            return false;
+        }
+
+        BluetoothGattDescriptor gattDescriptor = characteristic.getDescriptor(descriptor);
+        if (gattDescriptor == null) {
+            BluetoothLog.e(String.format("descriptor not exist"));
+            return false;
+        }
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        gattDescriptor.setValue(value != null ? value : ByteUtils.EMPTY_BYTES);
+
+        if (!mBluetoothGatt.writeDescriptor(gattDescriptor)) {
+            BluetoothLog.e(String.format("writeDescriptor failed"));
             return false;
         }
 

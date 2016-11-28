@@ -12,6 +12,10 @@ import java.util.UUID;
 
 public class BleWriteNoRspRequest extends BleRequest implements WriteCharacterListener {
 
+    private UUID mServiceUUID;
+    private UUID mCharacterUUID;
+    private byte[] mBytes;
+
     public BleWriteNoRspRequest(UUID service, UUID character, byte[] bytes, BleGeneralResponse response) {
         super(response);
         mServiceUUID = service;

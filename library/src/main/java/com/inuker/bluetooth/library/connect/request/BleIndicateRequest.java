@@ -16,6 +16,9 @@ import java.util.UUID;
 
 public class BleIndicateRequest extends BleRequest implements WriteDescriptorListener {
 
+    private UUID mServiceUUID;
+    private UUID mCharacterUUID;
+
     public BleIndicateRequest(UUID service, UUID character, BleGeneralResponse response) {
         super(response);
         mServiceUUID = service;

@@ -21,11 +21,6 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
 
     protected static final int MSG_REQUEST_TIMEOUT = 0x20;
 
-    protected UUID mServiceUUID;
-    protected UUID mCharacterUUID;
-
-    protected byte[] mBytes;
-
     protected BleGeneralResponse mResponse;
 
     protected Bundle mExtra;
@@ -120,6 +115,16 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
 
     protected String getStatusText() {
         return Constants.getStatusText(getCurrentStatus());
+    }
+
+    @Override
+    public boolean readDescriptor(UUID service, UUID characteristic, UUID descriptor) {
+        return mWorker.readDescriptor(service, characteristic, descriptor);
+    }
+
+    @Override
+    public boolean writeDescriptor(UUID service, UUID characteristic, UUID descriptor, byte[] value) {
+        return mWorker.writeDescriptor(service, characteristic, descriptor, value);
     }
 
     public abstract void processRequest();
