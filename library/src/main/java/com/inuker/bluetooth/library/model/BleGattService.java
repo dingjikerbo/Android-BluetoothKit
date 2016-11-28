@@ -76,6 +76,7 @@ public class BleGattService implements Parcelable, Comparable {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Service: %s\n", uuid));
 
+        List<BleGattCharacter> characters = getCharacters();
         int size = characters.size();
         for (int i = 0; i < size; i++) {
             sb.append(String.format(">>> Character: %s", characters.get(i)));
