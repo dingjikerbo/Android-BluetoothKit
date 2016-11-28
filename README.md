@@ -42,7 +42,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.2.6'
+compile 'com.inuker.bluetooth:library:1.2.7'
 ```
 
 如果是Eclipse，可以导入library\build\intermediates\bundles\release下的jar包
