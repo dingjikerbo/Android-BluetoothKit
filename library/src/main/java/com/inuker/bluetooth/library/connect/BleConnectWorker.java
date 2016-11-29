@@ -470,7 +470,6 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
         }
 
         characteristic.setValue(value != null ? value : ByteUtils.EMPTY_BYTES);
-        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
 
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
             BluetoothLog.e(String.format("writeCharacteristic failed"));
@@ -702,6 +701,11 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
         }
 
         return true;
+    }
+
+    @Override
+    public BleGattProfile getGattProfile() {
+        return mBleGattProfile;
     }
 
     private boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {

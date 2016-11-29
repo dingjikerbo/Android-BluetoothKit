@@ -13,6 +13,7 @@ import com.inuker.bluetooth.library.connect.IBleConnectDispatcher;
 import com.inuker.bluetooth.library.connect.IBleConnectWorker;
 import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
+import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.UUID;
@@ -276,6 +277,11 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
 
     protected void stopRequestTiming() {
         mHandler.removeMessages(MSG_REQUEST_TIMEOUT);
+    }
+
+    @Override
+    public BleGattProfile getGattProfile() {
+        return mWorker.getGattProfile();
     }
 }
 

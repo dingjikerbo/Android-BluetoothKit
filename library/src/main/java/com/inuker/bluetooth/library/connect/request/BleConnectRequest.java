@@ -53,7 +53,7 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
                 break;
 
             case Constants.STATUS_DEVICE_SERVICE_READY:
-                onRequestCompleted(Code.REQUEST_SUCCESS);
+                onConnectSuccess();
                 break;
         }
     }
@@ -107,7 +107,7 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
                 break;
 
             case Constants.STATUS_DEVICE_SERVICE_READY:
-                onRequestCompleted(Code.REQUEST_SUCCESS);
+                onConnectSuccess();
                 break;
         }
     }
@@ -190,10 +190,17 @@ public class BleConnectRequest extends BleRequest implements ServiceDiscoverList
         mHandler.removeMessages(MSG_DISCOVER_SERVICE_TIMEOUT);
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            putParcelable(Constants.EXTRA_GATT_PROFILE, profile);
-            onRequestCompleted(Code.REQUEST_SUCCESS);
+            onConnectSuccess();
         } else {
             onServiceDiscoverFailed();
         }
+    }
+
+    private void onConnectSuccess() {
+        BleGattProfile profile = getGattProfile();
+        if (profile != null) {
+            putParcelable(Constants.EXTRA_GATT_PROFILE, profile);
+        }
+        onRequestCompleted(Code.REQUEST_SUCCESS);
     }
 }
