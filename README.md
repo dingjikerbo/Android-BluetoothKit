@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.2.9 - 2016/11/30**
+- 去掉allowBackup选项
+
 ### **Version 1.2.8 - 2016/11/29**
 - 提高写兼容性，修复已连接时不返回profile的问题
 
@@ -45,7 +48,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.2.8'
+compile 'com.inuker.bluetooth:library:1.2.9'
 ```
 
 如果是Eclipse，可以导入library\build\intermediates\bundles\release下的jar包
