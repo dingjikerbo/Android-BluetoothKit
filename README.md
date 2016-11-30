@@ -51,7 +51,7 @@ BluetoothKit---Android Bluetooth Framework
 compile 'com.inuker.bluetooth:library:1.2.9'
 ```
 
-如果是Eclipse，可以导入library\build\intermediates\bundles\release下的jar包，在AndroidManifest.xml中添加如下：
+如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
 ```
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
