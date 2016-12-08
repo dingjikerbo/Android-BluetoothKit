@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.0 - 2016/12/8**
+- Context管理
+
 ### **Version 1.2.9 - 2016/11/30**
 - 去掉allowBackup选项
 
@@ -48,7 +51,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.2.9'
+compile 'com.inuker.bluetooth:library:1.3.0'
 ```
 
 如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
@@ -110,6 +113,8 @@ mClient.search(request, new SearchResponse() {
     }
 });
 ```
+
+如果扫描不出来，可将targetSdk调到低于6.0.
 
 可以随时停止扫描:
 
