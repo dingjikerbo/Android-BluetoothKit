@@ -29,7 +29,7 @@ public class BluetoothUtils {
     private static Handler mHandler;
 
     public static Context getContext() {
-        return BluetoothContext.getContext();
+        return BluetoothContext.get();
     }
 
     private static Handler getHandler() {

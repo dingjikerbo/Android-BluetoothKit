@@ -108,7 +108,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
-        BluetoothContext.setContext(mContext);
+        BluetoothContext.set(mContext);
 
         mWorkerThread = new HandlerThread(TAG);
         mWorkerThread.start();

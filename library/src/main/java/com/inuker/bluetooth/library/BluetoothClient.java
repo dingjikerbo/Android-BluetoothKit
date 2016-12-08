@@ -28,6 +28,9 @@ public class BluetoothClient implements IBluetoothClient {
     private IBluetoothClient mClient;
 
     public BluetoothClient(Context context) {
+        if (context == null) {
+            throw new NullPointerException("Context null");
+        }
         mClient = BluetoothClientImpl.getInstance(context);
     }
 

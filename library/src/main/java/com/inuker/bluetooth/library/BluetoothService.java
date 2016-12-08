@@ -23,7 +23,7 @@ public class BluetoothService extends Service {
         super.onCreate();
         BluetoothLog.v(String.format("BluetoothService onCreate"));
         mContext = getApplicationContext();
-        BluetoothContext.setContext(mContext);
+        BluetoothContext.set(mContext);
     }
 
     @Override

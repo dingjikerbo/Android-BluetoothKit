@@ -26,7 +26,7 @@ public abstract class AbsBluetoothReceiver {
 
     protected AbsBluetoothReceiver(IReceiverDispatcher dispatcher) {
         mDispatcher = dispatcher;
-        mContext = BluetoothContext.getContext();
+        mContext = BluetoothContext.get();
         mHandler = new Handler(Looper.getMainLooper());
     }
 
