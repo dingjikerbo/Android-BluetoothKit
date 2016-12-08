@@ -19,6 +19,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        BluetoothContext.setContext(this);
+        BluetoothContext.set(this);
     }
 }
