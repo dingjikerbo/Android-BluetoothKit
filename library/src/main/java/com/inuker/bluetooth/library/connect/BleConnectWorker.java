@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library.connect;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -10,6 +11,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -65,7 +67,7 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
     private RuntimeChecker mRuntimeChecker;
 
     public BleConnectWorker(String mac, RuntimeChecker runtimeChecker) {
-        BluetoothAdapter adapter = BluetoothUtils.getBluetoothLeAdapter();
+        BluetoothAdapter adapter = BluetoothUtils.getBluetoothAdapter();
         if (adapter != null) {
             mBluetoothDevice = adapter.getRemoteDevice(mac);
         } else {

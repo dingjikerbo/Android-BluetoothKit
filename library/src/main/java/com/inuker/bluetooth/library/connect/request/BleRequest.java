@@ -15,6 +15,7 @@ import com.inuker.bluetooth.library.connect.listener.GattResponseListener;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.BluetoothUtils;
 
 import java.util.UUID;
 
@@ -153,12 +154,18 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
 
         BluetoothLog.w(String.format("Process %s, status = %s", getClass().getSimpleName(), getStatusText()));
 
-        try {
-            registerGattResponseListener(this);
-            processRequest();
-        } catch (Throwable e) {
-            BluetoothLog.e(e);
-            onRequestCompleted(Code.REQUEST_EXCEPTION);
+        if (!BluetoothUtils.isBleSupported()) {
+            onRequestCompleted(Code.BLE_NOT_SUPPORTED);
+        } else if (!BluetoothUtils.isBluetoothEnabled()) {
+            onRequestCompleted(Code.BLUETOOTH_DISABLED);
+        } else {
+            try {
+                registerGattResponseListener(this);
+                processRequest();
+            } catch (Throwable e) {
+                BluetoothLog.e(e);
+                onRequestCompleted(Code.REQUEST_EXCEPTION);
+            }
         }
     }
 

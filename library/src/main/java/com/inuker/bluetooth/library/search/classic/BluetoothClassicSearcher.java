@@ -19,7 +19,7 @@ public class BluetoothClassicSearcher extends BluetoothSearcher {
 	private BluetoothSearchReceiver mReceiver;
 	
 	private BluetoothClassicSearcher() {
-		mBluetoothAdapter = BluetoothUtils.getBluetoothClassicAdapter();
+		mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter();
 	}
 
 	public static BluetoothClassicSearcher getInstance() {

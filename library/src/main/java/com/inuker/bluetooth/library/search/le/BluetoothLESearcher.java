@@ -17,7 +17,7 @@ import com.inuker.bluetooth.library.utils.BluetoothUtils;
 public class BluetoothLESearcher extends BluetoothSearcher {
 
 	private BluetoothLESearcher() {
-		mBluetoothAdapter = BluetoothUtils.getBluetoothLeAdapter();
+		mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter();
 	}
 
 	public static BluetoothLESearcher getInstance() {
