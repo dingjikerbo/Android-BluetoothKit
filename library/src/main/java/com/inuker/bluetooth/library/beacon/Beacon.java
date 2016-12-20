@@ -4,6 +4,7 @@ import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.inuker.bluetooth.library.utils.ListUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,9 +17,10 @@ public class Beacon {
     public List<BeaconItem> mItems;
 
     public Beacon(byte[] scanRecord) {
+        mItems = new LinkedList<BeaconItem>();
         if (!ByteUtils.isEmpty(scanRecord)) {
             mBytes = ByteUtils.trimLast(scanRecord);
-            mItems = BeaconParser.parseBeacon(mBytes);
+            mItems.addAll(BeaconParser.parseBeacon(mBytes));
         }
     }
 
