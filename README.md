@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.2 - 2016/12/21**
+- 修复Beacon的NPR
+
 ### **Version 1.3.1 - 2016/12/15**
 - 调低minSdkVersion
 
