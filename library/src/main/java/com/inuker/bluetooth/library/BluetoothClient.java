@@ -15,6 +15,7 @@ import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListen
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
 
@@ -165,8 +166,7 @@ public class BluetoothClient implements IBluetoothClient {
         mClient.unregisterBluetoothStateListener(listener);
     }
 
-    @Override
     public int getConnectStatus(String mac) {
-        return mClient.getConnectStatus(mac);
+        return BluetoothUtils.getConnectStatus(mac);
     }
 }

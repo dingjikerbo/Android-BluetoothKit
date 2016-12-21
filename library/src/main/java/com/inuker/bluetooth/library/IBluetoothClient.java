@@ -56,6 +56,4 @@ public interface IBluetoothClient {
     void registerBluetoothStateListener(BluetoothStateListener listener);
 
     void unregisterBluetoothStateListener(BluetoothStateListener listener);
-
-    int getConnectStatus(String mac);
 }
