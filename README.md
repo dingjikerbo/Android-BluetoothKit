@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.3 - 2016/12/21**
+- 增加获取连接状态接口
+
 ### **Version 1.3.2 - 2016/12/21**
 - 修复Beacon的NPR
 
@@ -257,6 +260,17 @@ private final BleConnectStatusListener mBleConnectStatusListener = new BleConnec
 };
 
 mClient.unregisterConnectStatusListener(MAC, mBleConnectStatusListener);
+```
+
+也可以主动获取连接状态：
+
+```
+int status = mClient.getConnectStatus(MAC);
+// Constants.STATUS_UNKNOWN
+// Constants.STATUS_DEVICE_CONNECTED
+// Constants.STATUS_DEVICE_CONNECTING
+// Constants.STATUS_DEVICE_DISCONNECTING
+// Constants.STATUS_DEVICE_DISCONNECTED
 ```
 
 ### **● 断开连接**

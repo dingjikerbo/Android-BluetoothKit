@@ -16,10 +16,13 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.BluetoothContext;
+import com.inuker.bluetooth.library.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.transform.sax.TransformerHandler;
 
 public class BluetoothUtils {
 
@@ -142,6 +145,20 @@ public class BluetoothUtils {
         }
 
         return devices;
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public static int getConnectStatus(String mac) {
+        BluetoothManager manager = getBluetoothManager();
+        if (manager != null) {
+            try {
+                BluetoothDevice device = getRemoteDevice(mac);
+                return manager.getConnectionState(device, BluetoothProfile.GATT);
+            } catch (Throwable e) {
+                BluetoothLog.e(e);
+            }
+        }
+        return Constants.STATUS_UNKNOWN;
     }
 
     public static List<BluetoothDevice> getBondedBluetoothClassicDevices() {

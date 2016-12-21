@@ -164,4 +164,9 @@ public class BluetoothClient implements IBluetoothClient {
     public void unregisterBluetoothStateListener(BluetoothStateListener listener) {
         mClient.unregisterBluetoothStateListener(listener);
     }
+
+    @Override
+    public int getConnectStatus(String mac) {
+        return mClient.getConnectStatus(mac);
+    }
 }

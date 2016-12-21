@@ -469,6 +469,11 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         }
     }
 
+    @Override
+    public int getConnectStatus(String mac) {
+        return BluetoothUtils.getConnectStatus(mac);
+    }
+
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
         try {
             IBluetoothService service = getBluetoothService();
