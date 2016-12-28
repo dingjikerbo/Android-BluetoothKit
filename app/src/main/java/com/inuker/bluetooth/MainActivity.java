@@ -67,6 +67,13 @@ public class MainActivity extends Activity {
             }
         });
 
+        ClientManager.getClient().registerBluetoothStateListener(new BluetoothStateListener() {
+            @Override
+            public void onBluetoothStateChanged(boolean openOrClosed) {
+                BluetoothLog.v(String.format("onBluetoothStateChanged %b", openOrClosed));
+            }
+        });
+
         searchDevice();
     }
 
