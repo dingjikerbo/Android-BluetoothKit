@@ -14,6 +14,7 @@ import com.inuker.bluetooth.library.search.SearchRequest;
 
 import java.util.UUID;
 
+import static com.inuker.bluetooth.library.Constants.CODE_CLEAR_REQUEST;
 import static com.inuker.bluetooth.library.Constants.CODE_CONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_INDICATE;
@@ -34,6 +35,7 @@ import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
 import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
 import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SERVICE_UUID;
+import static com.inuker.bluetooth.library.Constants.EXTRA_TYPE;
 
 /**
  * Created by dingjikerbo on 2015/10/29.
@@ -146,6 +148,11 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
             case CODE_INDICATE:
                 BleConnectManager.indicate(mac, service, character, response);
+                break;
+
+            case CODE_CLEAR_REQUEST:
+                int clearType = args.getInt(EXTRA_TYPE, 0);
+                BleConnectManager.clearRequest(mac, clearType);
                 break;
         }
         return true;

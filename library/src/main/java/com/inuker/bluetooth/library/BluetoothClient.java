@@ -166,14 +166,23 @@ public class BluetoothClient implements IBluetoothClient {
         mClient.unregisterBluetoothStateListener(listener);
     }
 
+<<<<<<< Updated upstream
     /**
      * 获取设备连接状态
      * @param mac
      */
+=======
+    @Override
+    public void clearRequest(String mac, int type) {
+        mClient.clearRequest(mac, type);
+    }
+
+>>>>>>> Stashed changes
     public int getConnectStatus(String mac) {
         return BluetoothUtils.getConnectStatus(mac);
     }
 
+<<<<<<< Updated upstream
     /**
      * 主动获取蓝牙开关状态
      */
@@ -198,6 +207,12 @@ public class BluetoothClient implements IBluetoothClient {
     /**
      * 是否支持BLE
      */
+=======
+    public boolean isBluetoothEnabled() {
+        return BluetoothUtils.isBluetoothEnabled();
+    }
+
+>>>>>>> Stashed changes
     public boolean isBleSupported() {
         return BluetoothUtils.isBleSupported();
     }

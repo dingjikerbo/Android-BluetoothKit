@@ -87,4 +87,8 @@ public class BleConnectManager {
     public static void indicate(String mac, UUID service, UUID character, BleGeneralResponse response) {
         getBleConnectMaster(mac).indicate(service, character, response);
     }
+
+    public static void clearRequest(String mac, int type) {
+        getBleConnectMaster(mac).clearRequest(type);
+    }
 }

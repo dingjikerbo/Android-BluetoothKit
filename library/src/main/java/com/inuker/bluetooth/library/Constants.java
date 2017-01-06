@@ -25,6 +25,7 @@ public class Constants {
     public static final String EXTRA_SEARCH_RESULT = "extra.search.result";
     public static final String EXTRA_GATT_PROFILE = "extra.gatt.profile";
     public static final String EXTRA_OPTIONS = "extra.options";
+    public static final String EXTRA_TYPE = "extra.type";
 
     /**
      * CallBluetoothApi response code
@@ -73,6 +74,7 @@ public class Constants {
     public static final int CODE_STOP_SESARCH = 12;
     public static final int CODE_READ_DESCRIPTOR = 13;
     public static final int CODE_WRITE_DESCRIPTOR = 14;
+    public static final int CODE_CLEAR_REQUEST = 20;
 
     public static final int STATUS_UNKNOWN = -1;
     public static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
@@ -96,4 +98,9 @@ public class Constants {
             default: return String.format("Unknown %d", status);
         }
     }
+
+    public static final int REQUEST_READ = 0x1;
+    public static final int REQUEST_WRITE = 0x2;
+    public static final int REQUEST_NOTIFY = 0x4;
+    public static final int REQUEST_RSSI = 0x8;
 }

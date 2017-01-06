@@ -50,6 +50,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static com.inuker.bluetooth.library.Constants.ACTION_CHARACTER_CHANGED;
 import static com.inuker.bluetooth.library.Constants.ACTION_CONNECT_STATUS_CHANGED;
+import static com.inuker.bluetooth.library.Constants.CODE_CLEAR_REQUEST;
 import static com.inuker.bluetooth.library.Constants.CODE_CONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_INDICATE;
@@ -75,6 +76,7 @@ import static com.inuker.bluetooth.library.Constants.EXTRA_RSSI;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SEARCH_RESULT;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SERVICE_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_STATUS;
+import static com.inuker.bluetooth.library.Constants.EXTRA_TYPE;
 import static com.inuker.bluetooth.library.Constants.REQUEST_SUCCESS;
 import static com.inuker.bluetooth.library.Constants.SEARCH_CANCEL;
 import static com.inuker.bluetooth.library.Constants.SEARCH_START;
@@ -467,6 +469,14 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
         if (listener != null) {
             mBluetoothStateListener.remove(listener);
         }
+    }
+
+    @Override
+    public void clearRequest(String mac, int type) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putInt(EXTRA_TYPE, type);
+        safeCallBluetoothApi(CODE_CLEAR_REQUEST, args, null);
     }
 
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {

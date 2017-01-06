@@ -98,6 +98,11 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
+    public void clearRequest(int clearType) {
+        getConnectDispatcher().clearRequest(clearType);
+    }
+
+    @Override
     public boolean onIntercept(Object object, Method method, Object[] args) {
         mHandler.obtainMessage(0, new ProxyBulk(object, method, args)).sendToTarget();
         return true;

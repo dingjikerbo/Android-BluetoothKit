@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.inuker.bluetooth.library.Code;
+import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.RuntimeChecker;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
@@ -58,7 +59,7 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
     public void disconnect() {
         checkRuntime();
 
-        BluetoothLog.w(String.format("start process disconnect"));
+        BluetoothLog.w(String.format("Process disconnect"));
 
         if (mCurrentRequest != null) {
             mCurrentRequest.cancel();
@@ -72,6 +73,45 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
         mBleWorkList.clear();
 
         mWorker.closeGatt();
+    }
+
+    public void clearRequest(int clearType) {
+        checkRuntime();
+
+        BluetoothLog.w(String.format("clearRequest %d", clearType));
+
+        List<BleRequest> requestClear = new LinkedList<BleRequest>();
+
+        if (clearType == 0) {
+            requestClear.addAll(mBleWorkList);
+        } else {
+            for (BleRequest request : mBleWorkList) {
+                if (isRequestMatch(request, clearType)) {
+                    requestClear.add(request);
+                }
+            }
+        }
+
+        for (BleRequest request : requestClear) {
+            request.cancel();
+        }
+
+        mBleWorkList.removeAll(requestClear);
+    }
+
+    private boolean isRequestMatch(BleRequest request, int requestType) {
+        if ((requestType & Constants.REQUEST_READ) != 0) {
+            return request instanceof BleReadRequest;
+        } else if ((requestType & Constants.REQUEST_WRITE) != 0) {
+            return request instanceof BleWriteRequest || request instanceof BleWriteNoRspRequest;
+        } else if ((requestType & Constants.REQUEST_NOTIFY) != 0) {
+            return request instanceof BleNotifyRequest || request instanceof BleUnnotifyRequest
+                    || request instanceof BleIndicateRequest;
+        } else if ((requestType & Constants.REQUEST_RSSI) != 0) {
+            return request instanceof BleReadRssiRequest;
+        } else {
+            return false;
+        }
     }
 
     public void read(UUID service, UUID character, BleGeneralResponse response) {
@@ -126,7 +166,7 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
             request.onResponse(Code.REQUEST_OVERFLOW);
         }
 
-        scheduleNextRequest(100);
+        scheduleNextRequest(10);
     }
 
     @Override
@@ -139,7 +179,7 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
 
         mCurrentRequest = null;
 
-        scheduleNextRequest(100);
+        scheduleNextRequest(10);
     }
 
     private void scheduleNextRequest(long delayInMillis) {
