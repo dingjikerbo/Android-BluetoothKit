@@ -131,9 +131,22 @@ mClient.search(request, new SearchResponse() {
 mClient.stopSearch();
 ```
 
-## **监听蓝牙开关状态**
+## **蓝牙开关**
 
-回调的参数如果是true表示蓝牙打开，false表示蓝牙关闭
+打开关闭蓝牙：
+
+```
+mClient.openBluetooth();
+mClient.closeBluetooth();
+```
+
+判断蓝牙是否打开：
+
+```
+mClient.isBluetoothOpened();
+```
+
+蓝牙打开或关闭需要一段时间，可以注册回调监听状态，回调的参数如果是true表示蓝牙已打开，false表示蓝牙关闭
 
 ```
 mClient.registerBluetoothStateListener(mBluetoothStateListener);
@@ -416,3 +429,17 @@ mClient.readRssi(MAC, new BleReadRssiResponse() {
     }
 });
 ```
+
+### **● 清理请求队列**
+
+如果发送给设备的请求设备来不及处理，则这些请求会保存到队列中，如果在某些场景下需要清除这些请求，可以调用
+
+```
+mClient.clearRequest(MAC, clearType);
+// Constants.REQUEST_READ，所有读请求
+// Constants.REQUEST_WRITE，所有写请求
+// Constants.REQUEST_NOTIFY，所有通知相关的请求
+// Constants.REQUEST_RSSI，所有读信号强度的请求
+```
+
+clearType表示要清除的请求类型，如果要清除多种请求，可以将多种类型取或，如果要清除所有请求，则传入0。
