@@ -82,11 +82,13 @@ compile 'com.inuker.bluetooth:library:1.3.4'
 </application>
 ```
 
-2、创建一个BluetoothClient，建议作为一个单例: 
+2、创建一个BluetoothClient，建议作为一个全局单例，管理所有BLE设备的连接。 
 
 ```Java
 BluetoothClient mClient = new BluetoothClient(context);
 ```
+
+所有接口都通过BluetoothClient调用，涉及的常量如回调的错误码都在Constants类中。
 
 ## **设备扫描** 
 
