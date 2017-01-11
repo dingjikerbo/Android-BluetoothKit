@@ -166,38 +166,22 @@ public class BluetoothClient implements IBluetoothClient {
         mClient.unregisterBluetoothStateListener(listener);
     }
 
-    /**
-     * 获取设备连接状态
-     * @param mac
-     */
     public int getConnectStatus(String mac) {
         return BluetoothUtils.getConnectStatus(mac);
     }
 
-    /**
-     * 主动获取蓝牙开关状态
-     */
     public boolean isBluetoothOpened() {
         return BluetoothUtils.isBluetoothEnabled();
     }
 
-    /**
-     * 打开手机蓝牙
-     */
     public boolean openBluetooth() {
         return BluetoothUtils.openBluetooth();
     }
 
-    /**
-     * 关闭手机蓝牙
-     */
     public boolean closeBluetooth() {
         return BluetoothUtils.closeBluetooth();
     }
 
-    /**
-     * 是否支持BLE
-     */
     public boolean isBleSupported() {
         return BluetoothUtils.isBleSupported();
     }

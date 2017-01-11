@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.5 - 2016/01/11**
+- 增加部分蓝牙接口
+
 ### **Version 1.3.4 - 2016/12/21**
 - 增加获取连接状态接口
 
@@ -60,7 +63,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.3.4'
+compile 'com.inuker.bluetooth:library:1.3.5'
 ```
 
 如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
