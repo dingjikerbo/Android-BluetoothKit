@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
@@ -480,6 +481,9 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            throw new IllegalStateException("safe call deny!!");
+        }
         try {
             IBluetoothService service = getBluetoothService();
             if (service != null) {
@@ -578,7 +582,9 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
             @Override
             public void onBluetoothStateChanged(final int previousState, final int currentState) {
                 if (currentState == Constants.STATE_OFF || currentState == Constants.STATE_TURNING_OFF) {
-                    stopSearch();
+                    if (sInstance != null) {
+                        sInstance.stopSearch();
+                    }
                 }
 
                 mWorkerHandler.post(new Runnable() {

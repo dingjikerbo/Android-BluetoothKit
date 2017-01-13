@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.6 - 2016/01/13**
+- 修复关闭蓝牙时的ANR
+
 ### **Version 1.3.5 - 2016/01/11**
 - 增加部分蓝牙接口
 
@@ -63,7 +66,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.3.5'
+compile 'com.inuker.bluetooth:library:1.3.6'
 ```
 
 如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
@@ -95,7 +98,7 @@ BluetoothClient mClient = new BluetoothClient(context);
 
 ## **设备扫描** 
 
-支持经典蓝牙和BLE设备混合扫描，可自定义扫描策略:
+支持经典蓝牙和BLE设备混合扫描，可自定义扫描策略。每次扫描都要创建新的SearchRequest，不能复用。
 
 ```Java
 SearchRequest request = new SearchRequest.Builder()
