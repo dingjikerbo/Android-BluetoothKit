@@ -1,11 +1,8 @@
 package com.inuker.bluetooth.library;
 
-import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +14,8 @@ import android.os.Message;
 import android.os.RemoteException;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothBondStateChangeListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -30,6 +28,8 @@ import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.receiver.BluetoothReceiver;
 import com.inuker.bluetooth.library.receiver.listener.BleCharacterChangeListener;
 import com.inuker.bluetooth.library.receiver.listener.BleConnectStatusChangeListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -49,8 +49,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-import static com.inuker.bluetooth.library.Constants.ACTION_CHARACTER_CHANGED;
-import static com.inuker.bluetooth.library.Constants.ACTION_CONNECT_STATUS_CHANGED;
 import static com.inuker.bluetooth.library.Constants.CODE_CLEAR_REQUEST;
 import static com.inuker.bluetooth.library.Constants.CODE_CONNECT;
 import static com.inuker.bluetooth.library.Constants.CODE_DISCONNECT;
@@ -76,14 +74,12 @@ import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
 import static com.inuker.bluetooth.library.Constants.EXTRA_RSSI;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SEARCH_RESULT;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SERVICE_UUID;
-import static com.inuker.bluetooth.library.Constants.EXTRA_STATUS;
 import static com.inuker.bluetooth.library.Constants.EXTRA_TYPE;
 import static com.inuker.bluetooth.library.Constants.REQUEST_SUCCESS;
 import static com.inuker.bluetooth.library.Constants.SEARCH_CANCEL;
 import static com.inuker.bluetooth.library.Constants.SEARCH_START;
 import static com.inuker.bluetooth.library.Constants.SEARCH_STOP;
 import static com.inuker.bluetooth.library.Constants.SERVICE_UNREADY;
-import static com.inuker.bluetooth.library.Constants.STATUS_DISCONNECTED;
 
 /**
  * Created by dingjikerbo on 16/4/8.
@@ -107,7 +103,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private HashMap<String, HashMap<String, List<BleNotifyResponse>>> mNotifyResponses;
     private HashMap<String, List<BleConnectStatusListener>> mConnectStatusListeners;
-    private List<BluetoothStateListener> mBluetoothStateListener;
+    private List<BluetoothStateListener> mBluetoothStateListeners;
+    private List<BluetoothBondListener> mBluetoothBondListeners;
 
     private BluetoothClientImpl(Context context) {
         mContext = context.getApplicationContext();
@@ -120,7 +117,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
         mNotifyResponses = new HashMap<String, HashMap<String, List<BleNotifyResponse>>>();
         mConnectStatusListeners = new HashMap<String, List<BleConnectStatusListener>>();
-        mBluetoothStateListener = new LinkedList<BluetoothStateListener>();
+        mBluetoothStateListeners = new LinkedList<BluetoothStateListener>();
+        mBluetoothBondListeners = new LinkedList<BluetoothBondListener>();
 
         registerBluetoothReceiver();
 
@@ -460,15 +458,29 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     @Override
     public void registerBluetoothStateListener(BluetoothStateListener listener) {
-        if (listener != null && !mBluetoothStateListener.contains(listener)) {
-            mBluetoothStateListener.add(listener);
+        if (listener != null && !mBluetoothStateListeners.contains(listener)) {
+            mBluetoothStateListeners.add(listener);
         }
     }
 
     @Override
     public void unregisterBluetoothStateListener(BluetoothStateListener listener) {
         if (listener != null) {
-            mBluetoothStateListener.remove(listener);
+            mBluetoothStateListeners.remove(listener);
+        }
+    }
+
+    @Override
+    public void registerBluetoothBondListener(BluetoothBondListener listener) {
+        if (listener != null && !mBluetoothBondListeners.contains(listener)) {
+            mBluetoothBondListeners.add(listener);
+        }
+    }
+
+    @Override
+    public void unregisterBluetoothBondListener(BluetoothBondListener listener) {
+        if (listener != null) {
+            mBluetoothBondListeners.remove(listener);
         }
     }
 
@@ -550,7 +562,11 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
                     @Override
                     public void run() {
-                        listener.onConnectStatusChanged(mac, status);
+                        try {
+                            listener.onConnectStatusChanged(mac, status);
+                        } catch (Throwable e) {
+                            BluetoothLog.e(e);
+                        }
                     }
                 });
             }
@@ -559,12 +575,16 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private void dispatchBluetoothStateChanged(int previousState, final int currentState) {
         if (currentState == Constants.STATE_OFF || currentState == Constants.STATE_ON) {
-            for (final BluetoothStateListener listener : mBluetoothStateListener) {
+            for (final BluetoothStateListener listener : mBluetoothStateListeners) {
                 BluetoothUtils.post(new Runnable() {
 
                     @Override
                     public void run() {
-                        listener.onBluetoothStateChanged(currentState == Constants.STATE_ON);
+                        try {
+                            listener.onBluetoothStateChanged(currentState == Constants.STATE_ON);
+                        } catch (Throwable e) {
+                            BluetoothLog.e(e);
+                        }
                     }
                 });
             }
@@ -573,6 +593,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private void registerBluetoothReceiver() {
         registerBluetoothStateReceiver();
+        registerBluetoothBondReceiver();
         registerBleConnectStatusReceiver();
         registerBleCharacterChangeReceiver();
     }
@@ -596,6 +617,32 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                 });
             }
         });
+    }
+
+    private void registerBluetoothBondReceiver() {
+        BluetoothReceiver.getInstance().register(new BluetoothBondStateChangeListener() {
+
+            @Override
+            public void onBondStateChanged(String mac, int bondState) {
+                dispatchBondStateChanged(mac, bondState);
+            }
+        });
+    }
+
+    private void dispatchBondStateChanged(final String mac, final int bondState) {
+        for (final BluetoothBondListener listener : mBluetoothBondListeners) {
+            BluetoothUtils.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        listener.onBondStateChanged(mac, bondState);
+                    } catch (Throwable e) {
+                        BluetoothLog.e(e);
+                    }
+                }
+            });
+        }
     }
 
     private void registerBleConnectStatusReceiver() {

@@ -1,4 +1,4 @@
-package com.inuker.bluetooth.library.connect.listener;
+package com.inuker.bluetooth.library.receiver.listener;
 
 /**
  * Created by dingjikerbo on 2016/11/26.

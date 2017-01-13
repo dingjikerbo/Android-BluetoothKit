@@ -3,7 +3,7 @@ package com.inuker.bluetooth.library;
 import android.content.Context;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -11,7 +11,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
@@ -164,6 +164,16 @@ public class BluetoothClient implements IBluetoothClient {
     @Override
     public void unregisterBluetoothStateListener(BluetoothStateListener listener) {
         mClient.unregisterBluetoothStateListener(listener);
+    }
+
+    @Override
+    public void registerBluetoothBondListener(BluetoothBondListener listener) {
+        mClient.registerBluetoothBondListener(listener);
+    }
+
+    @Override
+    public void unregisterBluetoothBondListener(BluetoothBondListener listener) {
+        mClient.unregisterBluetoothBondListener(listener);
     }
 
     public int getConnectStatus(String mac) {

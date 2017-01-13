@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
+import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -39,6 +40,7 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
 
     private AbsBluetoothReceiver[] RECEIVERS = {
             BluetoothStateReceiver.newInstance(mDispatcher),
+            BluetoothBondReceiver.newInstance(mDispatcher),
             BleConnectStatusChangeReceiver.newInstance(mDispatcher),
             BleCharacterChangeReceiver.newInstance(mDispatcher),
     };
