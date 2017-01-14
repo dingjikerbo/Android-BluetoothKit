@@ -173,6 +173,22 @@ private final BluetoothStateListener mBluetoothStateListener = new BluetoothStat
 mClient.unregisterBluetoothStateListener(mBluetoothStateListener);
 ```
 
+## **设备配对**
+
+监听设备配对状态变化
+
+```
+private final BluetoothBondListener mBluetoothBondListener = new BluetoothBondListener() {
+    @Override
+    public void onBondStateChanged(String mac, int bondState) {
+        // bondState = Constants.BOND_NONE, BOND_BONDING, BOND_BONDED
+    }
+};
+
+mClient.registerBluetoothBondListener(mBluetoothBondListener);
+mClient.unregisterBluetoothBondListener(mBluetoothBondListener);
+```
+
 ## **Beacon解析**
 
 可以在广播中携带设备的自定义数据，用于设备识别，数据广播，事件通知等，这样手机端无需连接设备就可以获取设备推送的数据。

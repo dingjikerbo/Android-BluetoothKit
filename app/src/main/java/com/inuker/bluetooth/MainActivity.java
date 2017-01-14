@@ -71,7 +71,6 @@ public class MainActivity extends Activity {
                 if (bondState == Constants.BOND_BONDED) {
 
                 }
-                BluetoothLog.e(String.format("onBondStateChanged %s %d, %s", mac, bondState, Thread.currentThread().getName()));
             }
         });
 
