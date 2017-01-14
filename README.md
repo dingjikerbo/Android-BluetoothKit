@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.7 - 2016/01/14**
+- 代码优化，监听设备配对
+
 ### **Version 1.3.6 - 2016/01/13**
 - 修复关闭蓝牙时的ANR
 
