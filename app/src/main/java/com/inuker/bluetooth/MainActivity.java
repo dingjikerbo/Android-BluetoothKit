@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.inuker.bluetooth.library.Constants;
+import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
@@ -70,7 +71,7 @@ public class MainActivity extends Activity {
                 if (bondState == Constants.BOND_BONDED) {
 
                 }
-                BluetoothLog.e(String.format("onBondStateChanged %s %d", mac, bondState));
+                BluetoothLog.e(String.format("onBondStateChanged %s %d, %s", mac, bondState, Thread.currentThread().getName()));
             }
         });
 
@@ -80,7 +81,8 @@ public class MainActivity extends Activity {
     private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
         @Override
         public void onBluetoothStateChanged(boolean openOrClosed) {
-            BluetoothLog.v(String.format("MainActivity onBluetoothStateChanged: %s", openOrClosed ? "open" : "close"));
+            BluetoothLog.v(String.format("MainActivity onBluetoothStateChanged: %s, %s",
+                    openOrClosed ? "open" : "close", Thread.currentThread().getName()));
         }
 
     };

@@ -43,7 +43,7 @@ public abstract class AbsBluetoothListener implements Handler.Callback {
     }
 
     final public void invokeSync(Object...args) {
-        mSyncHandler.obtainMessage(MSG_SYNC_INVOKE).sendToTarget();
+        mSyncHandler.obtainMessage(MSG_SYNC_INVOKE, args).sendToTarget();
     }
 
     abstract public void onInvoke(Object...args);

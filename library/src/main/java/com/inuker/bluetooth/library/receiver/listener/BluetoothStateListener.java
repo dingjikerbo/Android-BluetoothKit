@@ -6,10 +6,10 @@ package com.inuker.bluetooth.library.receiver.listener;
 
 public abstract class BluetoothStateListener extends BluetoothClientListener {
 
-    abstract void onBluetoothStateChanged(boolean openOrClosed);
+    public abstract void onBluetoothStateChanged(boolean openOrClosed);
 
     @Override
-    public void onSyncInvoke(Object... args) {
+    public void onSyncInvoke(Object...args) {
         boolean openOrClosed = (boolean) args[0];
         onBluetoothStateChanged(openOrClosed);
     }

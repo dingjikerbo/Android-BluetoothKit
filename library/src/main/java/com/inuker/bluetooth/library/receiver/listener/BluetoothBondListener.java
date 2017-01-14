@@ -6,7 +6,7 @@ package com.inuker.bluetooth.library.receiver.listener;
 
 public abstract class BluetoothBondListener extends BluetoothClientListener {
 
-    abstract void onBondStateChanged(String mac, int bondState);
+    public abstract void onBondStateChanged(String mac, int bondState);
 
     @Override
     public void onSyncInvoke(Object... args) {
