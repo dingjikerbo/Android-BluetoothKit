@@ -2,7 +2,6 @@ package com.inuker.bluetooth.library.connect.request;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.os.Message;
 
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.Constants;

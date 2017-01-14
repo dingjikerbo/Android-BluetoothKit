@@ -9,6 +9,4 @@ import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 public interface IBluetoothReceiver {
 
     void register(BluetoothReceiverListener listener);
-
-    void unregister(BluetoothReceiverListener listener);
 }

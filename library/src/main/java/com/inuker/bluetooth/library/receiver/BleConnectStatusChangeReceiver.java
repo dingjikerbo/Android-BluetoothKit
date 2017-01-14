@@ -47,7 +47,7 @@ public class BleConnectStatusChangeReceiver extends AbsBluetoothReceiver {
     private void onConnectStatusChanged(String mac, int status) {
         List<BluetoothReceiverListener> listeners = getListeners(BleConnectStatusChangeListener.class);
         for (BluetoothReceiverListener listener : listeners) {
-            ((BleConnectStatusChangeListener) listener).onConnectStatusChanged(mac, status);
+            listener.invoke(mac, status);
         }
     }
 }

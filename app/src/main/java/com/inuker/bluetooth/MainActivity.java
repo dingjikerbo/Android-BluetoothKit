@@ -5,12 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.inuker.bluetooth.library.beacon.Beacon;
-import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
-import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
-import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.model.BleGattProfile;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
+import com.inuker.bluetooth.library.Constants;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
@@ -67,10 +64,13 @@ public class MainActivity extends Activity {
             }
         });
 
-        ClientManager.getClient().registerBluetoothStateListener(new BluetoothStateListener() {
+        ClientManager.getClient().registerBluetoothBondListener(new BluetoothBondListener() {
             @Override
-            public void onBluetoothStateChanged(boolean openOrClosed) {
-                BluetoothLog.v(String.format("onBluetoothStateChanged %b", openOrClosed));
+            public void onBondStateChanged(String mac, int bondState) {
+                if (bondState == Constants.BOND_BONDED) {
+
+                }
+                BluetoothLog.e(String.format("onBondStateChanged %s %d", mac, bondState));
             }
         });
 
@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
         @Override
         public void onSearchStarted() {
             BluetoothLog.w("MainActivity.onSearchStarted");
-            mRefreshLayout.showState(Constants.LOADING);
+            mRefreshLayout.showState(AppConstants.LOADING);
             mTvTitle.setText(R.string.string_refreshing);
             mDevices.clear();
         }
@@ -108,8 +108,8 @@ public class MainActivity extends Activity {
                 mDevices.add(device);
                 mAdapter.setDataList(mDevices);
 
-                Beacon beacon = new Beacon(device.scanRecord);
-                BluetoothLog.v(String.format("beacon for %s\n%s", device.getAddress(), beacon.toString()));
+//                Beacon beacon = new Beacon(device.scanRecord);
+//                BluetoothLog.v(String.format("beacon for %s\n%s", device.getAddress(), beacon.toString()));
 
 //                BeaconItem beaconItem = null;
 //                BeaconParser beaconParser = new BeaconParser(beaconItem);
@@ -122,7 +122,7 @@ public class MainActivity extends Activity {
             }
 
             if (mDevices.size() > 0) {
-                mRefreshLayout.showState(Constants.LIST);
+                mRefreshLayout.showState(AppConstants.LIST);
             }
         }
 
@@ -130,7 +130,7 @@ public class MainActivity extends Activity {
         public void onSearchStopped() {
             BluetoothLog.w("MainActivity.onSearchStopped");
             mListView.onRefreshComplete(true);
-            mRefreshLayout.showState(Constants.LIST);
+            mRefreshLayout.showState(AppConstants.LIST);
 
             mTvTitle.setText(R.string.devices);
         }
@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
             BluetoothLog.w("MainActivity.onSearchCanceled");
 
             mListView.onRefreshComplete(true);
-            mRefreshLayout.showState(Constants.LIST);
+            mRefreshLayout.showState(AppConstants.LIST);
 
             mTvTitle.setText(R.string.devices);
         }

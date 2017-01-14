@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.transform.sax.TransformerHandler;
-
 public class BluetoothUtils {
 
     private static BluetoothManager mBluetoothManager;

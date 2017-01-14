@@ -2,7 +2,6 @@ package com.inuker.bluetooth.library.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Parcel;
-import android.os.ParcelUuid;
 import android.os.Parcelable;
 
 import com.inuker.bluetooth.library.utils.ListUtils;

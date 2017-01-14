@@ -1,6 +1,6 @@
 package com.inuker.bluetooth;
 
-public class Constants {
+public class AppConstants {
 	/** 下拉刷新列表的各个状态 */
     public static final int LIST = 0;
     public static final int EMPTY = 1;

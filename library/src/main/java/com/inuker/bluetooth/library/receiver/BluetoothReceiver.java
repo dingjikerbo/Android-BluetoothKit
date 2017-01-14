@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
-import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
@@ -108,24 +107,14 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
     @Override
     public void register(BluetoothReceiverListener listener) {
         if (listener != null) {
+//            BluetoothLog.v(String.format("register %s", listener.getName()));
             List<BluetoothReceiverListener> listeners = mListeners.get(listener.getName());
             if (listeners == null) {
                 listeners = new LinkedList<BluetoothReceiverListener>();
-                BluetoothLog.v(String.format("register %s", listener.getName()));
                 mListeners.put(listener.getName(), listeners);
             }
             // You can register repetitive
             listeners.add(listener);
-        }
-    }
-
-    @Override
-    public void unregister(BluetoothReceiverListener listener) {
-        if (listener != null) {
-            List<BluetoothReceiverListener> listeners = mListeners.get(listener.getName());
-            if (listeners != null) {
-                listeners.remove(listener);
-            }
         }
     }
 

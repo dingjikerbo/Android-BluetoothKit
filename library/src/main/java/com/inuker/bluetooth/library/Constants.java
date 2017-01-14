@@ -1,6 +1,7 @@
 package com.inuker.bluetooth.library;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 
 import java.util.UUID;
@@ -103,4 +104,8 @@ public class Constants {
     public static final int REQUEST_WRITE = 0x2;
     public static final int REQUEST_NOTIFY = 0x4;
     public static final int REQUEST_RSSI = 0x8;
+
+    public static final int BOND_NONE = BluetoothDevice.BOND_NONE;
+    public static final int BOND_BONDING = BluetoothDevice.BOND_BONDING;
+    public static final int BOND_BONDED = BluetoothDevice.BOND_BONDED;
 }

@@ -1,13 +1,11 @@
 package com.inuker.bluetooth.library.receiver;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 
 import com.inuker.bluetooth.library.receiver.listener.BluetoothBondStateChangeListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +46,7 @@ public class BluetoothBondReceiver extends AbsBluetoothReceiver {
     private void onBondStateChanged(String mac, int bondState) {
         List<BluetoothReceiverListener> listeners = getListeners(BluetoothBondStateChangeListener.class);
         for (BluetoothReceiverListener listener : listeners) {
-            ((BluetoothBondStateChangeListener) listener).onBondStateChanged(mac, bondState);
+            listener.invoke(mac, bondState);
         }
     }
 }

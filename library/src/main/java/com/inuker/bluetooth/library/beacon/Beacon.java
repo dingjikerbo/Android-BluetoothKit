@@ -1,9 +1,7 @@
 package com.inuker.bluetooth.library.beacon;
 
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.inuker.bluetooth.library.utils.ListUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package com.inuker.bluetooth.library;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
@@ -12,6 +12,7 @@ import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
+import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
@@ -42,7 +43,6 @@ public class BluetoothClient implements IBluetoothClient {
     @Override
     public void connect(String mac, BleConnectOptions options, BleConnectResponse response) {
         BluetoothLog.v(String.format("connect %s", mac));
-
         response = ProxyUtils.getUIProxy(response);
         mClient.connect(mac, options, response);
     }
@@ -51,16 +51,6 @@ public class BluetoothClient implements IBluetoothClient {
     public void disconnect(String mac) {
         BluetoothLog.v(String.format("disconnect %s", mac));
         mClient.disconnect(mac);
-    }
-
-    @Override
-    public void registerConnectStatusListener(String mac, BleConnectStatusListener listener) {
-        mClient.registerConnectStatusListener(mac, listener);
-    }
-
-    @Override
-    public void unregisterConnectStatusListener(String mac, BleConnectStatusListener listener) {
-        mClient.unregisterConnectStatusListener(mac, listener);
     }
 
     @Override
@@ -154,6 +144,16 @@ public class BluetoothClient implements IBluetoothClient {
     public void stopSearch() {
         BluetoothLog.v(String.format("stopSearch"));
         mClient.stopSearch();
+    }
+
+    @Override
+    public void registerConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        mClient.registerConnectStatusListener(mac, listener);
+    }
+
+    @Override
+    public void unregisterConnectStatusListener(String mac, BleConnectStatusListener listener) {
+        mClient.unregisterConnectStatusListener(mac, listener);
     }
 
     @Override

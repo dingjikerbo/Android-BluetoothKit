@@ -47,7 +47,7 @@ public class BleCharacterChangeReceiver extends AbsBluetoothReceiver {
     private void onCharacterChanged(String mac, UUID service, UUID character, byte[] value) {
         List<BluetoothReceiverListener> listeners = getListeners(BleCharacterChangeListener.class);
         for (BluetoothReceiverListener listener : listeners) {
-            ((BleCharacterChangeListener) listener).onCharacterChanged(mac, service, character, value);
+            listener.invoke(mac, service, character, value);
         }
     }
 }

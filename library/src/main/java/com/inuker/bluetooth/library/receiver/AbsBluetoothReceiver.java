@@ -10,6 +10,7 @@ import com.inuker.bluetooth.library.BluetoothContext;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothReceiverListener;
 import com.inuker.bluetooth.library.utils.ListUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,7 +40,8 @@ public abstract class AbsBluetoothReceiver {
     }
 
     protected List<BluetoothReceiverListener> getListeners(Class<?> clazz) {
-        return mDispatcher.getListeners(clazz);
+        List<BluetoothReceiverListener> listeners = mDispatcher.getListeners(clazz);
+        return listeners != null ? listeners : Collections.EMPTY_LIST;
     }
 
     abstract List<String> getActions();

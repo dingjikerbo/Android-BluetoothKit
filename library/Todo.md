@@ -19,3 +19,8 @@
  - Hook掉系统的BluetoothGatt
  - discoverService重试和超时
  - 研究可否手机主动发起更改连接参数
+
+ 1.5.0
+ - 研究注入来confirm所在线程
+ - 支持新接口
+ - 支持断线自动重连
