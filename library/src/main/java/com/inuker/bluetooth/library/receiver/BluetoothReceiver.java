@@ -26,9 +26,15 @@ import java.util.Map;
  * Created by dingjikerbo on 2016/11/25.
  */
 
-public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothReceiver, Handler.Callback, ProxyInterceptor {
+public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothReceiver, Handler.Callback {
 
-    private static final int MSG_INVOKE_PROXY = 1;
+    private static final int MSG_REGISTER = 1;
+
+    private Map<String, List<BluetoothReceiverListener>> mListeners;
+
+    private static IBluetoothReceiver mReceiver;
+
+    private Handler mHandler;
 
     private IReceiverDispatcher mDispatcher = new IReceiverDispatcher() {
         @Override
@@ -44,18 +50,11 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
             BleCharacterChangeReceiver.newInstance(mDispatcher),
     };
 
-    private Map<String, List<BluetoothReceiverListener>> mListeners;
-
-    private static IBluetoothReceiver mReceiver;
-
-    private Handler mHandler;
-
     public static IBluetoothReceiver getInstance() {
         if (mReceiver == null) {
             synchronized (BluetoothReceiver.class) {
                 if (mReceiver == null) {
-                    BluetoothReceiver receiver = new BluetoothReceiver();
-                    mReceiver = ProxyUtils.getUIProxy(receiver, IBluetoothReceiver.class, receiver);
+                    mReceiver = new BluetoothReceiver();
                 }
             }
         }
@@ -106,14 +105,16 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
 
     @Override
     public void register(BluetoothReceiverListener listener) {
+        mHandler.obtainMessage(MSG_REGISTER, listener).sendToTarget();
+    }
+
+    private void registerInner(BluetoothReceiverListener listener) {
         if (listener != null) {
-//            BluetoothLog.v(String.format("register %s", listener.getName()));
             List<BluetoothReceiverListener> listeners = mListeners.get(listener.getName());
             if (listeners == null) {
                 listeners = new LinkedList<BluetoothReceiverListener>();
                 mListeners.put(listener.getName(), listeners);
             }
-            // You can register repetitive
             listeners.add(listener);
         }
     }
@@ -121,17 +122,10 @@ public class BluetoothReceiver extends BroadcastReceiver implements IBluetoothRe
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-            case MSG_INVOKE_PROXY:
-                ProxyBulk.safeInvoke(msg.obj);
+            case MSG_REGISTER:
+                registerInner((BluetoothReceiverListener) msg.obj);
                 break;
         }
-        return true;
-    }
-
-    @Override
-    public boolean onIntercept(Object object, Method method, Object[] args) {
-        mHandler.obtainMessage(MSG_INVOKE_PROXY, new ProxyBulk(object, method, args))
-                .sendToTarget();
         return true;
     }
 }
