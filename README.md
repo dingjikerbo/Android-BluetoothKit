@@ -7,9 +7,6 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
-### **Version 1.3.7 - 2016/01/14**
-- 代码优化，监听设备配对
-
 ### **Version 1.3.6 - 2016/01/13**
 - 修复关闭蓝牙时的ANR
 
@@ -69,7 +66,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.3.7'
+compile 'com.inuker.bluetooth:library:1.3.6'
 ```
 
 如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
