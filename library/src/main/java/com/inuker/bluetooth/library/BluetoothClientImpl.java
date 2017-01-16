@@ -28,7 +28,7 @@ import com.inuker.bluetooth.library.receiver.listener.BleConnectStatusChangeList
 import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothBondStateChangeListener;
 import com.inuker.bluetooth.library.receiver.listener.BluetoothStateChangeListener;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
+import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
