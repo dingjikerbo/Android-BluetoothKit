@@ -9,11 +9,13 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,200 +25,210 @@ import java.util.Random;
  * Created by liwentian on 2017/1/19.
  */
 
-public class WaveView extends SurfaceView implements SurfaceHolder.Callback {
-
-    private static final float RATIO_PEEK = 0.6f;
-
-    /**
-     * 10ms刷新绘制一次
-     */
-    private static final int RENDER_CYCLE = 1;
-
-    /**
-     * 每次占用10个像素宽度
-     */
-    private static final int CYCLE_WIDTH = 4;
+public class WaveView extends View {
 
     private int mWidth, mHeight;
 
-    private SurfaceHolder mHolder;
-    private RenderThread mRender;
-
-    private Bitmap mBitmap, mBitmapNext;
-    private Canvas mCanvas, mCanvasNext;
+    private Bitmap mBitmap;
+    private Canvas mCanvas;
 
     private Paint mPaint;
 
-    private int mValue;
+    private Config mConfig;
 
-    /**
-     * 最大振幅，即波峰的高度或者波谷的高度
-     */
-    private int mMax;
-
-    private float mRatio;
+    private List<Integer> mList;
 
     public WaveView(Context context) {
         super(context);
-        init();
     }
 
     public WaveView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public WaveView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+    }
+
+    public void setConfig(Config config) {
+        mConfig = config;
+    }
+
+    public static class Config {
+
+        /**
+         * 背景色
+         */
+        private int backgroundColor = Color.BLACK;
+        /**
+         * 前景色
+         */
+        private int foregroundColor = Color.WHITE;
+        /**
+         * 线条宽
+         */
+        private int strokeWidth;
+        /**
+         * 分几段
+         */
+        private int sliceCount;
+        /**
+         * 纵向范围区间
+         */
+        private int rangeStart, rangeEnd;
+
+        public int getBackgroundColor() {
+            return backgroundColor;
+        }
+
+        public void setBackgroundColor(int backgroundColor) {
+            this.backgroundColor = backgroundColor;
+        }
+
+        public int getForegroundColor() {
+            return foregroundColor;
+        }
+
+        public void setForegroundColor(int foregroundColor) {
+            this.foregroundColor = foregroundColor;
+        }
+
+        public int getStrokeWidth() {
+            return strokeWidth;
+        }
+
+        public void setStrokeWidth(int strokeWidth) {
+            this.strokeWidth = strokeWidth;
+        }
+
+        public int getSliceCount() {
+            return sliceCount;
+        }
+
+        public void setSliceCount(int sliceCount) {
+            this.sliceCount = sliceCount;
+        }
+
+        public int getRangeStart() {
+            return rangeStart;
+        }
+
+        public void setRangeStart(int rangeStart) {
+            this.rangeStart = rangeStart;
+        }
+
+        public int getRangeEnd() {
+            return rangeEnd;
+        }
+
+        public void setRangeEnd(int rangeEnd) {
+            this.rangeEnd = rangeEnd;
+        }
+
+        public static class Builder {
+
+            Config config = new Config();
+
+            public Builder setBackgroundColor(int color) {
+                config.backgroundColor= color;
+                return this;
+            }
+
+            public Builder setForegroundColor(int color) {
+                config.foregroundColor = color;
+                return this;
+            }
+
+            public Builder setStrokeWidth(int width) {
+                config.strokeWidth = width;
+                return this;
+            }
+
+            public Builder setSliceCount(int count) {
+                config.sliceCount = count;
+                return this;
+            }
+
+            public Builder setRange(int start, int end) {
+                config.rangeStart = start;
+                config.rangeEnd = end;
+                return this;
+            }
+
+            public Config build() {
+                return config;
+            }
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        setWaveSize(getWidth(), getHeight());
+    }
+
+    private void setWaveSize(int width, int height) {
+        if (width != mWidth && height != mHeight && width > 0 && height > 0) {
+            mWidth = width;
+            mHeight = height;
+            if (mBitmap != null) {
+                mBitmap.recycle();
+                mBitmap = null;
+            }
+            mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            mCanvas = new Canvas(mBitmap);
+
+            mPaint = new Paint();
+            mPaint.setAntiAlias(true);
+            mList = new LinkedList<>();
+        }
     }
 
     public void setValue(int y) {
-        if (y > mMax || y < -mMax) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            throw new RuntimeException();
+        }
+        if (y > mConfig.rangeEnd || y < mConfig.rangeStart) {
             throw new IllegalArgumentException();
         }
-        mValue = (int) (mHeight / 2 + mRatio * y);
+        float ratio = 1.0f * Math.abs(mConfig.rangeStart - mConfig.rangeEnd) / mHeight;
+
+        mList.add((int) (mHeight / 2 + y / ratio));
+        if (mList.size() > mConfig.sliceCount) {
+            mList.remove(0);
+        }
+
+        mCanvas.drawColor(mConfig.backgroundColor);
+
+        int preX = 0, preY = mList.get(0), curX, curY;
+
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(mConfig.strokeWidth);
+        mPaint.setColor(mConfig.foregroundColor);
+
+        for (int i = 0; i < mList.size(); i++) {
+            curX = i * (mWidth / mConfig.sliceCount);
+            curY = mList.get(i);
+            mCanvas.drawLine(preX, preY, curX, curY, mPaint);
+            preX = curX;
+            preY = curY;
+        }
+
+        invalidate();
     }
 
-    public void setMaxValue(int max) {
-        mMax = max;
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        setWaveSize(w, h);
     }
 
-    private void init() {
-        Log.i("bush", "WaveView init");
-        mHolder = getHolder();
-        mRender = new RenderThread();
-        mHolder.addCallback(this);
-        setZOrderOnTop(true);
-
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.WHITE);
-        mPaint.setStrokeWidth(5);
-    }
-
-    public void start() {
-        post(new Runnable() {
-
-            @Override
-            public void run() {
-                initBuffer();
-            }
-        });
-    }
-
-    private void initBuffer() {
-        mWidth = getWidth();
-        mHeight = getHeight();
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         if (mBitmap != null) {
-            mBitmap.recycle();
-            mBitmap = null;
-        }
-        mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        if (mBitmapNext != null) {
-            mBitmapNext.recycle();
-            mBitmapNext = null;
-        }
-        mBitmapNext = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
-        mCanvasNext = new Canvas(mBitmapNext);
-
-        if (mMax <= 0) {
-            mMax = (int) (mHeight * RATIO_PEEK / 2);
-        }
-
-        mRatio = mHeight * RATIO_PEEK / 2 / (mMax * 2);
-
-        mRender.start();
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        Log.i("bush", "surfaceCreated");
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        Log.i("bush", "surfaceChanged");
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        Log.i("bush", "surfaceDestroyed");
-    }
-
-    private class RenderThread extends Thread {
-
-        RenderThread() {
-        }
-
-        @Override
-        public void run() {
-            int x = 0, y = mHeight / 2, nextX = 0, nextY = 0;
-
-            Bitmap bitmap = null;
-
-            long start = System.currentTimeMillis();
-
-            while (true) {
-                start = System.currentTimeMillis();
-                if (x < mWidth) {
-                    nextX = x + CYCLE_WIDTH;
-                    nextY = mValue;
-                    mCanvas.drawLine(x, y, nextX, nextY, mPaint);
-                    x = nextX;
-                    y = nextY;
-                    bitmap = mBitmap;
-                } else {
-                    mCanvasNext.drawBitmap(mBitmap, new Rect(CYCLE_WIDTH, 0, mWidth, mHeight),
-                            new Rect(0, 0, mWidth - CYCLE_WIDTH, mHeight),
-                            mPaint);
-                    mCanvasNext.drawLine(mWidth - CYCLE_WIDTH, y, mWidth, mValue, mPaint);
-                    x = mWidth;
-                    y = mValue;
-                    bitmap = mBitmapNext;
-                }
-
-                Log.i("bush", String.format("time1 = %dms", System.currentTimeMillis() - start));
-
-                start = System.currentTimeMillis();
-
-                Canvas canvas = null;
-                try {
-                    synchronized (mHolder) {
-                        canvas = mHolder.lockCanvas();
-                        canvas.drawColor(Color.BLACK);
-                        canvas.drawBitmap(bitmap, 0, 0, mPaint);
-                    }
-                } finally {
-                    if (canvas != null) {
-                        mHolder.unlockCanvasAndPost(canvas);
-                    }
-                    Log.i("bush", String.format("time2 = %dms", System.currentTimeMillis() - start));
-                }
-
-                if (bitmap == mBitmapNext) {
-                    swapCanvas();
-                    mCanvasNext.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                }
-
-//                try {
-//                    Thread.sleep(RENDER_CYCLE);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-            }
-
-        }
-
-        private void swapCanvas() {
-            Canvas canvas = mCanvas;
-            mCanvas = mCanvasNext;
-            mCanvasNext = canvas;
-
-            Bitmap bitmap = mBitmap;
-            mBitmap = mBitmapNext;
-            mBitmapNext = bitmap;
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            canvas.drawBitmap(mBitmap, 0, 0, mPaint);
         }
     }
 }
