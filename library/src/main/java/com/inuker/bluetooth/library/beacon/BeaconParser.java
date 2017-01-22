@@ -18,7 +18,11 @@ public class BeaconParser {
     private ByteBuffer mByteBuffer;
 
     public BeaconParser(BeaconItem item) {
-        this.bytes = item.bytes;
+        this(item.bytes);
+    }
+
+    public BeaconParser(byte[] bytes) {
+        this.bytes = bytes;
         mByteBuffer = ByteBuffer.wrap(bytes).order(
                 ByteOrder.LITTLE_ENDIAN);
     }
