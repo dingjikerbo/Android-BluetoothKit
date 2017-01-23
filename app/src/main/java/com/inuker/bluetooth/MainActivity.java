@@ -5,10 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.inuker.bluetooth.library.Constants;
-import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothBondListener;
-import com.inuker.bluetooth.library.receiver.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
@@ -55,40 +51,12 @@ public class MainActivity extends Activity {
 
         });
 
-        ClientManager.getClient().registerBluetoothStateListener(mBluetoothStateListener);
-
-        mTvTitle.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                ClientManager.getClient().unregisterBluetoothStateListener(mBluetoothStateListener);
-            }
-        });
-
-        ClientManager.getClient().registerBluetoothBondListener(new BluetoothBondListener() {
-            @Override
-            public void onBondStateChanged(String mac, int bondState) {
-                if (bondState == Constants.BOND_BONDED) {
-
-                }
-            }
-        });
-
         searchDevice();
     }
 
-    private final BluetoothStateListener mBluetoothStateListener = new BluetoothStateListener() {
-        @Override
-        public void onBluetoothStateChanged(boolean openOrClosed) {
-            BluetoothLog.v(String.format("MainActivity onBluetoothStateChanged: %s, %s",
-                    openOrClosed ? "open" : "close", Thread.currentThread().getName()));
-        }
-
-    };
-
     private void searchDevice() {
         SearchRequest request = new SearchRequest.Builder()
-                .searchBluetoothLeDevice(4000, 3).build();
+                .searchBluetoothLeDevice(5000, 6).build();
 
         ClientManager.getClient().search(request, mSearchResponse);
     }

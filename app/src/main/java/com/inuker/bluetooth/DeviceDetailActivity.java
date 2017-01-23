@@ -99,23 +99,19 @@ public class DeviceDetailActivity extends Activity {
 
         BleConnectOptions options = new BleConnectOptions.Builder()
                 .setConnectRetry(3)
-                .setConnectTimeout(15000)
+                .setConnectTimeout(20000)
                 .setServiceDiscoverRetry(3)
                 .setServiceDiscoverTimeout(10000)
                 .build();
 
-        ClientManager.getClient().connect(mDevice.getAddress(), new BleConnectResponse() {
+        ClientManager.getClient().connect(mDevice.getAddress(), options, new BleConnectResponse() {
             @Override
             public void onResponse(int code, BleGattProfile profile) {
-                BluetoothLog.v(String.format("onResponse code = %d", code));
-
                 mTvTitle.setText(String.format("%s", mDevice.getAddress()));
                 mPbar.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
 
-
                 if (code == REQUEST_SUCCESS) {
-                    BluetoothLog.v(String.format("Profiles: \n%s", profile));
                     mAdapter.setGattProfile(profile);
                 }
             }
