@@ -24,6 +24,7 @@ public class WaveView extends View {
     private int mWidth, mHeight;
 
     private Bitmap mBitmap;
+    private Bitmap mAxis;
     private Canvas mCanvas;
 
     private Paint mPaint;
@@ -70,63 +71,37 @@ public class WaveView extends View {
         /**
          * 线条宽
          */
-        private int strokeWidth;
+        private int strokeWidth = 5;
         /**
          * 分几段
          */
-        private int sliceCount;
+        private int sliceCount = 20;
         /**
          * 纵向范围区间
          */
-        private int rangeStart, rangeEnd;
+        private int rangeStart = Short.MIN_VALUE, rangeEnd = Short.MAX_VALUE;
+        /**
+         * 轴突宽度
+         */
+        private int axisWidth = 15;
+        /**
+         * 轴突数
+         */
+        private int axisCount = 10;
 
-        public int getBackgroundColor() {
-            return backgroundColor;
-        }
+        /**
+         * 轴突线宽
+         */
+        private int axisStrokeWidth = 2;
+        /**
+         *  轴突标注字体大小
+         */
+        private int axisSize = 20;
 
-        public void setBackgroundColor(int backgroundColor) {
-            this.backgroundColor = backgroundColor;
-        }
-
-        public int getForegroundColor() {
-            return foregroundColor;
-        }
-
-        public void setForegroundColor(int foregroundColor) {
-            this.foregroundColor = foregroundColor;
-        }
-
-        public int getStrokeWidth() {
-            return strokeWidth;
-        }
-
-        public void setStrokeWidth(int strokeWidth) {
-            this.strokeWidth = strokeWidth;
-        }
-
-        public int getSliceCount() {
-            return sliceCount;
-        }
-
-        public void setSliceCount(int sliceCount) {
-            this.sliceCount = sliceCount;
-        }
-
-        public int getRangeStart() {
-            return rangeStart;
-        }
-
-        public void setRangeStart(int rangeStart) {
-            this.rangeStart = rangeStart;
-        }
-
-        public int getRangeEnd() {
-            return rangeEnd;
-        }
-
-        public void setRangeEnd(int rangeEnd) {
-            this.rangeEnd = rangeEnd;
-        }
+        /**
+         * 坐标轴总宽度
+         */
+        private int axisPadding = 100;
 
         public static class Builder {
 
@@ -180,8 +155,31 @@ public class WaveView extends View {
                 mBitmap = null;
             }
             mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            initAxis();
+
             mCanvas = new Canvas(mBitmap);
             mCanvas.drawColor(mConfig.backgroundColor);
+        }
+    }
+
+    private void initAxis() {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(mConfig.axisStrokeWidth);
+        paint.setTextSize(mConfig.axisSize);
+        mAxis = Bitmap.createBitmap(mConfig.axisPadding, mHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(mAxis);
+        canvas.drawColor(mConfig.backgroundColor);
+        int start = mConfig.rangeStart, end = mConfig.rangeEnd;
+        for (int i = 1; i <= mConfig.axisCount - 1; i++) {
+            int y = i * mHeight / mConfig.axisCount;
+            paint.setStyle(Paint.Style.STROKE);
+            canvas.drawLine(0, y, mConfig.axisWidth, y, paint);
+            int val = end - i * (end - start) / mConfig.axisCount;
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawText(String.valueOf(val), mConfig.axisWidth, y + mConfig.axisSize / 2, paint);
         }
     }
 
@@ -231,6 +229,7 @@ public class WaveView extends View {
         super.onDraw(canvas);
         if (mBitmap != null) {
             canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+            canvas.drawBitmap(mAxis, 0, 0, mPaint);
         }
     }
 }
