@@ -133,6 +133,26 @@ public class WaveView extends View {
                 return this;
             }
 
+            public Builder setAxisWidth(int axisWidth) {
+                config.axisWidth = axisWidth;
+                return this;
+            }
+
+            public Builder setAxisCount(int axisCount) {
+                config.axisCount = axisCount;
+                return this;
+            }
+
+            public Builder setAxisSize(int axisSize) {
+                config.axisSize = axisSize;
+                return this;
+            }
+
+            public Builder setAxisPadding(int axisPadding) {
+                config.axisPadding = axisPadding;
+                return this;
+            }
+
             public Config build() {
                 return config;
             }
