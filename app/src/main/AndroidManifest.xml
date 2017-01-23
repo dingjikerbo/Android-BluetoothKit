@@ -27,6 +27,9 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".WaveActivity" />
+
         <activity android:name=".DeviceDetailActivity" />
 
         <activity android:name=".CharacterActivity" />
