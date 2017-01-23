@@ -17,7 +17,7 @@
         android:name=".MyApplication"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".WaveActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,8 +27,8 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".WaveActivity" />
+        <!--<activity-->
+            <!--android:name=".WaveActivity" />-->
 
         <activity android:name=".DeviceDetailActivity" />
 

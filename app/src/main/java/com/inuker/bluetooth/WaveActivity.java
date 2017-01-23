@@ -25,7 +25,7 @@ import java.util.UUID;
 
 public class WaveActivity extends Activity implements IWaveGenerator.WaveResponse {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private IWaveGenerator mGenerator;
 
@@ -36,22 +36,35 @@ public class WaveActivity extends Activity implements IWaveGenerator.WaveRespons
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wave_activity);
 
-        WaveView.Config config = new WaveView.Config.Builder()
-                .setBackgroundColor(Color.BLACK)
-                .setForegroundColor(Color.WHITE)
+        mWaveX = (WaveView) findViewById(R.id.wavex);
+        WaveView.Config config1 = new WaveView.Config.Builder()
+                .setBackgroundColor(Color.WHITE)
+                .setForegroundColor(Color.BLACK)
                 .setSliceCount(20)
                 .setStrokeWidth(5)
                 .setRange(Short.MIN_VALUE, Short.MAX_VALUE)
                 .build();
-
-        mWaveX = (WaveView) findViewById(R.id.wavex);
-        mWaveX.setConfig(config);
+        mWaveX.setConfig(config1);
 
         mWaveY = (WaveView) findViewById(R.id.wavey);
-        mWaveY.setConfig(config);
+        WaveView.Config config2 = new WaveView.Config.Builder()
+                .setBackgroundColor(Color.WHITE)
+                .setForegroundColor(Color.RED)
+                .setSliceCount(20)
+                .setStrokeWidth(5)
+                .setRange(Short.MIN_VALUE, Short.MAX_VALUE)
+                .build();
+        mWaveY.setConfig(config2);
 
         mWaveZ = (WaveView) findViewById(R.id.wavez);
-        mWaveZ.setConfig(config);
+        WaveView.Config config3 = new WaveView.Config.Builder()
+                .setBackgroundColor(Color.WHITE)
+                .setForegroundColor(Color.GREEN)
+                .setSliceCount(20)
+                .setStrokeWidth(5)
+                .setRange(Short.MIN_VALUE, Short.MAX_VALUE)
+                .build();
+        mWaveZ.setConfig(config3);
 
         String mac = getIntent().getStringExtra("mac");
 
