@@ -107,12 +107,12 @@ public class WaveGenerator implements IWaveGenerator {
     }
 
     private void processNotify(byte[] value) {
-        BeaconParser parser = new BeaconParser(value);
-        int mode = parser.readByte();
-        int len = parser.readByte();
-        int x = parser.readShort();
-        int y = parser.readShort();
-        int z = parser.readShort();
-        mResponse.onRaw(x, y, z);
+//        BeaconParser parser = new BeaconParser(value);
+//        int mode = parser.readByte();
+//        int len = parser.readByte();
+//        int x = parser.readShort();
+//        int y = parser.readShort();
+//        int z = parser.readShort();
+//        mResponse.onRaw(x, y, z);
     }
 }
