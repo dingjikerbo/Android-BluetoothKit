@@ -7,6 +7,9 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
+### **Version 1.3.8 - 2016/02/15**
+- 新增refreshCache及优化广播
+
 ### **Version 1.3.6 - 2016/01/13**
 - 修复关闭蓝牙时的ANR
 
