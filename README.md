@@ -69,7 +69,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.3.7.1'
+compile 'com.inuker.bluetooth:library:1.3.8'
 ```
 
 如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
@@ -470,3 +470,9 @@ mClient.clearRequest(MAC, clearType);
 ```
 
 clearType表示要清除的请求类型，如果要清除多种请求，可以将多种类型取或，如果要清除所有请求，则传入0。
+
+### **● 刷新缓存**
+
+```
+mClient.refreshCache(MAC);
+```
