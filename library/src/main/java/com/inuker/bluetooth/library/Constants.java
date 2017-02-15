@@ -76,6 +76,7 @@ public class Constants {
     public static final int CODE_READ_DESCRIPTOR = 13;
     public static final int CODE_WRITE_DESCRIPTOR = 14;
     public static final int CODE_CLEAR_REQUEST = 20;
+    public static final int CODE_REFRESH_CACHE = 21;
 
     public static final int STATUS_UNKNOWN = -1;
     public static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;

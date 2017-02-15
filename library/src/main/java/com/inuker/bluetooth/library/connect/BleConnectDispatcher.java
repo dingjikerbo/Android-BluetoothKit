@@ -14,6 +14,7 @@ import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadDescriptorRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
+import com.inuker.bluetooth.library.connect.request.BleRefreshCacheRequest;
 import com.inuker.bluetooth.library.connect.request.BleRequest;
 import com.inuker.bluetooth.library.connect.request.BleUnnotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleWriteDescriptorRequest;
@@ -73,6 +74,10 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
         mBleWorkList.clear();
 
         mWorker.closeGatt();
+    }
+
+    public void refreshCache() {
+        addNewRequest(new BleRefreshCacheRequest(null));
     }
 
     public void clearRequest(int clearType) {

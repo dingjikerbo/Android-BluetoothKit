@@ -22,6 +22,7 @@ import static com.inuker.bluetooth.library.Constants.CODE_NOTIFY;
 import static com.inuker.bluetooth.library.Constants.CODE_READ;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
+import static com.inuker.bluetooth.library.Constants.CODE_REFRESH_CACHE;
 import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
@@ -153,6 +154,10 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
             case CODE_CLEAR_REQUEST:
                 int clearType = args.getInt(EXTRA_TYPE, 0);
                 BleConnectManager.clearRequest(mac, clearType);
+                break;
+
+            case CODE_REFRESH_CACHE:
+                BleConnectManager.refreshCache(mac);
                 break;
         }
         return true;

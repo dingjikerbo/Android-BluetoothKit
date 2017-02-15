@@ -91,4 +91,8 @@ public class BleConnectManager {
     public static void clearRequest(String mac, int type) {
         getBleConnectMaster(mac).clearRequest(type);
     }
+
+    public static void refreshCache(String mac) {
+        getBleConnectMaster(mac).refreshCache();
+    }
 }

@@ -199,4 +199,9 @@ public class BluetoothClient implements IBluetoothClient {
     public void clearRequest(String mac, int type) {
         mClient.clearRequest(mac, type);
     }
+
+    @Override
+    public void refreshCache(String mac) {
+        mClient.refreshCache(mac);
+    }
 }

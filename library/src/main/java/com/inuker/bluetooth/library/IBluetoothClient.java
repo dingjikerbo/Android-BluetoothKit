@@ -61,4 +61,6 @@ public interface IBluetoothClient {
     void unregisterBluetoothBondListener(BluetoothBondListener listener);
 
     void clearRequest(String mac, int type);
+
+    void refreshCache(String mac);
 }

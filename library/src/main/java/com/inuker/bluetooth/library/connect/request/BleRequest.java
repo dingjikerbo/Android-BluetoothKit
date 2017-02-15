@@ -170,6 +170,8 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
     }
 
     protected void onRequestCompleted(int code) {
+        checkRuntime();
+
         log(String.format("request complete: code = %d", code));
 
         mHandler.removeCallbacksAndMessages(null);

@@ -386,31 +386,12 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
-        if (!refreshGattCache(mBluetoothGatt)) {
+        if (!BluetoothUtils.refreshGattCache(mBluetoothGatt)) {
             BluetoothLog.e(String.format("refreshDeviceCache failed"));
             return false;
         }
 
         return true;
-    }
-
-    private boolean refreshGattCache(BluetoothGatt gatt) {
-        boolean result = false;
-        try {
-            if (gatt != null) {
-                Method refresh = BluetoothGatt.class.getMethod("refresh");
-                if (refresh != null) {
-                    refresh.setAccessible(true);
-                    result = (boolean) refresh.invoke(gatt, new Object[0]);
-                }
-            }
-        } catch (Exception e) {
-            BluetoothLog.e(e);
-        }
-
-        BluetoothLog.v(String.format("refreshDeviceCache return %b", result));
-
-        return result;
     }
 
     @Override

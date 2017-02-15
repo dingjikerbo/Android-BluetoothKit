@@ -33,4 +33,6 @@ public interface IBleConnectMaster {
     void indicate(UUID service, UUID character, BleGeneralResponse response);
 
     void clearRequest(int clearType);
+
+    void refreshCache();
 }
