@@ -378,12 +378,10 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
             protected void onAsyncResponse(int code, Bundle data) {
                 checkRuntime(true);
 
+                removeNotifyListener(mac, service, character);
+
                 if (response != null) {
                     response.onResponse(code);
-                }
-
-                if (code == REQUEST_SUCCESS) {
-                    removeNotifyListener(mac, service, character);
                 }
             }
         });
