@@ -3,6 +3,8 @@ BluetoothKit---Android Bluetooth Framework
 
 这个库用于Android蓝牙BLE设备通信，支持设备扫描，连接，读写，通知。
 
+Android 5.0新增发送广播以及GattServer模式，本库会尽快支持。
+
 ## 这套框架存在的意义
 
 一、统一解决Android蓝牙通信过程中的兼容性问题
@@ -22,6 +24,9 @@ BluetoothKit---Android Bluetooth Framework
 ------
 
 # **更新日志**
+
+### **Version 1.3.9 - 2016/03/24**
+- 取消属性检查；连接返回descriptor
 
 ### **Version 1.3.8 - 2016/02/15**
 - 新增refreshCache及优化广播
@@ -85,7 +90,7 @@ BluetoothKit---Android Bluetooth Framework
 1、在Android Studio的build.gradle中，在dependencies里添加一行:
 
 ```groovy
-compile 'com.inuker.bluetooth:library:1.3.8'
+compile 'com.inuker.bluetooth:library:1.3.9'
 ```
 
 如果是Eclipse，可以导入bluetoothkit.jar，在AndroidManifest.xml中添加如下：
