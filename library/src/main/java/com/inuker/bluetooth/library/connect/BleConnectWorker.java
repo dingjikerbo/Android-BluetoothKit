@@ -408,10 +408,10 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
-        if (!isCharacteristicReadable(characteristic)) {
-            BluetoothLog.e(String.format("characteristic not readable!"));
-            return false;
-        }
+//        if (!isCharacteristicReadable(characteristic)) {
+//            BluetoothLog.e(String.format("characteristic not readable!"));
+//            return false;
+//        }
 
         if (mBluetoothGatt == null) {
             BluetoothLog.e(String.format("ble gatt null"));
@@ -440,10 +440,10 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
-        if (!isCharacteristicWritable(characteristic)) {
-            BluetoothLog.e(String.format("characteristic not writable!"));
-            return false;
-        }
+//        if (!isCharacteristicWritable(characteristic)) {
+//            BluetoothLog.e(String.format("characteristic not writable!"));
+//            return false;
+//        }
 
         if (mBluetoothGatt == null) {
             BluetoothLog.e(String.format("ble gatt null"));
@@ -542,10 +542,10 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
-        if (!isCharacteristicNoRspWritable(characteristic)) {
-            BluetoothLog.e(String.format("characteristic not norsp writable!"));
-            return false;
-        }
+//        if (!isCharacteristicNoRspWritable(characteristic)) {
+//            BluetoothLog.e(String.format("characteristic not norsp writable!"));
+//            return false;
+//        }
 
         if (mBluetoothGatt == null) {
             BluetoothLog.e(String.format("ble gatt null"));
@@ -577,10 +577,10 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
-        if (!isCharacteristicNotifyable(characteristic)) {
-            BluetoothLog.e(String.format("characteristic not notifyable!"));
-            return false;
-        }
+//        if (!isCharacteristicNotifyable(characteristic)) {
+//            BluetoothLog.e(String.format("characteristic not notifyable!"));
+//            return false;
+//        }
 
         if (mBluetoothGatt == null) {
             BluetoothLog.e(String.format("ble gatt null"));
@@ -628,10 +628,10 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
-        if (!isCharacteristicIndicatable(characteristic)) {
-            BluetoothLog.e(String.format("characteristic not indicatable!"));
-            return false;
-        }
+//        if (!isCharacteristicIndicatable(characteristic)) {
+//            BluetoothLog.e(String.format("characteristic not indicatable!"));
+//            return false;
+//        }
 
         if (mBluetoothGatt == null) {
             BluetoothLog.e(String.format("ble gatt null"));
