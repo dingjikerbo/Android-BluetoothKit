@@ -1,9 +1,13 @@
 package com.inuker.bluetooth.library.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.os.Parcel;
+import android.os.ParcelUuid;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -12,34 +16,29 @@ import java.util.UUID;
 
 public class BleGattCharacter implements Parcelable {
 
-    private UUID uuid;
+    private ParcelUuid uuid;
 
     private int property;
 
     private int permissions;
 
+    private List<BleGattDescriptor> descriptors;
+
     protected BleGattCharacter(Parcel in) {
-        uuid = (UUID) in.readSerializable();
+        uuid = in.readParcelable(ParcelUuid.class.getClassLoader());
         property = in.readInt();
         permissions = in.readInt();
+        descriptors = in.createTypedArrayList(BleGattDescriptor.CREATOR);
     }
 
     public BleGattCharacter(BluetoothGattCharacteristic characteristic) {
-        this.uuid = characteristic.getUuid();
+        this.uuid = new ParcelUuid(characteristic.getUuid());
         this.property = characteristic.getProperties();
         this.permissions = characteristic.getPermissions();
-    }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeSerializable(uuid);
-        dest.writeInt(property);
-        dest.writeInt(permissions);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        for (BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
+            getDescriptors().add(new BleGattDescriptor(descriptor));
+        }
     }
 
     public static final Creator<BleGattCharacter> CREATOR = new Creator<BleGattCharacter>() {
@@ -54,20 +53,33 @@ public class BleGattCharacter implements Parcelable {
         }
     };
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(uuid, flags);
+        dest.writeInt(property);
+        dest.writeInt(permissions);
+        dest.writeTypedList(descriptors);
+    }
+
+    public UUID getUuid() {
+        return uuid.getUuid();
+    }
+
+    public void setUuid(ParcelUuid uuid) {
+        this.uuid = uuid;
+    }
+
     public int getProperty() {
         return property;
     }
 
     public void setProperty(int property) {
         this.property = property;
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
     }
 
     public int getPermissions() {
@@ -78,12 +90,24 @@ public class BleGattCharacter implements Parcelable {
         this.permissions = permissions;
     }
 
+    public List<BleGattDescriptor> getDescriptors() {
+        if (descriptors == null) {
+            descriptors = new ArrayList<BleGattDescriptor>();
+        }
+        return descriptors;
+    }
+
+    public void setDescriptors(List<BleGattDescriptor> descriptors) {
+        this.descriptors = descriptors;
+    }
+
     @Override
     public String toString() {
         return "BleGattCharacter{" +
                 "uuid=" + uuid +
                 ", property=" + property +
                 ", permissions=" + permissions +
+                ", descriptors=" + descriptors +
                 '}';
     }
 }

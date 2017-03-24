@@ -2,6 +2,7 @@ package com.inuker.bluetooth.library.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Parcel;
+import android.os.ParcelUuid;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
@@ -15,12 +16,12 @@ import java.util.UUID;
  */
 public class BleGattService implements Parcelable, Comparable {
 
-    private UUID uuid;
+    private ParcelUuid uuid;
 
     private List<BleGattCharacter> characters;
 
     public BleGattService(UUID uuid, Map<UUID, BluetoothGattCharacteristic> characters) {
-        this.uuid = uuid;
+        this.uuid = new ParcelUuid(uuid);
 
         Iterator<BluetoothGattCharacteristic> itor = characters.values().iterator();
         while (itor.hasNext()) {
@@ -29,31 +30,10 @@ public class BleGattService implements Parcelable, Comparable {
         }
     }
 
+
     protected BleGattService(Parcel in) {
-        uuid = (UUID) in.readSerializable();
-        in.readTypedList(getCharacters(), BleGattCharacter.CREATOR);
-    }
-
-    public UUID getUUID() {
-        return uuid;
-    }
-
-    public List<BleGattCharacter> getCharacters() {
-        if (characters == null) {
-            characters = new ArrayList<BleGattCharacter>();
-        }
-        return characters;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeSerializable(uuid);
-        dest.writeTypedList(getCharacters());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        uuid = in.readParcelable(ParcelUuid.class.getClassLoader());
+        characters = in.createTypedArrayList(BleGattCharacter.CREATOR);
     }
 
     public static final Creator<BleGattService> CREATOR = new Creator<BleGattService>() {
@@ -67,6 +47,17 @@ public class BleGattService implements Parcelable, Comparable {
             return new BleGattService[size];
         }
     };
+
+    public UUID getUUID() {
+        return uuid.getUuid();
+    }
+
+    public List<BleGattCharacter> getCharacters() {
+        if (characters == null) {
+            characters = new ArrayList<BleGattCharacter>();
+        }
+        return characters;
+    }
 
     @Override
     public String toString() {
@@ -91,6 +82,17 @@ public class BleGattService implements Parcelable, Comparable {
         }
 
         BleGattService anotherService = (BleGattService) another;
-        return uuid.compareTo(anotherService.uuid);
+        return getUUID().compareTo(anotherService.getUUID());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(uuid, flags);
+        dest.writeTypedList(characters);
     }
 }
