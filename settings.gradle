@@ -1,1 +1,1 @@
-include ':app', ':library', ':wave'
+include ':app', ':library', ':wave', ':test', ':testgattserver', ':testj'

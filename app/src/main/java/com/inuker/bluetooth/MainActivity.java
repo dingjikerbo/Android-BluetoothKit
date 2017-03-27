@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
 
     private void searchDevice() {
         SearchRequest request = new SearchRequest.Builder()
-                .searchBluetoothLeDevice(5000, 6).build();
+                .searchBluetoothLeDevice(5000, 2).build();
 
         ClientManager.getClient().search(request, mSearchResponse);
     }
@@ -65,7 +65,8 @@ public class MainActivity extends Activity {
         @Override
         public void onSearchStarted() {
             BluetoothLog.w("MainActivity.onSearchStarted");
-            mRefreshLayout.showState(AppConstants.LOADING);
+            mListView.onRefreshComplete(true);
+            mRefreshLayout.showState(AppConstants.LIST);
             mTvTitle.setText(R.string.string_refreshing);
             mDevices.clear();
         }

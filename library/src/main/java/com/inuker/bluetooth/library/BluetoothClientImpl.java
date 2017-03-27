@@ -137,6 +137,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     private IBluetoothService getBluetoothService() {
+        BluetoothLog.v(String.format("getBluetoothService"));
         if (mBluetoothService == null) {
             bindServiceSync();
         }
@@ -145,6 +146,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private void bindServiceSync() {
         checkRuntime(true);
+
+        BluetoothLog.v(String.format("bindServiceSync"));
 
         mCountDownLatch = new CountDownLatch(1);
 
@@ -163,12 +166,14 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            BluetoothLog.v(String.format("onServiceConnected"));
             mBluetoothService = IBluetoothService.Stub.asInterface(service);
             notifyBluetoothManagerReady();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            BluetoothLog.v(String.format("onServiceDisconnected"));
             mBluetoothService = null;
         }
     };
@@ -522,8 +527,14 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private void safeCallBluetoothApi(int code, Bundle args, final BluetoothResponse response) {
         checkRuntime(true);
+
+        BluetoothLog.v(String.format("safeCallBluetoothApi code = %d", code));
+
         try {
             IBluetoothService service = getBluetoothService();
+
+            BluetoothLog.v(String.format("IBluetoothService = %s", service));
+
             if (service != null) {
                 args = (args != null ? args : new Bundle());
                 service.callBluetoothApi(code, args, response);
@@ -543,6 +554,8 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     private void notifyBluetoothManagerReady() {
+        BluetoothLog.v(String.format("notifyBluetoothManagerReady %s", mCountDownLatch));
+
         if (mCountDownLatch != null) {
             mCountDownLatch.countDown();
             mCountDownLatch = null;
@@ -550,6 +563,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     private void waitBluetoothManagerReady() {
+        BluetoothLog.v(String.format("waitBluetoothManagerReady %s", mCountDownLatch));
         try {
             mCountDownLatch.await();
         } catch (InterruptedException e) {

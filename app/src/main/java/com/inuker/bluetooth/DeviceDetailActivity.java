@@ -14,6 +14,7 @@ import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
+import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
 import static com.inuker.bluetooth.library.Constants.*;
@@ -31,6 +32,8 @@ public class DeviceDetailActivity extends Activity {
     private ListView mListView;
     private DeviceDetailAdapter mAdapter;
 
+    private SearchResult mResult;
+
     private BluetoothDevice mDevice;
 
     private boolean mConnected;
@@ -42,6 +45,7 @@ public class DeviceDetailActivity extends Activity {
 
         Intent intent = getIntent();
         String mac = intent.getStringExtra("mac");
+        mResult = intent.getParcelableExtra("device");
 
         mDevice = BluetoothUtils.getRemoteDevice(mac);
 
@@ -107,6 +111,7 @@ public class DeviceDetailActivity extends Activity {
         ClientManager.getClient().connect(mDevice.getAddress(), options, new BleConnectResponse() {
             @Override
             public void onResponse(int code, BleGattProfile profile) {
+                BluetoothLog.v(String.format("profile:\n%s", profile));
                 mTvTitle.setText(String.format("%s", mDevice.getAddress()));
                 mPbar.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
@@ -114,6 +119,8 @@ public class DeviceDetailActivity extends Activity {
                 if (code == REQUEST_SUCCESS) {
                     mAdapter.setGattProfile(profile);
                 }
+
+                SecureConnector.processStep1(mDevice);
             }
         });
     }

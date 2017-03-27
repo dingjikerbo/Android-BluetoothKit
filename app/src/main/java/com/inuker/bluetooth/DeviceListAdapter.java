@@ -97,7 +97,7 @@ public class DeviceListAdapter extends BaseAdapter implements Comparator<SearchR
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(mContext, WaveActivity.class);
+                intent.setClass(mContext, DeviceDetailActivity.class);
                 intent.putExtra("mac", result.getAddress());
                 mContext.startActivity(intent);
             }
