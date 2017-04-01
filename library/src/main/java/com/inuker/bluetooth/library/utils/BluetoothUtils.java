@@ -161,6 +161,19 @@ public class BluetoothUtils {
         return Constants.STATUS_UNKNOWN;
     }
 
+    public static int getBondState(String mac) {
+        BluetoothManager manager = getBluetoothManager();
+        if (manager != null) {
+            try {
+                BluetoothDevice device = getRemoteDevice(mac);
+                return device.getBondState();
+            } catch (Throwable e) {
+                BluetoothLog.e(e);
+            }
+        }
+        return BluetoothDevice.BOND_NONE;
+    }
+
     public static List<BluetoothDevice> getBondedBluetoothClassicDevices() {
         BluetoothAdapter adapter = getBluetoothAdapter();
         List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();

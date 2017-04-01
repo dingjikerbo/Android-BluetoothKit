@@ -195,6 +195,10 @@ public class BluetoothClient implements IBluetoothClient {
         return BluetoothUtils.isBleSupported();
     }
 
+    public int getBondState(String mac) {
+        return BluetoothUtils.getBondState(mac);
+    }
+
     @Override
     public void clearRequest(String mac, int type) {
         mClient.clearRequest(mac, type);
