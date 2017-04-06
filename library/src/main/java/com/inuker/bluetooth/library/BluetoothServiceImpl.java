@@ -11,6 +11,7 @@ import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleGeneralResponse;
 import com.inuker.bluetooth.library.search.BluetoothSearchManager;
 import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 
 import java.util.UUID;
 
@@ -74,8 +75,8 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
                     }
                     try {
                         response.onResponse(code, data);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                    } catch (Throwable e) {
+                        BluetoothLog.e(e);
                     }
                 }
             }
