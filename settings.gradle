@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 include ':app', ':library', ':wave', ':test', ':testgattserver', ':testj'
+=======
+include ':app', ':library'
+>>>>>>> Stashed changes
