@@ -3,7 +3,13 @@ BluetoothKit---Android Bluetooth Framework
 
 这个库用于Android蓝牙BLE设备通信，支持设备扫描，连接，读写，通知。
 
-Android 5.0新增发送广播以及GattServer模式，本库会尽快支持。
+接下来会支持以下特性：
+
+一、蓝牙BLE设备大批量发数据，分包协议
+
+二、蓝牙GattServer端
+
+三、经典蓝牙数据收发
 
 ## 这套框架存在的意义
 
