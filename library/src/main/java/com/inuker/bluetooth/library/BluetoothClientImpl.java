@@ -91,9 +91,9 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     private Context mContext;
 
-    private IBluetoothService mBluetoothService;
+    private volatile IBluetoothService mBluetoothService;
 
-    private static IBluetoothClient sInstance;
+    private volatile static IBluetoothClient sInstance;
 
     private CountDownLatch mCountDownLatch;
 
