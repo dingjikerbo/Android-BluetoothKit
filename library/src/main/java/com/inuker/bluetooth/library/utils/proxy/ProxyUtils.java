@@ -20,6 +20,10 @@ public class ProxyUtils {
         return (T) getProxy(object, clazz, interceptor, false, false);
     }
 
+    public static <T> T getProxy(Object object, ProxyInterceptor interceptor) {
+        return (T) getUIProxy(object, object.getClass().getInterfaces(), interceptor);
+    }
+
     public static <T> T getWeakUIProxy(Object object, Class<?> clazz) {
         return (T) getProxy(object, clazz, null, true, true);
     }

@@ -31,4 +31,9 @@ public class BluetoothContext {
         }
         mHandler.postDelayed(runnable, delayInMillis);
     }
+
+    public static String getCurrentMethodName() {
+        StackTraceElement e = Thread.currentThread().getStackTrace()[4];
+        return e.getMethodName();
+    }
 }
