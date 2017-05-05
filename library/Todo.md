@@ -6,3 +6,6 @@
  6. 通过注入来confirm所在线程
  7. 支持新android api
  8. hook系统的gatt
+ 9. 连接断掉时自动clearRequest
+ 10. 搜索增强
+ 11. 不要用广播，都用事件总线
