@@ -17,8 +17,6 @@ import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.BluetoothUtils;
-import com.xiaomi.smarthome.mibtservice.library.channel.Channel;
-import com.xiaomi.smarthome.mibtservice.library.channel.ChannelCallback;
 
 import static com.inuker.bluetooth.library.Constants.*;
 
@@ -124,19 +122,6 @@ public class DeviceDetailActivity extends Activity {
                 }
             }
         });
-    }
-
-    private class MyChannel extends Channel {
-
-        @Override
-        public void write(byte[] bytes, ChannelCallback channelCallback) {
-
-        }
-
-        @Override
-        public void onRecv(byte[] bytes) {
-
-        }
     }
 
     private void connectDeviceIfNeeded() {
