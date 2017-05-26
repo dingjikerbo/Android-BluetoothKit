@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
@@ -52,6 +53,13 @@ public class MainActivity extends Activity {
         });
 
         searchDevice();
+
+        ClientManager.getClient().registerBluetoothStateListener(new BluetoothStateListener() {
+            @Override
+            public void onBluetoothStateChanged(boolean openOrClosed) {
+                BluetoothLog.v(String.format("onBluetoothStateChanged %b", openOrClosed));
+            }
+        });
     }
 
     private void searchDevice() {
