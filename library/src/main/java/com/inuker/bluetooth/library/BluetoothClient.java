@@ -120,7 +120,7 @@ public class BluetoothClient implements IBluetoothClient {
         BluetoothLog.v(String.format("indicate %s: service = %s, character = %s", mac, service, character));
 
         response = ProxyUtils.getUIProxy(response);
-        unindicate(mac, service, character, response);
+        mClient.unindicate(mac, service, character, response);
     }
 
     @Override
