@@ -100,7 +100,7 @@ public class DeviceDetailAdapter extends BaseAdapter {
             holder.uuid.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
             holder.uuid.setText(String.format("Service: %s", result.uuid.toString().toUpperCase()));
 
-            holder.root.setOnClickListener(null);
+//            holder.root.setOnClickListener(null);
         } else {
             holder.root.setBackgroundColor(mContext.getResources().getColor(R.color.device_detail_character));
             holder.uuid.getPaint().setFakeBoldText(false);
