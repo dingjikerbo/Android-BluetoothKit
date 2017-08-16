@@ -100,6 +100,14 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
+    public void unnotify(String mac, UUID service, UUID character, BleNotifyResponse response) {
+        BluetoothLog.v(String.format("unnotify %s: service = %s, character = %s", mac, service, character));
+
+        response = ProxyUtils.getUIProxy(response);
+        mClient.unnotify(mac, service, character, response);
+    }
+
+    @Override
     public void unnotify(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
         BluetoothLog.v(String.format("unnotify %s: service = %s, character = %s", mac, service, character));
 
