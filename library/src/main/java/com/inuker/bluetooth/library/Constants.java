@@ -27,6 +27,7 @@ public class Constants {
     public static final String EXTRA_GATT_PROFILE = "extra.gatt.profile";
     public static final String EXTRA_OPTIONS = "extra.options";
     public static final String EXTRA_TYPE = "extra.type";
+    public static final String EXTRA_MTU = "extra.mtu";
 
     /**
      * CallBluetoothApi response code
@@ -77,6 +78,7 @@ public class Constants {
     public static final int CODE_WRITE_DESCRIPTOR = 14;
     public static final int CODE_CLEAR_REQUEST = 20;
     public static final int CODE_REFRESH_CACHE = 21;
+    public static final int CODE_REQUEST_MTU = 22;
 
     public static final int STATUS_UNKNOWN = -1;
     public static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
@@ -109,4 +111,7 @@ public class Constants {
     public static final int BOND_NONE = BluetoothDevice.BOND_NONE;
     public static final int BOND_BONDING = BluetoothDevice.BOND_BONDING;
     public static final int BOND_BONDED = BluetoothDevice.BOND_BONDED;
+
+    public static final int GATT_DEF_BLE_MTU_SIZE = 23;
+    public static final int GATT_MAX_MTU_SIZE = 517;
 }

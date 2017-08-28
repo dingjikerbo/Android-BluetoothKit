@@ -41,5 +41,7 @@ public interface IBleConnectWorker {
 
     boolean readRemoteRssi();
 
+    boolean requestMtu(int mtu);
+
     BleGattProfile getGattProfile();
 }

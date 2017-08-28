@@ -3,6 +3,7 @@ package com.inuker.bluetooth.library;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleMtuResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
@@ -47,6 +48,8 @@ public interface IBluetoothClient {
     void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response);
 
     void readRssi(String mac, BleReadRssiResponse response);
+
+    void requestMtu(String mac, int mtu, BleMtuResponse response);
 
     void search(SearchRequest request, SearchResponse response);
 

@@ -244,6 +244,11 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
         return mWorker.readRemoteRssi();
     }
 
+    @Override
+    public boolean requestMtu(int mtu) {
+        return mWorker.requestMtu(mtu);
+    }
+
     protected void log(String msg) {
         BluetoothLog.v(String.format("%s %s >>> %s", getClass().getSimpleName(), getAddress(), msg));
     }

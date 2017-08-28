@@ -88,6 +88,10 @@ public class BleConnectManager {
         getBleConnectMaster(mac).indicate(service, character, response);
     }
 
+    public static void requestMtu(String mac, int mtu, BleGeneralResponse response) {
+        getBleConnectMaster(mac).requestMtu(mtu, response);
+    }
+
     public static void clearRequest(String mac, int type) {
         getBleConnectMaster(mac).clearRequest(type);
     }
