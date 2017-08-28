@@ -3,18 +3,22 @@ package com.inuker.bluetooth;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
+import com.inuker.bluetooth.library.connect.response.BleMtuResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleUnnotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
+
 import static com.inuker.bluetooth.library.Constants.*;
 
 import java.util.UUID;
@@ -37,6 +41,8 @@ public class CharacterActivity extends Activity implements View.OnClickListener 
 
     private Button mBtnNotify;
     private Button mBtnUnnotify;
+    private EditText mEtInputMtu;
+    private Button mBtnRequestMtu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,9 @@ public class CharacterActivity extends Activity implements View.OnClickListener 
         mBtnNotify = (Button) findViewById(R.id.notify);
         mBtnUnnotify = (Button) findViewById(R.id.unnotify);
 
+        mEtInputMtu = (EditText) findViewById(R.id.et_input_mtu);
+        mBtnRequestMtu = (Button) findViewById(R.id.btn_request_mtu);
+
         mBtnRead.setOnClickListener(this);
         mBtnWrite.setOnClickListener(this);
 
@@ -67,6 +76,8 @@ public class CharacterActivity extends Activity implements View.OnClickListener 
 
         mBtnUnnotify.setOnClickListener(this);
         mBtnUnnotify.setEnabled(false);
+
+        mBtnRequestMtu.setOnClickListener(this);
     }
 
     private final BleReadResponse mReadRsp = new BleReadResponse() {
@@ -126,6 +137,17 @@ public class CharacterActivity extends Activity implements View.OnClickListener 
         }
     };
 
+    private final BleMtuResponse mMtuResponse = new BleMtuResponse() {
+        @Override
+        public void onResponse(int code, Integer data) {
+            if (code == REQUEST_SUCCESS) {
+                CommonUtils.toast("request mtu success,mtu = " + data);
+            } else {
+                CommonUtils.toast("request mtu failed");
+            }
+        }
+    };
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -141,6 +163,19 @@ public class CharacterActivity extends Activity implements View.OnClickListener 
                 break;
             case R.id.unnotify:
                 ClientManager.getClient().unnotify(mMac, mService, mCharacter, mUnnotifyRsp);
+                break;
+            case R.id.btn_request_mtu:
+                String mtuStr = mEtInputMtu.getText().toString();
+                if (TextUtils.isEmpty(mtuStr)) {
+                    CommonUtils.toast("MTU不能为空");
+                    return;
+                }
+                int mtu = Integer.parseInt(mtuStr);
+                if (mtu < GATT_DEF_BLE_MTU_SIZE || mtu > GATT_MAX_MTU_SIZE) {
+                    CommonUtils.toast("MTU不不在范围内");
+                    return;
+                }
+                ClientManager.getClient().requestMtu(mMac, mtu, mMtuResponse);
                 break;
         }
     }
