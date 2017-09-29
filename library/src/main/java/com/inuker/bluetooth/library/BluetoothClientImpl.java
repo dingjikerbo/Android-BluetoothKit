@@ -15,6 +15,7 @@ import android.os.Message;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleMtuResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
@@ -67,6 +68,7 @@ import static com.inuker.bluetooth.library.Constants.EXTRA_CHARACTER_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_DESCRIPTOR_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_GATT_PROFILE;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
+import static com.inuker.bluetooth.library.Constants.EXTRA_MTU;
 import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
 import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
 import static com.inuker.bluetooth.library.Constants.EXTRA_RSSI;
@@ -78,6 +80,8 @@ import static com.inuker.bluetooth.library.Constants.SEARCH_CANCEL;
 import static com.inuker.bluetooth.library.Constants.SEARCH_START;
 import static com.inuker.bluetooth.library.Constants.SEARCH_STOP;
 import static com.inuker.bluetooth.library.Constants.SERVICE_UNREADY;
+import static com.inuker.bluetooth.library.Constants.CODE_REQUEST_MTU;
+import static com.inuker.bluetooth.library.Constants.GATT_DEF_BLE_MTU_SIZE;
 
 /**
  * Created by dingjikerbo on 16/4/8.
@@ -427,6 +431,22 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                 checkRuntime(true);
                 if (response != null) {
                     response.onResponse(code, data.getInt(EXTRA_RSSI, 0));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void requestMtu(String mac, int mtu, final BleMtuResponse response) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putInt(EXTRA_MTU, mtu);
+        safeCallBluetoothApi(CODE_REQUEST_MTU, args, new BluetoothResponse() {
+            @Override
+            protected void onAsyncResponse(int code, Bundle data) {
+                checkRuntime(true);
+                if (response != null) {
+                    response.onResponse(code, data.getInt(EXTRA_MTU, GATT_DEF_BLE_MTU_SIZE));
                 }
             }
         });

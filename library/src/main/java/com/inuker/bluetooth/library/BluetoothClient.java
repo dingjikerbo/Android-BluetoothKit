@@ -5,6 +5,7 @@ import android.content.Context;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
+import com.inuker.bluetooth.library.connect.response.BleMtuResponse;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadResponse;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
@@ -129,6 +130,14 @@ public class BluetoothClient implements IBluetoothClient {
 
         response = ProxyUtils.getUIProxy(response);
         mClient.readRssi(mac, response);
+    }
+
+    @Override
+    public void requestMtu(String mac, int mtu, BleMtuResponse response) {
+        BluetoothLog.v(String.format("requestMtu %s", mac));
+
+        response = ProxyUtils.getUIProxy(response);
+        mClient.requestMtu(mac, mtu, response);
     }
 
     @Override

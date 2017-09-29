@@ -10,6 +10,7 @@ import com.inuker.bluetooth.library.RuntimeChecker;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleIndicateRequest;
+import com.inuker.bluetooth.library.connect.request.BleMtuRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadDescriptorRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRequest;
@@ -157,6 +158,10 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
 
     public void readRemoteRssi(BleGeneralResponse response) {
         addNewRequest(new BleReadRssiRequest(response));
+    }
+
+    public void requestMtu(int mtu, BleGeneralResponse response) {
+        addNewRequest(new BleMtuRequest(mtu, response));
     }
 
     private void addNewRequest(BleRequest request) {

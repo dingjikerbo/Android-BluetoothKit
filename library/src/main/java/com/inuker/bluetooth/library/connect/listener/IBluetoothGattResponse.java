@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library.connect.listener;
 
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 
@@ -23,4 +24,6 @@ public interface IBluetoothGattResponse {
     void onDescriptorWrite(BluetoothGattDescriptor descriptor, int status);
 
     void onReadRemoteRssi(int rssi, int status);
+
+    void onMtuChanged(int mtu, int status);
 }

@@ -57,4 +57,9 @@ public class BluetoothGattResponse extends BluetoothGattCallback {
     public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
         response.onReadRemoteRssi(rssi, status);
     }
+
+    @Override
+    public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+        response.onMtuChanged(mtu, status);
+    }
 }

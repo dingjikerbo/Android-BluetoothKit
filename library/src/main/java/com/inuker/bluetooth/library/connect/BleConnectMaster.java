@@ -98,6 +98,11 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
+    public void requestMtu(int mtu, BleGeneralResponse response) {
+        getConnectDispatcher().requestMtu(mtu, response);
+    }
+
+    @Override
     public void clearRequest(int clearType) {
         getConnectDispatcher().clearRequest(clearType);
     }

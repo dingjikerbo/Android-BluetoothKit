@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <TextView
         android:id="@+id/title"
@@ -12,13 +12,32 @@
         android:background="#000000"
         android:gravity="center"
         android:textColor="#ffffff"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
     <Button
         android:id="@+id/read"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="read" />
+        android:text="read"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_request_mtu"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="request mtu"/>
+
+        <EditText
+            android:id="@+id/et_input_mtu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="MTU范围23~517"
+            android:inputType="number"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,24 +48,24 @@
             android:id="@+id/write"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="write" />
+            android:text="write"/>
 
         <EditText
             android:id="@+id/input"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <Button
         android:id="@+id/notify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="open notify" />
+        android:text="open notify"/>
 
     <Button
         android:id="@+id/unnotify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="close notify" />
+        android:text="close notify"/>
 
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.inuker.bluetooth.library.connect;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -10,6 +11,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -21,6 +23,7 @@ import com.inuker.bluetooth.library.connect.listener.IBluetoothGattResponse;
 import com.inuker.bluetooth.library.connect.listener.ReadCharacterListener;
 import com.inuker.bluetooth.library.connect.listener.ReadDescriptorListener;
 import com.inuker.bluetooth.library.connect.listener.ReadRssiListener;
+import com.inuker.bluetooth.library.connect.listener.RequestMtuListener;
 import com.inuker.bluetooth.library.connect.listener.ServiceDiscoverListener;
 import com.inuker.bluetooth.library.connect.listener.WriteCharacterListener;
 import com.inuker.bluetooth.library.connect.listener.WriteDescriptorListener;
@@ -262,6 +265,18 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
 
         if (mGattResponseListener != null && mGattResponseListener instanceof ReadRssiListener) {
             ((ReadRssiListener) mGattResponseListener).onReadRemoteRssi(rssi, status);
+        }
+    }
+
+    @Override
+    public void onMtuChanged(int mtu, int status) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("onMtuChanged for %s, mtu = %d, status = %d",
+                mBluetoothDevice.getAddress(), mtu, status));
+
+        if (mGattResponseListener != null && mGattResponseListener instanceof RequestMtuListener) {
+            ((RequestMtuListener) mGattResponseListener).onMtuChanged(mtu, status);
         }
     }
 
@@ -681,6 +696,25 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
             return false;
         }
 
+        return true;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public boolean requestMtu(int mtu) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("requestMtu for %s, mtu = %d", getAddress(), mtu));
+
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e(String.format("ble gatt null"));
+            return false;
+        }
+
+        if (!mBluetoothGatt.requestMtu(mtu)) {
+            BluetoothLog.e(String.format("requestMtu failed"));
+            return false;
+        }
         return true;
     }
 
