@@ -24,16 +24,16 @@ BluetoothKit---Android Bluetooth Framework
 
 # **更新日志**
 
-### **Version 1.3.9 - 2016/03/24**
+### **Version 1.3.9 - 2017/03/24**
 - 取消属性检查；连接返回descriptor
 
-### **Version 1.3.8 - 2016/02/15**
+### **Version 1.3.8 - 2017/02/15**
 - 新增refreshCache及优化广播
 
-### **Version 1.3.6 - 2016/01/13**
+### **Version 1.3.6 - 2017/01/13**
 - 修复关闭蓝牙时的ANR
 
-### **Version 1.3.5 - 2016/01/11**
+### **Version 1.3.5 - 2017/01/11**
 - 增加部分蓝牙接口
 
 ### **Version 1.3.4 - 2016/12/21**
