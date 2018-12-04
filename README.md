@@ -20,16 +20,8 @@ BluetoothKit---Android Bluetooth Framework
 
 七、支持拦截所有对蓝牙原生接口的调用
 
-------
 
-关于Android BLE开发以及本框架源码讲解，可参考以下视频课程 - [Android BLE蓝牙通信教程](https://study.163.com/course/introduction/1006381079.htm)
-
-有问题或建议可以给我邮件，到我的博客留言，或者加QQ群
- - Email: dingjikerbo@gmail.com
- - Blog: http://blog.csdn.net/dingjikerbo
- - QQ群: 112408886
- 
-------
+## 本框架源码讲解，可参考 ** [Android BLE蓝牙通信教程](https://study.163.com/course/introduction/1006381079.htm) **
 
 # **用法**
 
@@ -443,3 +435,12 @@ clearType表示要清除的请求类型，如果要清除多种请求，可以�
 ```
 mClient.refreshCache(MAC);
 ```
+
+---
+有问题或建议可以给我邮件，到我的博客留言，或者加QQ群
+
+ - Email: dingjikerbo@gmail.com
+
+ - Blog: http://blog.csdn.net/dingjikerbo
+
+ - QQ群: 112408886
