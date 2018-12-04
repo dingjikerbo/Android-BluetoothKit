@@ -21,7 +21,7 @@ BluetoothKit---Android Bluetooth Framework
 七、支持拦截所有对蓝牙原生接口的调用
 
 
-## 本框架源码讲解，可参考 ** [Android BLE蓝牙通信教程](https://study.163.com/course/introduction/1006381079.htm) **
+## 本框架源码讲解，可参考 **[Android BLE蓝牙通信教程](https://study.163.com/course/introduction/1006381079.htm)**
 
 # **用法**
 
