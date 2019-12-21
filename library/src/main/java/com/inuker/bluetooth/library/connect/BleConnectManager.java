@@ -92,6 +92,10 @@ public class BleConnectManager {
         getBleConnectMaster(mac).requestMtu(mtu, response);
     }
 
+    public static void requestConnectionPriority(String mac, int priority) {
+        getBleConnectMaster(mac).requestConnectionPriority(priority);
+    }
+
     public static void clearRequest(String mac, int type) {
         getBleConnectMaster(mac).clearRequest(type);
     }

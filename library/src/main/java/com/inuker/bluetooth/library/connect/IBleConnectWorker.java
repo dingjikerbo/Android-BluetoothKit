@@ -43,5 +43,7 @@ public interface IBleConnectWorker {
 
     boolean requestMtu(int mtu);
 
+    boolean requestConnectionPriority(int connectionPriority);
+
     BleGattProfile getGattProfile();
 }

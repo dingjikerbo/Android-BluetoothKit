@@ -34,6 +34,8 @@ public interface IBleConnectMaster {
 
     void requestMtu(int mtu, BleGeneralResponse response);
 
+    void requestConnectionPriority(int connectionPriority);
+
     void clearRequest(int clearType);
 
     void refreshCache();

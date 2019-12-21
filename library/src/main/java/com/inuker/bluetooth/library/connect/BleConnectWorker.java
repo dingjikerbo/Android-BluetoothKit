@@ -288,7 +288,7 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
     }
 
     private void broadcastCharacterChanged(UUID service, UUID character,
-    byte[] value) {
+                                           byte[] value) {
         Intent intent = new Intent(
                 Constants.ACTION_CHARACTER_CHANGED);
         intent.putExtra(Constants.EXTRA_MAC,
@@ -713,6 +713,30 @@ public class BleConnectWorker implements Handler.Callback, IBleConnectWorker, IB
 
         if (!mBluetoothGatt.requestMtu(mtu)) {
             BluetoothLog.e(String.format("requestMtu failed"));
+            return false;
+        }
+        return true;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public boolean requestConnectionPriority(int connectionPriority) {
+        checkRuntime();
+
+        BluetoothLog.v(String.format("requestConnectionPriority for %s, priority = %s", getAddress(), connectionPriority));
+
+        if (connectionPriority < Constants.PRIORITY_BALANCED ||
+                connectionPriority > Constants.PRIORITY_LOW_POWER) {
+            BluetoothLog.e(String.format("requestConnectionPriority- params: %s not within valid range", connectionPriority));
+            return false;
+        }
+        if (mBluetoothGatt == null) {
+            BluetoothLog.e("ble gatt null");
+            return false;
+        }
+
+        if (!mBluetoothGatt.requestConnectionPriority(connectionPriority)) {
+            BluetoothLog.e("requestConnectionPriority failed");
             return false;
         }
         return true;

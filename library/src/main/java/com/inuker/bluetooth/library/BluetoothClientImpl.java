@@ -56,6 +56,7 @@ import static com.inuker.bluetooth.library.Constants.CODE_READ;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
 import static com.inuker.bluetooth.library.Constants.CODE_REFRESH_CACHE;
+import static com.inuker.bluetooth.library.Constants.CODE_REQUEST_PRIORITY;
 import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
@@ -70,6 +71,7 @@ import static com.inuker.bluetooth.library.Constants.EXTRA_GATT_PROFILE;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MTU;
 import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
+import static com.inuker.bluetooth.library.Constants.EXTRA_PRIORITY;
 import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
 import static com.inuker.bluetooth.library.Constants.EXTRA_RSSI;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SEARCH_RESULT;
@@ -418,7 +420,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     @Override
     public void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
-       unnotify(mac, service, character, response);
+        unnotify(mac, service, character, response);
     }
 
     @Override
@@ -450,6 +452,14 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
                 }
             }
         });
+    }
+
+    @Override
+    public void requestConnectionPriority(String mac, int connectionPriority) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_MAC, mac);
+        args.putInt(EXTRA_PRIORITY, connectionPriority);
+        safeCallBluetoothApi(CODE_REQUEST_PRIORITY, args, null);
     }
 
     @Override

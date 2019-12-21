@@ -12,6 +12,7 @@ import com.inuker.bluetooth.library.connect.request.BleConnectRequest;
 import com.inuker.bluetooth.library.connect.request.BleIndicateRequest;
 import com.inuker.bluetooth.library.connect.request.BleMtuRequest;
 import com.inuker.bluetooth.library.connect.request.BleNotifyRequest;
+import com.inuker.bluetooth.library.connect.request.BlePriorityRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadDescriptorRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRequest;
 import com.inuker.bluetooth.library.connect.request.BleReadRssiRequest;
@@ -162,6 +163,10 @@ public class BleConnectDispatcher implements IBleConnectDispatcher, RuntimeCheck
 
     public void requestMtu(int mtu, BleGeneralResponse response) {
         addNewRequest(new BleMtuRequest(mtu, response));
+    }
+
+    public void requestConnectionPriority(int priority) {
+        addNewRequest(new BlePriorityRequest(priority, null));
     }
 
     private void addNewRequest(BleRequest request) {
