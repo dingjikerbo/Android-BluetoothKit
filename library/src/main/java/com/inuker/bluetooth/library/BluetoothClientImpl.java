@@ -377,6 +377,22 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
     }
 
     @Override
+    public void unnotify(String mac, UUID service, UUID character, BleNotifyResponse response) {
+        checkRuntime(true);
+        if (response == null) {
+            return;
+        }
+        HashMap<String, List<BleNotifyResponse>> listenerMap = mNotifyResponses.get(mac);
+        if (listenerMap != null) {
+            String key = generateCharacterKey(service, character);
+            List<BleNotifyResponse> reponseList = listenerMap.get(key);
+            if (reponseList != null) {
+                reponseList.remove(response);
+            }
+        }
+    }
+
+    @Override
     public void unnotify(final String mac, final UUID service, final UUID character, final BleUnnotifyResponse response) {
         Bundle args = new Bundle();
         args.putString(EXTRA_MAC, mac);
@@ -418,7 +434,7 @@ public class BluetoothClientImpl implements IBluetoothClient, ProxyInterceptor, 
 
     @Override
     public void unindicate(String mac, UUID service, UUID character, BleUnnotifyResponse response) {
-       unnotify(mac, service, character, response);
+        unnotify(mac, service, character, response);
     }
 
     @Override

@@ -41,6 +41,8 @@ public interface IBluetoothClient {
 
     void notify(String mac, UUID service, UUID character, BleNotifyResponse response);
 
+    void unnotify(String mac, UUID service, UUID character, BleNotifyResponse response);
+
     void unnotify(String mac, UUID service, UUID character, BleUnnotifyResponse response);
 
     void indicate(String mac, UUID service, UUID character, BleNotifyResponse response);
