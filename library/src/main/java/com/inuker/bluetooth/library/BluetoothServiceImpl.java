@@ -25,6 +25,7 @@ import static com.inuker.bluetooth.library.Constants.CODE_READ_DESCRIPTOR;
 import static com.inuker.bluetooth.library.Constants.CODE_READ_RSSI;
 import static com.inuker.bluetooth.library.Constants.CODE_REFRESH_CACHE;
 import static com.inuker.bluetooth.library.Constants.CODE_REQUEST_MTU;
+import static com.inuker.bluetooth.library.Constants.CODE_REQUEST_PRIORITY;
 import static com.inuker.bluetooth.library.Constants.CODE_SEARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_STOP_SESARCH;
 import static com.inuker.bluetooth.library.Constants.CODE_UNNOTIFY;
@@ -37,6 +38,7 @@ import static com.inuker.bluetooth.library.Constants.EXTRA_DESCRIPTOR_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MAC;
 import static com.inuker.bluetooth.library.Constants.EXTRA_MTU;
 import static com.inuker.bluetooth.library.Constants.EXTRA_OPTIONS;
+import static com.inuker.bluetooth.library.Constants.EXTRA_PRIORITY;
 import static com.inuker.bluetooth.library.Constants.EXTRA_REQUEST;
 import static com.inuker.bluetooth.library.Constants.EXTRA_SERVICE_UUID;
 import static com.inuker.bluetooth.library.Constants.EXTRA_TYPE;
@@ -166,6 +168,10 @@ public class BluetoothServiceImpl extends IBluetoothService.Stub implements Hand
 
             case CODE_REFRESH_CACHE:
                 BleConnectManager.refreshCache(mac);
+                break;
+            case CODE_REQUEST_PRIORITY:
+                int priority = args.getInt(EXTRA_PRIORITY);
+                BleConnectManager.requestConnectionPriority(mac, priority);
                 break;
         }
         return true;

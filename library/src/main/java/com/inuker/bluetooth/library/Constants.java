@@ -28,6 +28,7 @@ public class Constants {
     public static final String EXTRA_OPTIONS = "extra.options";
     public static final String EXTRA_TYPE = "extra.type";
     public static final String EXTRA_MTU = "extra.mtu";
+    public static final String EXTRA_PRIORITY = "extra.priority";
 
     /**
      * CallBluetoothApi response code
@@ -79,6 +80,7 @@ public class Constants {
     public static final int CODE_CLEAR_REQUEST = 20;
     public static final int CODE_REFRESH_CACHE = 21;
     public static final int CODE_REQUEST_MTU = 22;
+    public static final int CODE_REQUEST_PRIORITY = 23;
 
     public static final int STATUS_UNKNOWN = -1;
     public static final int STATUS_DEVICE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
@@ -94,12 +96,18 @@ public class Constants {
 
     public static String getStatusText(int status) {
         switch (status) {
-            case Constants.STATUS_DEVICE_CONNECTED: return "Connected";
-            case Constants.STATUS_DEVICE_CONNECTING: return "Connecting";
-            case Constants.STATUS_DEVICE_DISCONNECTING: return "Disconnecting";
-            case Constants.STATUS_DEVICE_DISCONNECTED: return "Disconnected";
-            case Constants.STATUS_DEVICE_SERVICE_READY: return "Service Ready";
-            default: return String.format("Unknown %d", status);
+            case Constants.STATUS_DEVICE_CONNECTED:
+                return "Connected";
+            case Constants.STATUS_DEVICE_CONNECTING:
+                return "Connecting";
+            case Constants.STATUS_DEVICE_DISCONNECTING:
+                return "Disconnecting";
+            case Constants.STATUS_DEVICE_DISCONNECTED:
+                return "Disconnected";
+            case Constants.STATUS_DEVICE_SERVICE_READY:
+                return "Service Ready";
+            default:
+                return String.format("Unknown %d", status);
         }
     }
 
@@ -114,4 +122,9 @@ public class Constants {
 
     public static final int GATT_DEF_BLE_MTU_SIZE = 23;
     public static final int GATT_MAX_MTU_SIZE = 517;
+
+    public static final int PRIORITY_BALANCED = 0;
+    public static final int PRIORITY_HIGH = 1;
+    public static final int PRIORITY_LOW_POWER = 2;
+
 }

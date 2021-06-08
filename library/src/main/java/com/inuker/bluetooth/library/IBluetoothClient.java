@@ -51,6 +51,8 @@ public interface IBluetoothClient {
 
     void requestMtu(String mac, int mtu, BleMtuResponse response);
 
+    void requestConnectionPriority(String mac, int connectionPriority);
+
     void search(SearchRequest request, SearchResponse response);
 
     void stopSearch();

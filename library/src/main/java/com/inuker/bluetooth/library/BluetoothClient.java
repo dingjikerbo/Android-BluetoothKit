@@ -141,6 +141,12 @@ public class BluetoothClient implements IBluetoothClient {
     }
 
     @Override
+    public void requestConnectionPriority(String mac, int connectionPriority) {
+        BluetoothLog.v(String.format("requestConnectionPriority %s", mac));
+        mClient.requestConnectionPriority(mac, connectionPriority);
+    }
+
+    @Override
     public void search(SearchRequest request, SearchResponse response) {
         BluetoothLog.v(String.format("search %s", request));
 

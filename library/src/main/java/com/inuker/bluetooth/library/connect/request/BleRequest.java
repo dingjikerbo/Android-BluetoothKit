@@ -249,6 +249,11 @@ public abstract class BleRequest implements IBleConnectWorker, IBleRequest, Hand
         return mWorker.requestMtu(mtu);
     }
 
+    @Override
+    public boolean requestConnectionPriority(int connectionPriority) {
+        return mWorker.requestConnectionPriority(connectionPriority);
+    }
+
     protected void log(String msg) {
         BluetoothLog.v(String.format("%s %s >>> %s", getClass().getSimpleName(), getAddress(), msg));
     }

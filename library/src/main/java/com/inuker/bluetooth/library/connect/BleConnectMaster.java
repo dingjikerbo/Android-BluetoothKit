@@ -103,6 +103,11 @@ public class BleConnectMaster implements IBleConnectMaster, ProxyInterceptor, Ca
     }
 
     @Override
+    public void requestConnectionPriority(int connectionPriority) {
+        getConnectDispatcher().requestConnectionPriority(connectionPriority);
+    }
+
+    @Override
     public void clearRequest(int clearType) {
         getConnectDispatcher().clearRequest(clearType);
     }
